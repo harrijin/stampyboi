@@ -1,2 +1,2 @@
 # video-clip-finder
-Search for video clips
+Search for specific video clips
