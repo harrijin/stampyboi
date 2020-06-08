@@ -1,0 +1,42 @@
+<html>
+
+  <head>
+
+  </head>
+
+  <body>
+    <label for="quote">Quote to search for:</label>
+    <input type="text" id="quote" name="quote"/> 
+
+    
+    <br>
+    <br>
+
+    <label for="source">Source to search in:</label>
+    <input type="text" id="source" name="source"/>
+
+    <br>
+    <br>
+
+    
+
+    <button onclick="sendSearch()">Submit</button>
+    <h1 id="results"></h1>
+  </body>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    function sendSearch(){
+      var q = document.getElementById("quote").value;
+      var s = document.getElementById("source").value;
+      $.ajax({
+        type: 'POST',
+        url: '/results?quote=' + q + '&source=' + s,
+        success: function(data){
+          document.getElementById('results').innerHTML = data;
+        }
+      })
+    }
+  </script>
+
+</html>
