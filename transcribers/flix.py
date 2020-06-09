@@ -13,6 +13,12 @@ EPISODES_CSS_SELECTOR = 'a'
 BUTTONS_CSS_SELECTOR = 'div.fl-button-wrap > a'
 PDF_BUTTON_INDEX = 0
 
+END_TIMESTAMP_REGEX = ' --> [\d:,]+\s'
+STAGE_DIRECTIONS_REGEX = '\[(.*?)\]'
+BLOCK_NUMBER_REGEX = '\s+\d+\s+(?=\d{2}:\d{2}:\d{2},\d{3})'
+
+TIMESTAMP_LEN = 12
+
 
 """
 FlixExtractor is the caption extractor for video sources where 
@@ -55,10 +61,27 @@ class FlixExtractor():
         pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
 
         # Extract text from PDF
-        self.raw_transcript = get_pdf_text(pdf_url)
+        transcript = get_pdf_text(pdf_url)
+
+        stage_dir_re = re.compile(STAGE_DIRECTIONS_REGEX)
+        transcript = stage_dir_re.sub(' ', transcript)
+
+        end_stamp_re = re.compile(END_TIMESTAMP_REGEX)
+        transcript = end_stamp_re.sub('', transcript)
+
+        transcript_list = re.split(BLOCK_NUMBER_REGEX, transcript)
+
+        # Remove intro text from generated timestamp-text pairs
+        transcript_list.pop(0)
+
+
+
+        self.transcript_list = transcript_list
+
+        # Remove 
     
-    def get_raw_transcript(self):
-        return self.raw_transcript
+    def get_transcript(self):
+        return self.transcript_list
 
     """
     Finds the element containing show data
