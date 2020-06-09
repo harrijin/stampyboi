@@ -1,3 +1,7 @@
+# Returns YouTube transcripts (including auto-generated) as a list of dictionaries, where each dictionary has 3 values
+# 'text': 'string'
+# 'start': time in seconds
+# 'duration': time in seconds
 from youtube_transcript_api import YouTubeTranscriptApi
 from urllib.parse import urlparse, parse_qs
 
