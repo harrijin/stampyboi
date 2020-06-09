@@ -1,13 +1,13 @@
 # stampyboi
-Search for specific video clips
+Search for timestamped video clips
 
 ## APIs/Frameworks/Libraries/etc
-###Interface:
+### Interface:
 
 -Flask
 
 -Ajax
 
-###YouTube:
+### YouTube:
 
 -[YouTube Transcript API](https://github.com/jdepoix/youtube-transcript-api)
