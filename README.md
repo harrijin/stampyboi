@@ -8,6 +8,6 @@ Search for timestamped video clips
 
 -Ajax
 
-### YouTube:
+### Transcribers:
 
 -[YouTube Transcript API](https://github.com/jdepoix/youtube-transcript-api)
