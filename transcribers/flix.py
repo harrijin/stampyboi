@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from utils import get_pdf_text
+from transcriber import Transcriber
 import requests
 import re
 
@@ -26,15 +27,17 @@ captions are available on 8flix.
 """
 
 
-class FlixExtractor():
-
-    
+class FlixExtractor(Transcriber):
 
     """
     title - String of title of Netflix show
+    season - integer indicating the season number
+    episode - integer indicating the episode number
     """
 
     def __init__(self, title, season, episode):
+
+        super().__init__()
 
         # Get list of shows and transcripts from 8flix
         r = requests.get(SHOW_TRANSCRIPTS_URL)
@@ -44,7 +47,7 @@ class FlixExtractor():
         shows = soup.select(SHOWS_CSS_SELECTOR)
         show = self.__find_show(title, shows)
         show_details = show.parent.find_next_sibling('ul')
-        
+
         # Find season
         szns = show_details.select(SEASONS_CSS_SELECTOR)
         szn = szns[season - 1]
@@ -97,4 +100,3 @@ class FlixExtractor():
         for show in shows:
             if re.search(title, show.text):
                 return show
-
