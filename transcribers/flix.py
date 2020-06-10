@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from utils import get_pdf_text, extract_words
-from transcriber import Transcriber
+from .utils import get_pdf_text, extract_words
+from .transcriber import Transcriber
 import requests
 import re
 
@@ -51,10 +51,14 @@ class FlixExtractor(Transcriber):
 
         # Find season
         szns = show_details.select(SEASONS_CSS_SELECTOR)
+        if (season <= 0 or season > len(szns)):
+            raise IndexError('Season out of range')
         szn = szns[season - 1]
         episodes = szn.select(EPISODES_CSS_SELECTOR)
 
         # Find episode
+        if (episode <= 0 or episode > len(episodes)):
+            raise IndexError('Episode out of range')
         epis = episodes[episode - 1]
 
         # Get episode link and fetch pdf
@@ -123,3 +127,5 @@ class FlixExtractor(Transcriber):
         for show in shows:
             if re.search(title, show.text):
                 return show
+        # If show not found
+        raise ValueError('Show not found')
