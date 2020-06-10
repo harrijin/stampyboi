@@ -11,3 +11,7 @@ Search for timestamped video clips
 ### Transcribers:
 
 -[YouTube Transcript API](https://github.com/jdepoix/youtube-transcript-api)
+
+### PDF Libraries:
+
+-[PyPDF2](http://pybrary.net/pyPdf/pythondoc-pyPdf.pdf.html)
