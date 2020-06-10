@@ -51,10 +51,14 @@ class FlixExtractor(Transcriber):
 
         # Find season
         szns = show_details.select(SEASONS_CSS_SELECTOR)
+        if (season <= 0 or season > len(szns)):
+            raise IndexError('Season out of range')
         szn = szns[season - 1]
         episodes = szn.select(EPISODES_CSS_SELECTOR)
 
         # Find episode
+        if (episode <= 0 or episode > len(episodes)):
+            raise IndexError('Episode out of range')
         epis = episodes[episode - 1]
 
         # Get episode link and fetch pdf
