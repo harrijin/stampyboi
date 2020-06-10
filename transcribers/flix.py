@@ -67,7 +67,6 @@ class FlixExtractor(Transcriber):
         pdf_soup = BeautifulSoup(e.content)
         buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
         self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
-
         
     
     def getTranscript(self):
@@ -94,7 +93,7 @@ class FlixExtractor(Transcriber):
             timestamp = component[:TIMESTAMP_LEN]
             time = self.__convert_to_seconds(timestamp)
 
-            phrase = component[-TIMESTAMP_LEN:]
+            phrase = component[TIMESTAMP_LEN:]
             words = extract_words(phrase)
             for word in words:
                 transcript.append((word, time))
