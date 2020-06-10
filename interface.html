@@ -24,19 +24,19 @@
     <br>
     <br>
 
-    <label for="flix_title">Name of Netflix show:</label>
+    <label for="flix_title" style="display: none;">Name of Netflix show:</label>
     <input type="text" id="flix_title" name="flix_title" style="display: none;"/>
 
     <br>
     <br>
 
-    <label for="flix_szn">Season #:</label>
+    <label for="flix_szn" style="display: none;">Season #:</label>
     <input type="text" id="flix_szn" name="flix_szn" style="display: none;"/>
 
     <br>
     <br>
 
-    <label for="flix_ep">Episode #:</label>
+    <label for="flix_ep" style="display: none;">Episode #:</label>
     <input type="text" id="flix_ep" name="flix_ep" style="display: none;"/>
 
     <br>
@@ -44,32 +44,45 @@
 
     <button onclick="sendSearch()">Submit Search</button>
 
-    <h3 id="results"></h3>
+    <p id="results"></p>
   </body>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
+    //for hiding the labels
+    var labels = document.getElementsByTagName('LABEL');
+    for (var i = 0; i < labels.length; i++) {
+        if (labels[i].htmlFor != '') {
+             var elem = document.getElementById(labels[i].htmlFor);
+             if (elem)
+                elem.label = labels[i];         
+        }
+    }
     var searchSrc="yt"
     //yt = youtube
     //flix = netflix
+    
     function ytSearch(){
       searchSrc="yt"
       document.getElementById("yt_source").style.display = "inline";
-
+      document.getElementById("yt_source").label.style.display = "inline";
       document.getElementById("flix_title").style.display = "none";
       document.getElementById("flix_szn").style.display = "none";
       document.getElementById("flix_ep").style.display = "none";
+      document.getElementById("flix_title").label.style.display = "none";
+      document.getElementById("flix_szn").label.style.display = "none";
+      document.getElementById("flix_ep").label.style.display = "none";
     }
     function flixSearch(){
       searchSrc="flix"
+      document.getElementById("yt_source").style.display = "none";
+      document.getElementById("yt_source").label.style.display = "none";
       document.getElementById("flix_title").style.display = "inline";
       document.getElementById("flix_szn").style.display = "inline";
       document.getElementById("flix_ep").style.display = "inline";
-
-
-      document.getElementById("yt_source").style.display = "none";
-
-
+      document.getElementById("flix_title").label.style.display = "inline";
+      document.getElementById("flix_szn").label.style.display = "inline";
+      document.getElementById("flix_ep").label.style.display = "inline";
     }
     /**
      * JavaScript function to match (and return) the video Id 

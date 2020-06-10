@@ -14,13 +14,13 @@ def return_results():
   if request.args['src'] == 'yt':
     source = request.args['source'] # source is now a youtube video ID
     transcriber = YouTube(source)
-    results = "Quote: " + quote + " YouTube Video ID: " + source + " Results: " + str(transcriber.getTranscript())
+    results = "Quote: " + quote + "<br>YouTube Video ID: " + source + "<br>Results: <br>" + str(transcriber.getTranscript())
   elif request.args['src'] == 'flix':
     title = request.args['title']
     szn = request.args['szn']
     ep = request.args['ep']
     transcriber = FlixExtractor(title, int(szn), int(ep))
-    results = str(transcriber.getTranscript())
+    results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
   else:
     results = "ERROR: Invalid searchSrc"
 
