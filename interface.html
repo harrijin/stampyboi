@@ -71,19 +71,30 @@
 
 
     }
+    /**
+     * JavaScript function to match (and return) the video Id 
+     * of any valid Youtube Url, given as input string.
+     * @author: Stephan Schmitz <eyecatchup@gmail.com>
+     * @url: https://stackoverflow.com/a/10315969/624466
+     */
+    function ytVidId(url) {
+      var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+      return (url.match(p)) ? RegExp.$1 : false;
+    }
     function sendSearch(){
     var q = document.getElementById("quote").value;
       switch(searchSrc){
         case "yt":
-          
-          var s = document.getElementById("yt_source").value;
-          $.ajax({
-            type: 'POST',
-            url: '/results?src='+ searchSrc + '&quote=' + q + '&source=' + s,
-            success: function(data){
-              document.getElementById('results').innerHTML = data;
-            }
-          })
+          var id = ytVidId(document.getElementById("yt_source").value);
+          if(id){
+            $.ajax({
+              type: 'POST',
+              url: '/results?src='+ searchSrc + '&quote=' + q + '&source=' + id,
+              success: function(data){
+                document.getElementById('results').innerHTML = data;
+              }
+            })
+          }else{document.getElementById('results').innerHTML = "ERROR: Invalid YouTube link";}
           break;
 
         case "flix":
@@ -99,7 +110,7 @@
           })
           break;
         default:
-          document.getElementById('results').innerHTML = "Error: Invalid source";
+          document.getElementById('results').innerHTML = "ERROR: Invalid source";
           break;
       }
     }
