@@ -29,18 +29,15 @@ class YouTube(Transcriber):
  #      return None
 
     def getTranscript(self):
-        
-        listTranscript = YouTubeTranscriptApi.get_transcript(self.source)
-        transcript = list()
-        for dic in listTranscript:
-            phrase = dic['text']
-            time = dic['start']
-            words = extract_words(phrase)
-            for word in words:
-                transcript.append((word, time))
+        try:    
+            listTranscript = YouTubeTranscriptApi.get_transcript(self.source)
+            transcript = list()
+            for dic in listTranscript:
+                phrase = dic['text']
+                time = dic['start']
+                words = extract_words(phrase)
+                for word in words:
+                    transcript.append((word, time))
+        except:
+            transcript = "ERROR:YouTube video is unable to be searched, either because the video/captions are unavailable or the video is age-restricted."
         return transcript        
-#testing purposes: CORRECT VIDEO ID
-#test = YouTube("2B1EAhgAvPs")
-#INCORRECT VIDEO ID
-#test = YouTube("2b1e")
-#print(test.getTranscript())
