@@ -64,6 +64,24 @@ class FlixExtractor(Transcriber):
         buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
         self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
 
+    def debug(self):
+        # Extract text from PDF
+        transcript = get_pdf_text(self.pdf_url)
+
+        # Strip stage directions
+        stage_dir_re = re.compile(STAGE_DIRECTIONS_REGEX)
+        transcript = stage_dir_re.sub(' ', transcript)
+
+        # Strip end timestamps
+        end_stamp_re = re.compile(END_TIMESTAMP_REGEX)
+        transcript = end_stamp_re.sub('', transcript)
+
+        transcript_list = re.split(BLOCK_NUMBER_REGEX, transcript)
+
+        # Remove intro text from generated timestamp-text pairs
+        transcript_list.pop(0)
+        print(transcript_list)
+
         
     
     def getTranscript(self):
@@ -90,7 +108,7 @@ class FlixExtractor(Transcriber):
             timestamp = component[:TIMESTAMP_LEN]
             time = self.__convert_to_seconds(timestamp)
 
-            phrase = component[-TIMESTAMP_LEN:]
+            phrase = component[TIMESTAMP_LEN:]
             words = extract_words(phrase)
             for word in words:
                 transcript.append((word, time))
