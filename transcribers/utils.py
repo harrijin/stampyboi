@@ -3,6 +3,8 @@ import requests
 import PyPDF2
 import re
 
+WORDS_REGEX = r"[A-Za-z0-9']+"
+
 """
 Extracts text from pdf file
 
@@ -27,3 +29,11 @@ def get_pdf_text(source):
     regex = re.compile(r'[\n\r\t]')
     
     return ''.join(regex.sub('', file_read.getPage(page_num).extractText()) for page_num in range(num_pages))
+
+'''
+Extracts words from a given phrase or text
+
+returns list of words
+'''
+def extract_words(phrase):
+    return re.compile(WORDS_REGEX).findall(phrase)
