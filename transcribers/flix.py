@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from utils import get_pdf_text, extract_words
-from transcriber import Transcriber
+from .utils import get_pdf_text, extract_words
+from .transcriber import Transcriber
 import requests
 import re
 

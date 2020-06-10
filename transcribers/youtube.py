@@ -4,8 +4,8 @@
 # 'duration': time in seconds
 from youtube_transcript_api import YouTubeTranscriptApi
 from urllib.parse import urlparse, parse_qs
-from transcriber import Transcriber
-from utils import extract_words
+from .transcriber import Transcriber
+from .utils import extract_words
 
 class YouTube(Transcriber):
     def __init__(self, source):

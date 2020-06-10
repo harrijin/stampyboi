@@ -1,4 +1,6 @@
 from flask import Flask, send_file, request
+from transcribers.youtube import YouTube
+from transcribers.flix import FlixExtractor
 
 app = Flask(__name__)
 
@@ -11,14 +13,14 @@ def return_results():
   quote = request.args['quote']
   if request.args['src'] == 'yt':
     source = request.args['source']
-    # Create an instance of YouTube here
-    results = "Quote: " + quote + " Source: " + source + " Results: " 
+    transcriber = YouTube(source)
+    results = str(transcriber.getTranscript())
   elif request.args['src'] == 'flix':
     title = request.args['title']
     szn = request.args['szn']
     ep = request.args['ep']
-    # Create an instance of FlixExtractor here
-    results = "Quote: " + quote + " Show: " + title + " Season: " + szn + " Episode: " + ep + " Results: "
+    transcriber = FlixExtractor(title, int(szn), int(ep))
+    results = str(transcriber.getTranscript())
   else:
     results = "Error: Invalid searchSrc"
 
