@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import get_pdf_text
+from utils import get_pdf_text, extract_words
 from transcriber import Transcriber
 import requests
 import re
@@ -17,6 +17,7 @@ PDF_BUTTON_INDEX = 0
 END_TIMESTAMP_REGEX = ' --> [\d:,]+\s'
 STAGE_DIRECTIONS_REGEX = '\[(.*?)\]'
 BLOCK_NUMBER_REGEX = '\s+\d+\s+(?=\d{2}:\d{2}:\d{2},\d{3})'
+TIMESTAMP_COMPONENTS_REGEX = '[:,]'
 
 TIMESTAMP_LEN = 12
 
@@ -61,14 +62,19 @@ class FlixExtractor(Transcriber):
         e = requests.get(episode_link)
         pdf_soup = BeautifulSoup(e.content)
         buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
-        pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
+        self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
 
+        
+    
+    def getTranscript(self):
         # Extract text from PDF
-        transcript = get_pdf_text(pdf_url)
+        transcript = get_pdf_text(self.pdf_url)
 
+        # Strip stage directions
         stage_dir_re = re.compile(STAGE_DIRECTIONS_REGEX)
         transcript = stage_dir_re.sub(' ', transcript)
 
+        # Strip end timestamps
         end_stamp_re = re.compile(END_TIMESTAMP_REGEX)
         transcript = end_stamp_re.sub('', transcript)
 
@@ -77,14 +83,31 @@ class FlixExtractor(Transcriber):
         # Remove intro text from generated timestamp-text pairs
         transcript_list.pop(0)
 
+        transcript = list()
 
+        for component in transcript_list:
 
-        self.transcript_list = transcript_list
+            timestamp = component[:TIMESTAMP_LEN]
+            time = self.__convert_to_seconds(timestamp)
 
-        # Remove 
+            phrase = component[-TIMESTAMP_LEN:]
+            words = extract_words(phrase)
+            for word in words:
+                transcript.append((word, time))
+        
+        return transcript
     
-    def get_transcript(self):
-        return self.transcript_list
+    @staticmethod
+    def __convert_to_seconds(timestamp):
+        components = re.split(TIMESTAMP_COMPONENTS_REGEX, timestamp)
+        hour_seconds = int(components[0]) * 60 * 60
+        minute_seconds = int(components[1]) * 60
+        seconds = int(components[2])
+        ms = int(components[3]) * 0.001
+
+        return hour_seconds + minute_seconds + seconds + ms
+
+
 
     """
     Finds the element containing show data
