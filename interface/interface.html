@@ -5,6 +5,12 @@
   </head>
 
   <body>
+    <button onclick="ytSearch()">Search YouTube video</button>
+    <button onclick="flixSearch()">Search Netflix show</button>
+
+    <br>
+    <br>
+
     <label for="quote">Quote to search for:</label>
     <input type="text" id="quote" name="quote"/> 
 
@@ -12,30 +18,90 @@
     <br>
     <br>
 
-    <label for="source">Source to search in:</label>
-    <input type="text" id="source" name="source"/>
+    <label for="yt_source">YouTube video to search in:</label>
+    <input type="text" id="yt_source" name="yt_source" style="display: inline;"/>
 
     <br>
     <br>
 
-    
+    <label for="flix_title">Name of Netflix show:</label>
+    <input type="text" id="flix_title" name="flix_title" style="display: none;"/>
 
-    <button onclick="sendSearch()">Submit</button>
-    <h1 id="results"></h1>
+    <br>
+    <br>
+
+    <label for="flix_szn">Season #:</label>
+    <input type="text" id="flix_szn" name="flix_szn" style="display: none;"/>
+
+    <br>
+    <br>
+
+    <label for="flix_ep">Episode #:</label>
+    <input type="text" id="flix_ep" name="flix_ep" style="display: none;"/>
+
+    <br>
+    <br>
+
+    <button onclick="sendSearch()">Submit Search</button>
+
+    <h3 id="results"></h3>
   </body>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
+    var searchSrc="yt"
+    //yt = youtube
+    //flix = netflix
+    function ytSearch(){
+      searchSrc="yt"
+      document.getElementById("yt_source").style.display = "inline";
+
+      document.getElementById("flix_title").style.display = "none";
+      document.getElementById("flix_szn").style.display = "none";
+      document.getElementById("flix_ep").style.display = "none";
+    }
+    function flixSearch(){
+      searchSrc="flix"
+      document.getElementById("flix_title").style.display = "inline";
+      document.getElementById("flix_szn").style.display = "inline";
+      document.getElementById("flix_ep").style.display = "inline";
+
+
+      document.getElementById("yt_source").style.display = "none";
+
+
+    }
     function sendSearch(){
-      var q = document.getElementById("quote").value;
-      var s = document.getElementById("source").value;
-      $.ajax({
-        type: 'POST',
-        url: '/results?quote=' + q + '&source=' + s,
-        success: function(data){
-          document.getElementById('results').innerHTML = data;
-        }
-      })
+    var q = document.getElementById("quote").value;
+      switch(searchSrc){
+        case "yt":
+          
+          var s = document.getElementById("yt_source").value;
+          $.ajax({
+            type: 'POST',
+            url: '/results?src='+ searchSrc + '&quote=' + q + '&source=' + s,
+            success: function(data){
+              document.getElementById('results').innerHTML = data;
+            }
+          })
+          break;
+
+        case "flix":
+          var title = document.getElementById("flix_title").value;
+          var szn = document.getElementById("flix_szn").value;
+          var ep = document.getElementById("flix_ep").value;
+          $.ajax({
+            type: 'POST',
+            url: '/results?src='+ searchSrc + '&quote=' + q + '&title=' + title + '&szn=' + szn + '&ep=' + ep,
+            success: function(data){
+              document.getElementById('results').innerHTML = data;
+            }
+          })
+          break;
+        default:
+          document.getElementById('results').innerHTML = "Error: Invalid source";
+          break;
+      }
     }
   </script>
 
