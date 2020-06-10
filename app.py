@@ -19,8 +19,11 @@ def return_results():
     title = request.args['title']
     szn = request.args['szn']
     ep = request.args['ep']
-    transcriber = FlixExtractor(title, int(szn), int(ep))
-    results = str(transcriber.getTranscript())
+    try:
+      transcriber = FlixExtractor(title, int(szn), int(ep))
+      results = str(transcriber.getTranscript())
+    except(ValueError):
+      results = "ERROR: Netflix Show not found"
   else:
     results = "ERROR: Invalid searchSrc"
 

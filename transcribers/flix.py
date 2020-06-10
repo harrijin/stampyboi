@@ -123,3 +123,5 @@ class FlixExtractor(Transcriber):
         for show in shows:
             if re.search(title, show.text):
                 return show
+        # If show not found
+        raise ValueError('Show not found')
