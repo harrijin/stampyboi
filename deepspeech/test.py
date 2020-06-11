@@ -7,7 +7,7 @@ import subprocess
 import json
 
 try:
-    from shhlex import quote
+    from shlex import quote
 except ImportError:
     from pipes import quote
 
@@ -29,7 +29,7 @@ def speech2Text(audio_file):
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
     model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
     desired_sample_rate = model.sampleRate()
-    print('Source: '+desired_sample_rate)
+    print('Model: '+str(desired_sample_rate))
 
     fin = wave.open(audio_file, 'rb')
     fs_orig = fin.getframerate()
@@ -39,7 +39,7 @@ def speech2Text(audio_file):
     else:
         audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
 
-    print('Model: '+fs_orig)
+    print('Source: '+str(fs_orig))
 
     fin.close()
 
