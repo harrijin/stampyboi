@@ -2,3 +2,4 @@
 */env
 *.pbmm
 *.scorer
+deepspeech/uploadedFiles/*.wav
