@@ -23,7 +23,21 @@ def convert_samplerate(audio_path, desired_sample_rate):
     return desired_sample_rate, np.frombuffer(output, np.int16)
 
 def metadata_to_string(metadata):
-    return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
+    result = []
+    word = ''
+    stamp = None
+    for token in metadata.tokens:
+        if token.text == ' ' and stamp is not None:
+            result.append((word, stamp))
+            word = ''
+        else:
+            if word == '':
+                stamp = token.start_time
+            word += str(token.text)
+
+    return json.dumps(result)
+
+    #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
 def speech2Text(audio_file):
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
