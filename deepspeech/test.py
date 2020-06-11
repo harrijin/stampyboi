@@ -5,6 +5,7 @@ import sys
 import shlex
 import subprocess
 import json
+import moviepy
 
 try:
     from shhlex import quote
@@ -46,3 +47,9 @@ def speech2Text(audio_file):
     print(metadata_to_string(model.sttWithMetadata(audio, 1).transcripts[0]))
 
 speech2Text('gettysburg.wav')
+
+def video2Audio(video_file):
+    '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
+    videoClip = VideoFileClip(video_file)
+    return videoClip.audio.to_soundarray(fps=16000, nbytes=2)
+
