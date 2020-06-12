@@ -26,7 +26,7 @@ def convert_samplerate(audio_path, desired_sample_rate):
 
     return np.frombuffer(output, np.int16)
 
-def metadata_to_string(metadata):
+def metadata_to_list(metadata):
     result = []
     word = ''
     stamp = None
@@ -39,7 +39,7 @@ def metadata_to_string(metadata):
                 stamp = token.start_time
             word += str(token.text)
 
-    return json.dumps(result)
+    return result
 
     #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
@@ -78,11 +78,15 @@ def speech2Text(audio_file):
     print()
     print(metadata_to_text(transcript))
     print()
-    print(metadata_to_string(transcript))
+
+    result = metadata_to_list(transcript)
+    result_json = json.dumps(result)
+    print(json.dumps(result, sort_keys=True, indent=4))
+    return result, result_json
 
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
-    videoClip = VideoFileClip(video_file).set_duration(30)
+    videoClip = VideoFileClip(video_file)
     audio = videoClip.audio
     if audio.nchannels == 2:
         sound_list = []
