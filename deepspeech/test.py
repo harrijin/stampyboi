@@ -5,6 +5,7 @@ import sys
 import shlex
 import subprocess
 import json
+import moviepy
 
 try:
     from shlex import quote
@@ -39,6 +40,11 @@ def metadata_to_string(metadata):
 
     #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
+def video2Audio(video_file):
+    '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
+    videoClip = VideoFileClip(video_file)
+    return videoClip.audio.to_soundarray(fps=16000, nbytes=2)
+
 def speech2Text(audio_file):
     print('Source File: ' + audio_file)
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
@@ -60,4 +66,10 @@ def speech2Text(audio_file):
 
     print(metadata_to_string(model.sttWithMetadata(audio, 1).transcripts[0]))
 
+def video2Text(video_file):
+    model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
+    model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
+    print(metadata_to_string(model.sttWithMetadata(video2Audio(video_file), 1).transcripts[0]))
+
 speech2Text(sys.argv[1])
+video2Text('Deadzoned Talking DotA.mp4')
