@@ -82,7 +82,7 @@ def speech2Text(audio_file):
 
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
-    videoClip = VideoFileClip(video_file).set_duration(30)
+    videoClip = VideoFileClip(video_file)
     audio = videoClip.audio
     if audio.nchannels == 2:
         sound_list = []
