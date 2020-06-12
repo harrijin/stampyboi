@@ -8,7 +8,7 @@ import json
 import moviepy
 
 try:
-    from shhlex import quote
+    from shlex import quote
 except ImportError:
     from pipes import quote
 
@@ -24,7 +24,21 @@ def convert_samplerate(audio_path, desired_sample_rate):
     return desired_sample_rate, np.frombuffer(output, np.int16)
 
 def metadata_to_string(metadata):
-    return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
+    result = []
+    word = ''
+    stamp = None
+    for token in metadata.tokens:
+        if token.text == ' ' and stamp is not None:
+            result.append((word, stamp))
+            word = ''
+        else:
+            if word == '':
+                stamp = token.start_time
+            word += str(token.text)
+
+    return json.dumps(result)
+
+    #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
@@ -32,10 +46,11 @@ def video2Audio(video_file):
     return videoClip.audio.to_soundarray(fps=16000, nbytes=2)
 
 def speech2Text(audio_file):
+    print('Source File: ' + audio_file)
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
     model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
     desired_sample_rate = model.sampleRate()
-    print('Source: '+desired_sample_rate)
+    print('Model: '+str(desired_sample_rate))
 
     fin = wave.open(audio_file, 'rb')
     fs_orig = fin.getframerate()
@@ -45,7 +60,7 @@ def speech2Text(audio_file):
     else:
         audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
 
-    print('Model: '+fs_orig)
+    print('Source: '+str(fs_orig))
 
     fin.close()
 
@@ -56,6 +71,5 @@ def video2Text(video_file):
     model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
     print(metadata_to_string(model.sttWithMetadata(video2Audio(video_file), 1).transcripts[0]))
 
-speech2Text('gettysburg.wav')
+speech2Text(sys.argv[1])
 video2Text('Deadzoned Talking DotA.mp4')
-
