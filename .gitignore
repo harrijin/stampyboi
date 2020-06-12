@@ -2,3 +2,5 @@
 */env
 *.pbmm
 *.scorer
+*.mp4
+deepspeech/uploadedFiles/*.wav
