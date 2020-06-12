@@ -6,6 +6,9 @@ import shlex
 import subprocess
 import json
 import moviepy
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from os.path import splitext
+from timeit import default_timer as timer
 
 try:
     from shlex import quote
@@ -21,7 +24,7 @@ def convert_samplerate(audio_path, desired_sample_rate):
     except OSError as e:
         raise OSError(e.errno, 'SoX not found, use {}hz files or install it: {}'.format(desired_sample_rate, e.strerror))
 
-    return desired_sample_rate, np.frombuffer(output, np.int16)
+    return np.frombuffer(output, np.int16)
 
 def metadata_to_string(metadata):
     result = []
@@ -40,36 +43,55 @@ def metadata_to_string(metadata):
 
     #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
-def video2Audio(video_file):
-    '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
-    videoClip = VideoFileClip(video_file)
-    return videoClip.audio.to_soundarray(fps=16000, nbytes=2)
+def metadata_to_text(metadata):
+    return ''.join(token.text for token in metadata.tokens)
 
 def speech2Text(audio_file):
     print('Source File: ' + audio_file)
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
     model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
-    desired_sample_rate = model.sampleRate()
-    print('Model: '+str(desired_sample_rate))
+    rate_model = model.sampleRate()
+    print('Model SR: {}Hz'.format(rate_model))
 
-    fin = wave.open(audio_file, 'rb')
-    fs_orig = fin.getframerate()
-    if fs_orig != desired_sample_rate:
-        #print('Warning: original sample rate ({}) is different than {}hz. Resampling might produce erratic speech recognition.'.format(fs_orig, desired_sample_rate), file=sys.stderr)
-        fs_new, audio = convert_samplerate(audio_file, desired_sample_rate)
+    extension = splitext(audio_file)[1]
+    if extension in ['.ogv', '.mp4', '.mpeg', '.avi', '.mov']:
+        print('Extracting audio from video format '+extension)
+        audio, audio_length = video2Audio(audio_file)
     else:
-        audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
+        wav = wave.open(audio_file, 'rb')
+        rate_orig = wav.getframerate()
+        if rate_orig != rate_model:
+            audio = convert_samplerate(audio_file, rate_model)
+        else:
+            audio = np.frombuffer(wav.readframes(wav.getnframes()), np.int16)
+        wav.close()
+        audio_length = wav.getnframes() * (1/rate_orig)
 
-    print('Source: '+str(fs_orig))
+        print('Source SR: {}Hz'.format(rate_orig))
 
-    fin.close()
+    timeElapsed = timer()
+    transcript = model.sttWithMetadata(audio, 1).transcripts[0]
+    timeElapsed = timer() - timeElapsed
 
-    print(metadata_to_string(model.sttWithMetadata(audio, 1).transcripts[0]))
+    print('Audio length: %.3f' % (audio_length))
+    print('Time elapsed: %.3f' % (timeElapsed))
+    print()
+    print(metadata_to_text(transcript))
+    print()
+    print(metadata_to_string(transcript))
 
-def video2Text(video_file):
-    model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
-    model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
-    print(metadata_to_string(model.sttWithMetadata(video2Audio(video_file), 1).transcripts[0]))
+def video2Audio(video_file):
+    '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
+    videoClip = VideoFileClip(video_file).set_duration(30)
+    audio = videoClip.audio
+    if audio.nchannels == 2:
+        sound_list = []
+        temp = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+        for i in range(len(temp)):
+            sound_list.append((temp[i][0] + temp[i][1])/2)
+        sound_array = np.array(sound_list, dtype=np.int16)
+    else:
+        sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+    return sound_array, audio.duration
 
 speech2Text(sys.argv[1])
-video2Text('Deadzoned Talking DotA.mp4')
