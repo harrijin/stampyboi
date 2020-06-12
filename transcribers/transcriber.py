@@ -22,7 +22,7 @@ class Transcriber(ABC):
         pass
 #       Call separatePhrases() here if necessary
 
-    def convertToJSON():
-        with open("transcript.json", "w") as outfile:
-            json.dumps(getTranscript(), outfile)
+    def convertToJSON(self, filepath):
+        with open(filepath, "w") as outfile:
+            json.dump(self.getTranscript(), outfile)
 

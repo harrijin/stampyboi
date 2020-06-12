@@ -35,6 +35,7 @@ def return_results():
         if ytVidId(source):
             transcriber = YouTube(ytVidId(source))
             results = "Quote: " + quote + "<br>YouTube Video ID: " + ytVidId(source) + "<br>Results: <br>" + str(transcriber.getTranscript())
+            transcriber.convertToJSON("jsonTranscripts/transcript.json")
         else:
             results = "ERROR: Invalid YouTube link"
     # =============Netflix==============
@@ -45,6 +46,7 @@ def return_results():
         try:
             transcriber = FlixExtractor(title, int(szn), int(ep))
             results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
+            transcriber.convertToJSON("jsonTranscripts/transcript.json")
         except(ValueError):
             results = "ERROR: Netflix show " + title + " not found"
         except(IndexError):
