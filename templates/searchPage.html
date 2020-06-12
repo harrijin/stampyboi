@@ -1,0 +1,104 @@
+<html>
+
+  <head>
+    StampyBoi
+  </head>
+
+  <body>
+    <br>
+    <button onclick="ytSearch()">Search YouTube video</button>
+    <button onclick="flixSearch()">Search Netflix show</button>
+    <button onclick="fileSearch()">Search a video/audio file</button>
+
+    <br>
+    <br>
+    <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
+      <label for="quote">Quote to search for:</label>
+      <input type="text" id="quote" name="quote"/> 
+      <p>in this video/audio file:</p>
+      <br>
+
+      <label for="yt_source">YouTube video to search in:</label>
+      <input type="text" id="yt_source" name="yt_source"/>
+
+      <br>
+      <br>
+
+      <label for="flix_title">Name of Netflix show:</label>
+      <input type="text" id="flix_title" name="flix_title" disabled=true/>
+
+      <br>
+      <br>
+
+      <label for="flix_szn">Season #:</label>
+      <input type="text" id="flix_szn" name="flix_szn" disabled=true/>
+
+      <br>
+      <br>
+
+      <label for="flix_ep">Episode #:</label>
+      <input type="text" id="flix_ep" name="flix_ep" disabled=true/>
+
+      <input type="text" id="search_src" name="search_src" style="display: none;" />
+      <br> 
+      <br>
+      <input type="file" id="vid_upload" name="vid_upload" disabled=true/>
+      <br>
+      <br>
+      <input type="submit" value="Search"/>
+
+
+    </form>
+  </body>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    //for hiding the labels
+    // var labels = document.getElementsByTagName('LABEL');
+    // for (var i = 0; i < labels.length; i++) {
+    //     if (labels[i].htmlFor != '') {
+    //          var elem = document.getElementById(labels[i].htmlFor);
+    //          if (elem)
+    //             elem.label = labels[i];         
+    //     }
+    // }
+    var searchSrc="yt"
+    document.getElementById('search_src').value=searchSrc;
+    //yt = youtube (default)
+    //flix = netflix
+    //file = file
+    function toggleFile(state){ 
+      document.getElementById("vid_upload").disabled = !state;
+    }
+    function toggleYt(state){
+      document.getElementById("yt_source").disabled = !state;
+    }
+    function toggleFlix(state){
+      document.getElementById("flix_title").disabled = !state;
+      document.getElementById("flix_szn").disabled = !state;
+      document.getElementById("flix_ep").disabled = !state;
+    }
+    function ytSearch(){
+      searchSrc="yt"
+      document.getElementById('search_src').value=searchSrc;
+      toggleYt(true);
+      toggleFlix(false);
+      toggleFile(false);
+    }
+    function flixSearch(){
+      searchSrc="flix"
+      document.getElementById('search_src').value=searchSrc;
+      toggleYt(false);
+      toggleFlix(true);
+      toggleFile(false);
+    }
+    function fileSearch(){
+      searchSrc="file"
+      document.getElementById('search_src').value=searchSrc;
+      toggleYt(false);
+      toggleFlix(false);
+      toggleFile(true);
+    }
+  </script>
+
+</html>
