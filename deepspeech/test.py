@@ -5,6 +5,8 @@ import sys
 import shlex
 import subprocess
 import json
+from moviepy.video.io.VideoFileClip import VideoFileClip
+import moviepy
 
 try:
     from shlex import quote
@@ -39,6 +41,9 @@ def metadata_to_string(metadata):
 
     #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
+def metadata_to_text(metadata):
+    return ''.join(token.text for token in metadata.tokens)
+
 def speech2Text(audio_file):
     print('Source File: ' + audio_file)
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
@@ -49,7 +54,7 @@ def speech2Text(audio_file):
     fin = wave.open(audio_file, 'rb')
     fs_orig = fin.getframerate()
     if fs_orig != desired_sample_rate:
-        #print('Warning: original sample rate ({}) is different than {}hz. Resampling might produce erratic speech recognition.'.format(fs_orig, desired_sample_rate), file=sys.stderr)
+        print('Warning: original sample rate ({}) is different than {}hz. Resampling might produce erratic speech recognition.'.format(fs_orig, desired_sample_rate), file=sys.stderr)
         fs_new, audio = convert_samplerate(audio_file, desired_sample_rate)
     else:
         audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
@@ -57,7 +62,30 @@ def speech2Text(audio_file):
     print('Source: '+str(fs_orig))
 
     fin.close()
+    print(audio)
 
     print(metadata_to_string(model.sttWithMetadata(audio, 1).transcripts[0]))
 
+def video2Audio(video_file):
+    '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
+    videoClip = VideoFileClip(video_file)
+    audio = videoClip.audio
+    if audio.nchannels == 2:
+        sound_list = []
+        temp = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+        for i in range(len(temp)):
+            sound_list.append((temp[i][0] + temp[i][1])/2)
+        sound_array = np.array(sound_list, dtype=np.int16)
+    else:
+        sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+    print(sound_array)
+    return sound_array
+
+def video2Text(video_file):
+    model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
+    model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
+    audio_array = video2Audio(video_file)
+    print(metadata_to_string(model.sttWithMetadata(audio_array, 1).transcripts[0]))
+
 speech2Text(sys.argv[1])
+video2Text('Deadzoned Talking DotA.mp4')
