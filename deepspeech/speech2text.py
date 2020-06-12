@@ -38,6 +38,8 @@ def metadata_to_list(metadata):
             if word == '':
                 stamp = token.start_time
             word += str(token.text)
+    if word != '':
+        result.append((word, stamp))
 
     return result
 
