@@ -14,35 +14,35 @@
     <br>
     <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
       <label for="quote">Quote to search for:</label>
-      <input type="text" id="quote" name="quote"/> 
+      <input type="text" id="quote" name="quote" autofocus/> 
       <p>in this video/audio file:</p>
       <br>
 
       <label for="yt_source">YouTube video to search in:</label>
-      <input type="text" id="yt_source" name="yt_source"/>
+      <input type="text" id="yt_source" name="yt_source" required/>
 
       <br>
       <br>
 
       <label for="flix_title">Name of Netflix show:</label>
-      <input type="text" id="flix_title" name="flix_title" disabled=true/>
+      <input type="text" id="flix_title" name="flix_title" disabled=true required/>
 
       <br>
       <br>
 
       <label for="flix_szn">Season #:</label>
-      <input type="text" id="flix_szn" name="flix_szn" disabled=true/>
+      <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 required/> 
 
       <br>
       <br>
 
       <label for="flix_ep">Episode #:</label>
-      <input type="text" id="flix_ep" name="flix_ep" disabled=true/>
+      <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 required/>
 
       <input type="text" id="search_src" name="search_src" style="display: none;" />
       <br> 
       <br>
-      <input type="file" id="vid_upload" name="vid_upload" disabled=true/>
+      <input type="file" id="vid_upload" name="vid_upload" disabled=true required/>
       <br>
       <br>
       <input type="submit" value="Search"/>
@@ -51,7 +51,6 @@
     </form>
   </body>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
     //for hiding the labels
     // var labels = document.getElementsByTagName('LABEL');
