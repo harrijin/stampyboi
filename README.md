@@ -19,3 +19,4 @@ Search for timestamped video clips
 ### Speech To Text:
 
 -[DeepSpeech](https://deepspeech.readthedocs.io/en/v0.7.3/?badge=latest)
+-[MoviePy](https://zulko.github.io/moviepy/ref/ref.html)
