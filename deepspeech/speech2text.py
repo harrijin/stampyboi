@@ -100,4 +100,5 @@ def video2Audio(video_file):
         sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
     return sound_array, audio.duration
 
-speech2Text(sys.argv[1])
+if __name__ == '__main__':
+    speech2Text(sys.argv[1])
