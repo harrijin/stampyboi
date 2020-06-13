@@ -6,7 +6,7 @@ import shlex
 import subprocess
 import json
 import moviepy
-from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 from os.path import splitext
 from timeit import default_timer as timer
 
@@ -42,8 +42,6 @@ def metadata_to_list(metadata):
         result.append((word, stamp))
 
     return result
-
-    #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
 
 def metadata_to_text(metadata):
     return ''.join(token.text for token in metadata.tokens)
@@ -88,16 +86,14 @@ def speech2Text(audio_file):
 
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
-    videoClip = VideoFileClip(video_file)
-    audio = videoClip.audio
+    audio = AudioFileClip(video_file, nbytes=2, fps=16000)
+    sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+
     if audio.nchannels == 2:
-        sound_list = []
-        temp = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
-        for i in range(len(temp)):
-            sound_list.append((temp[i][0] + temp[i][1])/2)
-        sound_array = np.array(sound_list, dtype=np.int16)
-    else:
-        sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+        sound_array = sound_array.sum(axis=1) / 2
+        sound_array = sound_array.astype(np.int16)
+        print(sound_array)
+
     return sound_array, audio.duration
 
 if __name__ == '__main__':
