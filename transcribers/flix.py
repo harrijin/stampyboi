@@ -3,6 +3,7 @@ from .utils import get_pdf_text, extract_words
 from .transcriber import Transcriber
 import requests
 import re
+import json
 
 BASE_URL = 'https://8flix.com'
 SHOW_TRANSCRIPTS_URL = 'https://8flix.com/transcripts/shows/'
@@ -100,6 +101,10 @@ class FlixExtractor(Transcriber):
         
         return transcript
     
+    def convertToJSON(self, filepath):
+        with open(filepath, "w") as outfile:
+            json.dump(self.getTranscript(), outfile)
+        
     @staticmethod
     def __convert_to_seconds(timestamp):
         components = re.split(TIMESTAMP_COMPONENTS_REGEX, timestamp)

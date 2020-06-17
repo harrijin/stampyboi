@@ -3,7 +3,8 @@ from flask import Flask, send_file, request, flash, redirect, url_for, render_te
 from werkzeug.utils import secure_filename
 from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
-
+from urllib.request import urlopen
+import json
 
 UPLOAD_FOLDER = './deepspeech/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
@@ -28,9 +29,12 @@ def render_index():
 @app.route('/results', methods=['POST'])
 def return_results():
     quote = request.form['quote']
-    
+    if request.form['search_src'] == 'none':
+        connection = urlopen('http://localhost:8983/solr/youtubeTest/select?q=script:"which+I+do+the+good+news"&hl=on&hl.fl=script&hl.method=unified')
+        response = json.load(connection)
+        results = response['highlighting']['0q2X3yVwGMk']['script']
     # =============YouTube=============
-    if request.form['search_src'] == 'yt':
+    elif request.form['search_src'] == 'yt':
         source = request.form['yt_source']
         if ytVidId(source):
             transcriber = YouTube(ytVidId(source))
