@@ -9,6 +9,7 @@
     <button onclick="ytSearch()">Search YouTube video</button>
     <button onclick="flixSearch()">Search Netflix show</button>
     <button onclick="fileSearch()">Search a video/audio file</button>
+    <button onclick="noneSearch()">Search with only a quote</button>
 
     <br>
     <br>
@@ -98,6 +99,13 @@
       toggleYt(false);
       toggleFlix(false);
       toggleFile(true);
+    }
+    function noneSearch(){
+      searchSrc="none"
+      document.getElementById('search_src').value=searchSrc;
+      toggleYt(false);
+      toggleFlix(false);
+      toggleFile(false);
     }
   </script>
 

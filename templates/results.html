@@ -3,6 +3,23 @@
     Results
   </head>  
   <body>  
-    <p>Results: {{result}}</p>  
+    <p id="results">Results: {{result}}</p>  
+    <p id="testing"></p>
   </body>  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    var timeRegex =/(\d+\.\d*)/g;
+    var idRegex = /([0-9A-z-_]{11})/g;
+    var times = document.getElementById('results').innerHTML.match(timeRegex);
+    document.getElementById('testing').innerHTML=times;
+    times = parseFloat(times);
+
+    var vidID = document.getElementById('results').innerHTML.match(idRegex);
+    roundedTime = Math.floor(times);
+    var htmlString="<iframe title='YouTube video player' type=\"text/html\" width='640' height='390' src='http://www.youtube.com/embed/" + vidID + "?start="+roundedTime+"' frameborder='0' allowFullScreen></iframe>";
+
+    document.write(htmlString);
+
+  </script>
 </html>  
+

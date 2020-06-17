@@ -8,6 +8,7 @@ import json
 
 UPLOAD_FOLDER = './deepspeech/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
+SOLR_COLLECTION = 'youtubeTest'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -29,10 +30,31 @@ def render_index():
 @app.route('/results', methods=['POST'])
 def return_results():
     quote = request.form['quote']
+    # ===============Database Search===============
     if request.form['search_src'] == 'none':
-        connection = urlopen('http://localhost:8983/solr/youtubeTest/select?q=script:"which+I+do+the+good+news"&hl=on&hl.fl=script&hl.method=unified')
+        #connection = urlopen('http://localhost:8983/solr/youtubeTest/select?q=script:"which+I+do+the+good+news"&hl=on&hl.fl=script&hl.method=unified')
+        quote = '\"'+quote.replace(" ", "+")+'\"'
+        connection = urlopen('http://localhost:8983/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified')
         response = json.load(connection)
-        results = response['highlighting']['0q2X3yVwGMk']['script']
+        resultIDs = []
+        resultTypes = []
+        resultTimes = []
+        resultScripts = []
+        results = ""
+        for document in response['response']['docs']:
+            resultIDs.append(document['id'])
+            resultTypes.append(document['type'][0])
+            resultTimes.append(document['times'])
+            hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
+            resultScripts.append(hilitedScript)
+
+            timestampIndices=stringToTimestamps(hilitedScript)
+            resultTimestamps=[]
+            for index in timestampIndices:
+                resultTimestamps.append(resultTimes[-1][index])
+            results = results + str(resultTimestamps) + "|" + str(resultIDs[-1])+ "===="
+
+            #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
     # =============YouTube=============
     elif request.form['search_src'] == 'yt':
         source = request.form['yt_source']
@@ -79,4 +101,17 @@ def return_results():
 
     return render_template("results.html", result=results)
 
-
+def stringToTimestamps(script):
+    tagLength = 4
+    result = []
+    indexOfTag = 0
+    prevIndex = 0
+    while indexOfTag != -1:
+        try:
+            indexOfTag = script.index('<em>', prevIndex)
+        except Exception as e:
+            indexOfTag = -1
+        if indexOfTag != -1:
+            result.append(len(script[0:indexOfTag].split()))
+            prevIndex = indexOfTag + tagLength
+    return result
