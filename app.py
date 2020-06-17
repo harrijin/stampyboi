@@ -80,3 +80,15 @@ def return_results():
     return render_template("results.html", result=results)
 
 
+def stringToTimestamps(script):
+	tagLength = 4
+	result = []
+	indexOfTag = 0
+	prevIndex = 0
+	while indexOfTag != -1:
+		indexOfTag = script.index("<em>", prevIndex)
+		if indexOfTag != -1:
+			result.append(len(script[0:indexOfTag].split()))
+			prevIndex = indexOfTag + tagLength
+	return result
+		
