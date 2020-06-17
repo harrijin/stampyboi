@@ -115,3 +115,4 @@ def stringToTimestamps(script):
             result.append(len(script[0:indexOfTag].split()))
             prevIndex = indexOfTag + tagLength
     return result
+
