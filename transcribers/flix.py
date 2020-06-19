@@ -51,20 +51,20 @@ class FlixExtractor(Transcriber):
 
         # Find show from title
         shows = soup.select(SHOWS_CSS_SELECTOR)
-        self.show = self.__find_show(title, shows)
+        show = self.__find_show(title, shows)
         show_details = show.parent.find_next_sibling('ul')
 
         # Find season
         szns = show_details.select(SEASONS_CSS_SELECTOR)
         if (season <= 0 or season > len(szns)):
             raise IndexError('Season out of range')
-        self.szn = szns[season - 1]
+        szn = szns[season - 1]
         episodes = szn.select(EPISODES_CSS_SELECTOR)
 
         # Find episode
         if (episode <= 0 or episode > len(episodes)):
             raise IndexError('Episode out of range')
-        self.epis = episodes[episode - 1]
+        epis = episodes[episode - 1]
 
         # Get episode link and fetch pdf
         episode_link = epis['href']
