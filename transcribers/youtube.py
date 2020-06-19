@@ -41,10 +41,7 @@ class YouTube(Transcriber):
                 phrase = dic['text']
                 time = dic['start']
                 words = extract_words(phrase)
-				newPhrase = list()
-                for word in words:
-                    newPhrase.append(word)
-				transcript.append((SPACE_REPLACEMENT_CHAR.join(newPhrase), time))
+				transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
         except:
             transcript = ERROR_MESSAGE
         return transcript        

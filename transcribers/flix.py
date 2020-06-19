@@ -22,6 +22,8 @@ TIMESTAMP_COMPONENTS_REGEX = '[:,]'
 
 TIMESTAMP_LEN = 12
 
+SPACE_REPLACEMENT_CHAR = '-'
+
 
 """
 FlixExtractor is the caption extractor for video sources where 
@@ -96,12 +98,26 @@ class FlixExtractor(Transcriber):
 
             phrase = component[TIMESTAMP_LEN:]
             words = extract_words(phrase)
-            for word in words:
-                transcript.append((word, time))
+            transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
         
         return transcript
     
     def convertToJSON(self, filepath):
+      transcript=self.getTranscript()
+      text=""
+      times=[]
+      i=0
+	  #this following line is the only weird one for me. not sure if those variables are local or not
+	  identification = self.show + self.szn + self.epis
+      for timestamp in transcript:
+          text+=(timestamp[0]+" ")
+          times.append(timestamp[1])
+      jsonObject={
+          "id":identification,
+          "type":"flix",
+          "script":text,
+          "times":times
+      }
         with open(filepath, "w") as outfile:
             json.dump(self.getTranscript(), outfile)
         
