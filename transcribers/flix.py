@@ -42,7 +42,9 @@ class FlixExtractor(Transcriber):
     def __init__(self, title, season, episode):
 
         super().__init__()
-
+        self.show=title
+        self.szn=season
+        self.epis=episode
         # Get list of shows and transcripts from 8flix
         r = requests.get(SHOW_TRANSCRIPTS_URL)
         soup = BeautifulSoup(r.content)
@@ -103,23 +105,23 @@ class FlixExtractor(Transcriber):
         return transcript
     
     def convertToJSON(self, filepath):
-      transcript=self.getTranscript()
-      text=""
-      times=[]
-      i=0
-	  #this following line is the only weird one for me. not sure if those variables are local or not
-	  identification = self.show + self.szn + self.epis
-      for timestamp in transcript:
-          text+=(timestamp[0]+" ")
-          times.append(timestamp[1])
-      jsonObject={
-          "id":identification,
-          "type":"flix",
-          "script":text,
-          "times":times
-      }
+        transcript=self.getTranscript()
+        text=""
+        times=[]
+        i=0
+        #this following line is the only weird one for me. not sure if those variables are local or not
+        identification = "!^" + self.show + "^!" + str(self.szn) + "_"+str(self.epis)
+        for timestamp in transcript:
+            text+=(timestamp[0]+" ")
+            times.append(timestamp[1])
+        jsonObject={
+            "id":identification,
+            "type":"flix",
+            "script":text,
+            "times":times
+        }
         with open(filepath, "w") as outfile:
-            json.dump(self.getTranscript(), outfile)
+            json.dump(jsonObject, outfile)
         
     @staticmethod
     def __convert_to_seconds(timestamp):
