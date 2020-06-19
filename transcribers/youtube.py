@@ -9,6 +9,10 @@ from .utils import extract_words
 import json
 
 class YouTube(Transcriber):
+
+	ERROR_MESSAGE = "ERROR:YouTube video is unable to be searched, either because the video/captions are unavailable or the video is age-restricted."
+	SPACE_REPLACEMENT_CHAR = '-'
+
     def __init__(self, source):
         super().__init__()
         self.source = source
@@ -37,10 +41,12 @@ class YouTube(Transcriber):
                 phrase = dic['text']
                 time = dic['start']
                 words = extract_words(phrase)
+				newPhrase = list()
                 for word in words:
-                    transcript.append((word, time))
+                    newPhrase.append(word)
+				transcript.append((SPACE_REPLACEMENT_CHAR.join(newPhrase), time))
         except:
-            transcript = "ERROR:YouTube video is unable to be searched, either because the video/captions are unavailable or the video is age-restricted."
+            transcript = ERROR_MESSAGE
         return transcript        
 
     def convertToJSON(self, filepath):
