@@ -51,20 +51,20 @@ class FlixExtractor(Transcriber):
 
         # Find show from title
         shows = soup.select(SHOWS_CSS_SELECTOR)
-        show = self.__find_show(title, shows)
+        self.show = self.__find_show(title, shows)
         show_details = show.parent.find_next_sibling('ul')
 
         # Find season
         szns = show_details.select(SEASONS_CSS_SELECTOR)
         if (season <= 0 or season > len(szns)):
             raise IndexError('Season out of range')
-        szn = szns[season - 1]
+        self.szn = szns[season - 1]
         episodes = szn.select(EPISODES_CSS_SELECTOR)
 
         # Find episode
         if (episode <= 0 or episode > len(episodes)):
             raise IndexError('Episode out of range')
-        epis = episodes[episode - 1]
+        self.epis = episodes[episode - 1]
 
         # Get episode link and fetch pdf
         episode_link = epis['href']
@@ -108,7 +108,6 @@ class FlixExtractor(Transcriber):
         transcript=self.getTranscript()
         text=""
         times=[]
-        i=0
         #this following line is the only weird one for me. not sure if those variables are local or not
         identification = "!^" + self.show + "^!" + str(self.szn) + "_"+str(self.epis)
         for timestamp in transcript:
@@ -120,6 +119,7 @@ class FlixExtractor(Transcriber):
             "script":text,
             "times":times
         }
+
         with open(filepath, "w") as outfile:
             json.dump(jsonObject, outfile)
         

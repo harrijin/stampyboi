@@ -52,7 +52,6 @@ class YouTube(Transcriber):
       transcript=self.getTranscript()
       text=""
       times=[]
-      i=0
       for timestamp in transcript:
           text+=(timestamp[0]+" ")
           times.append(timestamp[1])
