@@ -17,4 +17,4 @@ class YoutubeSpider(scrapy.Spider):
         if id:
             match = re.search("\"([0-9A-z-_]{11})\"\\);", id)
             if match:
-                return match.group(1)
+                yield {"realid" : match.group(1)}
