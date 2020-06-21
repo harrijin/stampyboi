@@ -5,7 +5,7 @@ class YoutubeSpider(scrapy.Spider):
     name = "youtube"
     start_urls = []
 
-    input = open("hiddenIDs.txt")
+    input = open("ids.txt")
     template = "http://data.yt8m.org/2/j/i/{}/{}.js"
 
     for line in input:
@@ -18,4 +18,3 @@ class YoutubeSpider(scrapy.Spider):
             match = re.search("\"([0-9A-z-_]{11})\"\\);", id)
             if match:
                 return match.group(1)
-            

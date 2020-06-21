@@ -1,4 +1,7 @@
-#Put all the tfrecord files in the same directory
+# Put all the tfrecord files in the same directory
+
+# $ curl data.yt8m.org/download.py | partition=2/video/train mirror=us python
+# $ python extractor.py > ../ids.txt
 
 import tensorflow as tf
 import numpy as np
