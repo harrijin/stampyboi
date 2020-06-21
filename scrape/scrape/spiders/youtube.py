@@ -1,14 +1,23 @@
 import scrapy
+import re
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 
 class YoutubeSpider(CrawlSpider):
     name = "youtube"
+    start_urls = []
 
-    def start_requests(self):
-        id = getattr(self, 'id', 'MvkN3003iU4')
-        url = 'https://www.youtube.com/s/player/0c5285fd/player_ias.vflset/en_US/base.js'
-        return scrapy.Request(url=url, callback=self.parse, headers={'Referer': 'https://www.youtube.com/watch?v=' + id})
+    input = open("hiddenIDs.txt")
+    template = "http://data.yt8m.org/2/j/i/{}/{}.js"
 
-    def parse(self, response):  
-        pass
+    for line in input:
+        url = template.format(line[0:2], line)
+        start_urls.append(url)
+
+    def parse(self, response):
+        id = response.xpath("/html/body/p/text()").get()
+        if id:
+            match = re.search("\"([0-9A-z-_]{11})\"\\);", id)
+            if match:
+                return match.group(1)
+            
