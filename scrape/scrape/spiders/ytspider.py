@@ -1,3 +1,8 @@
+'''
+This spider reads from ids.txt and converts it to the real video ids. The pipeline processes what to do with the ids.
+
+'''
+
 import scrapy
 import re
 
