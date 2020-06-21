@@ -1,9 +1,7 @@
 import scrapy
 import re
-from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
 
-class YoutubeSpider(CrawlSpider):
+class YoutubeSpider(scrapy.Spider):
     name = "youtube"
     start_urls = []
 
