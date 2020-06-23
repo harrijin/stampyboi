@@ -1,19 +1,22 @@
 import numpy as np
 import deepspeech
-import wave
-import sys
-import shlex
-import subprocess
-import json
+import sys, subprocess, json
+import wave, shlex
 import moviepy
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from os.path import splitext
 from timeit import default_timer as timer
+from .transcriber import Transcriber
 
 try:
     from shlex import quote
 except ImportError:
     from pipes import quote
+
+class File(Transcriber):
+    def __init__(self, source):
+        super().__init__()
+        self.source = source
 
 def convert_samplerate(audio_path, desired_sample_rate):
     sox_cmd = 'sox {} --type raw --bits 16 --channels 1 --rate {} --encoding signed-integer --endian little --compression 0.0 --no-dither - '.format(quote(audio_path), desired_sample_rate)
@@ -46,22 +49,22 @@ def metadata_to_list(metadata):
 def metadata_to_text(metadata):
     return ''.join(token.text for token in metadata.tokens)
 
-def speech2Text(audio_file):
-    print('Source File: ' + audio_file)
+def getTranscript(self):
+    print('Source File: ' + source)
     model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
     model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
     rate_model = model.sampleRate()
     print('Model SR: {}Hz'.format(rate_model))
 
-    extension = splitext(audio_file)[1]
+    extension = splitext(source)[1]
     if extension in ['.ogv', '.mp4', '.mpeg', '.avi', '.mov']:
         print('Extracting audio from video format '+extension)
-        audio, audio_length = video2Audio(audio_file)
+        audio, audio_length = video2Audio(source)
     else:
-        wav = wave.open(audio_file, 'rb')
+        wav = wave.open(source, 'rb')
         rate_orig = wav.getframerate()
         if rate_orig != rate_model:
-            audio = convert_samplerate(audio_file, rate_model)
+            audio = convert_samplerate(source, rate_model)
         else:
             audio = np.frombuffer(wav.readframes(wav.getnframes()), np.int16)
         wav.close()
@@ -81,7 +84,7 @@ def speech2Text(audio_file):
 
     result = metadata_to_list(transcript)
     result_json = json.dumps(result)
-    print(json.dumps(result, sort_keys=True, indent=4))
+    #print(json.dumps(result, sort_keys=True, indent=4))
     return result, result_json
 
 def video2Audio(video_file):
@@ -95,6 +98,3 @@ def video2Audio(video_file):
         print(sound_array)
 
     return sound_array, audio.duration
-
-if __name__ == '__main__':
-    speech2Text(sys.argv[1])
