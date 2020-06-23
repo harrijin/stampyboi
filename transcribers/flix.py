@@ -109,7 +109,7 @@ class FlixExtractor(Transcriber):
         text=""
         times=[]
         #this following line is the only weird one for me. not sure if those variables are local or not
-        identification = "!^" + self.show + "^!" + str(self.szn) + "_"+str(self.epis)
+        identification = self.show + "^!" + str(self.szn) + "_"+str(self.epis)
         for timestamp in transcript:
             text+=(timestamp[0]+" ")
             times.append(timestamp[1])
