@@ -117,9 +117,9 @@ class FlixExtractor(Transcriber):
             "id":identification,
             "type":"flix",
             "script":text,
-            "times":times
+            "times":times,
+            "title":self.show
         }
-
         with open(filepath, "w") as outfile:
             json.dump(jsonObject, outfile)
         

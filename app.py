@@ -10,11 +10,13 @@ from pathlib import Path
 UPLOAD_FOLDER = './deepspeech/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
 SOLR_COLLECTION = 'stampyboi'
-SOLR_HOST_DIR = 'home'
+SOLR_HOST_DIR = '/Documents'
+
+# Getting ip address of solr host from ~/Documents/solrhost.txt
 
 WORKING_DIRECTORY = os.getcwd()
 home = str(Path.home())
-os.chdir(home + '/Documents')
+os.chdir(home + SOLR_HOST_DIR)
 file = open("solrhost.txt", "r")
 SOLR_HOST = str(file.read())
 os.chdir(WORKING_DIRECTORY)
@@ -23,7 +25,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def ytVidId(url):
-    ytRegEx = re.compile('(?:\/|%3D|v=|vi=)([0-9A-z-_]{11})(?:[%#?&]|$)')
+    ytRegEx = re.compile('(?:/|%3D|v=|vi=)([0-9A-z-_]{11})(?:[%#?&]|$)')
     valid = ytRegEx.search(url)
     if valid:
         return valid.group(1)
@@ -34,17 +36,16 @@ def allowed_file(filename):
 
 def search_solr(quote, source='none', title=''):
     quote = '\"'+quote.replace(" ", "+")+'\"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote
-    connectionURL_suffix = '&hl=on&hl.fl=script&hl.method=unified'
+    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified'
     # ===============Database Search===============
     if source == 'yt':
-        connection = urlopen(connectionURL + '&fq=type:yt' + connectionURL_suffix)
+        connectionURL = connectionURL + '&fq=type:yt'
     elif source == 'flix':
         if len(title) > 0:
-            connection = urlopen(connectionURL + '&fq=type:flix' + connectionURL_suffix) # figure out how to add title as part of mandatory query filter
-        connection = urlopen(connectionURL + '&fq=type:flix' + connectionURL_suffix)
-    else:
-        connection = urlopen(connectionURL + connectionURL_suffix)
+            connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix' 
+        else:
+            connectionURL = connectionURL + '&fq=type:flix'
+    connection = urlopen(connectionURL)
     response = json.load(connection)
     resultIDs = []
     resultTypes = []
@@ -53,19 +54,19 @@ def search_solr(quote, source='none', title=''):
     results = ""
     for document in response['response']['docs']:
         resultIDs.append(document['id'])
-        resultTypes.append(document['type'][0])
+        resultTypes.append(document['type'])
         resultTimes.append(document['times'])
         hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
         resultScripts.append(hilitedScript)
-
         timestampIndices=stringToTimestamps(hilitedScript)
         resultTimestamps=[]
         for index in timestampIndices:
             resultTimestamps.append(resultTimes[-1][index])    
-        #results = results + str(resultTimestamps) + "|" + str(resultIDs[-1])+ "===="
         #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
-    results = str(response)
+    #results = str(response) # use this to see all the info that solr returns
+    results = str(resultIDs) + str(resultTypes) + str(resultTimes) + str(resultScripts)
     return results
+
 @app.route('/', methods=['GET'])
 def render_index():
     return render_template('searchPage.html')
@@ -93,17 +94,23 @@ def return_results():
         title = request.form['flix_title']
         szn = request.form['flix_szn']
         ep = request.form['flix_ep']
-        if len(title) > 0 and szn > 0:    
-            try:
-                transcriber = FlixExtractor(title, int(szn), int(ep))
-                results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
-                transcriber.convertToJSON("jsonTranscripts/transcript.json")
-            except(ValueError):
-                results = "ERROR: Netflix show " + title + " not found"
-            except(IndexError):
-                results = "ERROR:" + title +" season " + szn + " episode " + ep + " not found"
-        else:
+        try:
+            szn = int(szn)
+            ep = int(ep)  
+            if len(title) > 0 and int(szn) > 0 and int(ep) > 0:
+                try:
+                    transcriber = FlixExtractor(title, int(szn), int(ep))
+                    results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
+                    transcriber.convertToJSON("jsonTranscripts/transcript.json")
+                except(ValueError):
+                    results = "ERROR: Netflix show " + title + " not found"
+                except(IndexError):
+                    results = "ERROR:" + title +" season " + szn + " episode " + ep + " not found"
+            else:
+                results = search_solr(quote,'flix', title)
+        except:
             results = search_solr(quote,'flix', title)
+
     # ============File Upload===========
     elif request.form['search_src'] == 'file':
         # check if the post request has the file part
