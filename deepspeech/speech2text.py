@@ -6,7 +6,7 @@ import shlex
 import subprocess
 import json
 import moviepy
-from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 from os.path import splitext
 from timeit import default_timer as timer
 
@@ -26,7 +26,7 @@ def convert_samplerate(audio_path, desired_sample_rate):
 
     return np.frombuffer(output, np.int16)
 
-def metadata_to_string(metadata):
+def metadata_to_list(metadata):
     result = []
     word = ''
     stamp = None
@@ -38,10 +38,10 @@ def metadata_to_string(metadata):
             if word == '':
                 stamp = token.start_time
             word += str(token.text)
+    if word != '':
+        result.append((word, stamp))
 
-    return json.dumps(result)
-
-    #return ''.join(token.text+str(token.start_time)+'\n' for token in metadata.tokens)
+    return result
 
 def metadata_to_text(metadata):
     return ''.join(token.text for token in metadata.tokens)
@@ -78,20 +78,23 @@ def speech2Text(audio_file):
     print()
     print(metadata_to_text(transcript))
     print()
-    print(metadata_to_string(transcript))
+
+    result = metadata_to_list(transcript)
+    result_json = json.dumps(result)
+    print(json.dumps(result, sort_keys=True, indent=4))
+    return result, result_json
 
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
-    videoClip = VideoFileClip(video_file).set_duration(30)
-    audio = videoClip.audio
+    audio = AudioFileClip(video_file, nbytes=2, fps=16000)
+    sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+
     if audio.nchannels == 2:
-        sound_list = []
-        temp = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
-        for i in range(len(temp)):
-            sound_list.append((temp[i][0] + temp[i][1])/2)
-        sound_array = np.array(sound_list, dtype=np.int16)
-    else:
-        sound_array = audio.to_soundarray(fps=16000, quantize=True, nbytes=2)
+        sound_array = sound_array.sum(axis=1) / 2
+        sound_array = sound_array.astype(np.int16)
+        print(sound_array)
+
     return sound_array, audio.duration
 
-speech2Text(sys.argv[1])
+if __name__ == '__main__':
+    speech2Text(sys.argv[1])
