@@ -3,9 +3,10 @@ from flask import Flask, send_file, request, flash, redirect, url_for, render_te
 from werkzeug.utils import secure_filename
 from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
+from .transcribers.file import FileExtractor
 
 
-UPLOAD_FOLDER = './deepspeech/uploadedFiles'
+UPLOAD_FOLDER = './transcribers/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
@@ -65,8 +66,12 @@ def return_results():
             return render_template("results.html", result=results)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            results = 'successful file upload' # Change this to the search parameters concatenated to the timestamped transcript, like in the other two
+            audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(os.path.join(audioPath))
+            while not os.path.exists(audioPath):
+                pass
+            transcriber = FileExtractor(audioPath)
+            results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
         else:
             results = 'ERROR: incorrect file format'
 

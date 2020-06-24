@@ -13,21 +13,21 @@ try:
 except ImportError:
     from pipes import quote
 
-class File(Transcriber):
+class FileExtractor(Transcriber):
     def __init__(self, source):
         super().__init__()
         self.source = source
+        # print('Source File: ' + self.source)
+        self.model = deepspeech.Model('deepspeech-0.7.4-models.pbmm')
+        self.model.enableExternalScorer('deepspeech-0.7.4-models.scorer')
 
     def getTranscript(self):
-        #print('Source File: ' + self.source)
-        model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
-        model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
-        rate_model = model.sampleRate()
-        #print('Model SR: {}Hz'.format(rate_model))
+        rate_model = self.model.sampleRate()
+        # print('Model SR: {}Hz'.format(rate_model))
 
         extension = splitext(self.source)[1]
         if extension in ['.ogv', '.mp4', '.mpeg', '.avi', '.mov']:
-            #print('Extracting audio from video format '+extension)
+            # print('Extracting audio from video format ' + extension)
             audio, audio_length = video2Audio(self.source)
         else:
             wav = wave.open(self.source, 'rb')
@@ -42,7 +42,7 @@ class File(Transcriber):
             # print('Source SR: {}Hz'.format(rate_orig))
 
         # timeElapsed = timer()
-        transcript = model.sttWithMetadata(audio, 1).transcripts[0]
+        transcript = self.model.sttWithMetadata(audio, 1).transcripts[0]
         # timeElapsed = timer() - timeElapsed
 
         # print('Audio length: %.3f' % (audio_length))
@@ -94,6 +94,6 @@ def metadata_to_list(metadata):
     return result
 
 # DEBUG STUFF
-# trans = File('uploadedFiles/gettysburg.wav')
+# trans = FileExtractor('uploadedFiles/gettysburg.wav')
 # result = trans.getTranscript()
 # print(json.dumps(result, sort_keys=True, indent=4))
