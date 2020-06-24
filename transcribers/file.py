@@ -19,15 +19,15 @@ class File(Transcriber):
         self.source = source
 
     def getTranscript(self):
-        print('Source File: ' + self.source)
+        #print('Source File: ' + self.source)
         model = deepspeech.Model('deepspeech-0.7.3-models.pbmm')
         model.enableExternalScorer('deepspeech-0.7.3-models.scorer')
         rate_model = model.sampleRate()
-        print('Model SR: {}Hz'.format(rate_model))
+        #print('Model SR: {}Hz'.format(rate_model))
 
         extension = splitext(self.source)[1]
         if extension in ['.ogv', '.mp4', '.mpeg', '.avi', '.mov']:
-            print('Extracting audio from video format '+extension)
+            #print('Extracting audio from video format '+extension)
             audio, audio_length = video2Audio(self.source)
         else:
             wav = wave.open(self.source, 'rb')
