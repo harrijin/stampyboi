@@ -1,6 +1,7 @@
 import os, re
 from flask import Flask, send_file, request, flash, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
+import deepspeech
 from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
 from .transcribers.file import FileExtractor
@@ -8,6 +9,8 @@ from .transcribers.file import FileExtractor
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
+MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
+MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -67,11 +70,13 @@ def return_results():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(os.path.join(audioPath))
-            while not os.path.exists(audioPath):
-                pass
-            transcriber = FileExtractor(audioPath)
+            file.save(audioPath)
+            # while not os.path.exists(audioPath):
+            #     pass
+            transcriber = FileExtractor(audioPath, MODEL)
             results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
+            os.remove(audioPath)
+
         else:
             results = 'ERROR: incorrect file format'
 

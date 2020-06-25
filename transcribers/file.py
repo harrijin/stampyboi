@@ -14,12 +14,11 @@ except ImportError:
     from pipes import quote
 
 class FileExtractor(Transcriber):
-    def __init__(self, source):
+    def __init__(self, source, model):
         super().__init__()
         self.source = source
         # print('Source File: ' + self.source)
-        self.model = deepspeech.Model('deepspeech-0.7.4-models.pbmm')
-        self.model.enableExternalScorer('deepspeech-0.7.4-models.scorer')
+        self.model = model
 
     def getTranscript(self):
         rate_model = self.model.sampleRate()
