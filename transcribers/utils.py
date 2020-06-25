@@ -3,7 +3,7 @@ import requests
 import PyPDF2
 import re
 
-WORDS_REGEX = r"[A-Za-z0-9']+"
+WORDS_REGEX = r"[\w']+"
 
 """
 Extracts text from pdf file

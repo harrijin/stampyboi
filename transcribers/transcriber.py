@@ -10,7 +10,6 @@ Methods:
     convertToJSON() - call this method to convert a video into a timestamped transcript .JSON file
 '''
 from abc import ABC, abstractmethod
-import json
 
 class Transcriber(ABC):
     def __init__(self):
@@ -22,7 +21,6 @@ class Transcriber(ABC):
         pass
 #       Call separatePhrases() here if necessary
 
+    @abstractmethod
     def convertToJSON(self, filepath):
-        with open(filepath, "w") as outfile:
-            json.dump(self.getTranscript(), outfile)
-
+        pass
