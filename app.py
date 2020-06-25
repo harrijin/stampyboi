@@ -1,14 +1,20 @@
 import os, re
 from flask import Flask, send_file, request, flash, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
+import deepspeech
 from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
+from .transcribers.file import FileExtractor
 from urllib.request import urlopen
 import json
 from pathlib import Path
 
-UPLOAD_FOLDER = './deepspeech/uploadedFiles'
+
+UPLOAD_FOLDER = './transcribers/uploadedFiles'
 ALLOWED_EXTENSIONS = {'wav'}
+MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
+MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
+
 SOLR_COLLECTION = 'stampyboi'
 SOLR_HOST_DIR = '/Documents'
 
@@ -125,8 +131,14 @@ def return_results():
             return render_template("results.html", result=results)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            results = 'successful file upload' # Change this to the search parameters concatenated to the timestamped transcript, like in the other two
+            audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(audioPath)
+            # while not os.path.exists(audioPath):
+            #     pass
+            transcriber = FileExtractor(audioPath, MODEL)
+            results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
+            os.remove(audioPath)
+
         else:
             results = 'ERROR: incorrect file format'
 
