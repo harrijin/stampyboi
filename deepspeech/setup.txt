@@ -1,8 +1,0 @@
-#USE 'env' AS THE VENV DIRECTORY FOR GITIGNORE
-python3 -m venv env
-source env/bin/activate
-
-#INSTALL THE MODEL AND SCORER
-pip install deepspeech
-curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.7.3/deepspeech-0.7.3-models.pbmm
-curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.7.3/deepspeech-0.7.3-models.scorer
