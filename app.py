@@ -21,8 +21,8 @@ SOLR_HOST_DIR = '/Documents'
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
 WORKING_DIRECTORY = os.getcwd()
-home = str(Path.home())
-os.chdir(home + SOLR_HOST_DIR)
+HOME = str(Path.home())
+os.chdir(HOME + SOLR_HOST_DIR)
 file = open("solrhost.txt", "r")
 SOLR_HOST = str(file.read())
 os.chdir(WORKING_DIRECTORY)
@@ -48,7 +48,7 @@ def search_solr(quote, source='none', title=''):
         connectionURL = connectionURL + '&fq=type:yt'
     elif source == 'flix':
         if len(title) > 0:
-            connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix' 
+            connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
         else:
             connectionURL = connectionURL + '&fq=type:flix'
     connection = urlopen(connectionURL)
@@ -67,7 +67,7 @@ def search_solr(quote, source='none', title=''):
         timestampIndices=stringToTimestamps(hilitedScript)
         resultTimestamps=[]
         for index in timestampIndices:
-            resultTimestamps.append(resultTimes[-1][index])    
+            resultTimestamps.append(resultTimes[-1][index])
         #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
     #results = str(response) # use this to see all the info that solr returns
     results = str(resultIDs) + str(resultTypes) + str(resultTimes) + str(resultScripts)
@@ -82,7 +82,7 @@ def return_results():
     quote = request.form['quote']
     # ===============Database Search===============
     if request.form['search_src'] == 'none':
-        results = search_solr(quote) 
+        results = search_solr(quote)
     # =============YouTube=============
     elif request.form['search_src'] == 'yt':
         source = request.form['yt_source']
@@ -102,7 +102,7 @@ def return_results():
         ep = request.form['flix_ep']
         try:
             szn = int(szn)
-            ep = int(ep)  
+            ep = int(ep)
             if len(title) > 0 and int(szn) > 0 and int(ep) > 0:
                 try:
                     transcriber = FlixExtractor(title, int(szn), int(ep))
@@ -155,10 +155,9 @@ def stringToTimestamps(script):
     while indexOfTag != -1:
         try:
             indexOfTag = script.index('<em>', prevIndex)
-        except Exception as e:
+        except Exception:
             indexOfTag = -1
         if indexOfTag != -1:
             result.append(len(script[0:indexOfTag].split()))
             prevIndex = indexOfTag + tagLength
     return result
-
