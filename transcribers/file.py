@@ -53,6 +53,9 @@ class FileExtractor(Transcriber):
         result = metadata_to_list(transcript)
         return result
 
+    def convertToJSON(self, filepath):
+        pass
+
 def video2Audio(video_file):
     '''Takes in any extension supported by ffmpeg: .ogv, .mp4, .mpeg, .avi, .mov, etc'''
     audio = AudioFileClip(video_file, nbytes=2, fps=16000)
