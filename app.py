@@ -86,11 +86,16 @@ def return_results():
     # =============YouTube=============
     elif request.form['search_src'] == 'yt':
         source = request.form['yt_source']
-        if len(source) > 0:
-            if ytVidId(source):
+        if len(source) > 0: # Check if a youtube link was provided
+            if ytVidId(source): # Check if provided link is valid
                 transcriber = YouTube(ytVidId(source))
-                results = "Quote: " + quote + "<br>YouTube Video ID: " + ytVidId(source) + "<br>Results: <br>" + str(transcriber.getTranscript())
-                transcriber.convertToJSON("jsonTranscripts/transcript.json")
+                transcript = transcriber.getTranscript()
+                if not isinstance(transcript, str): # Check if getTranscript returned an error message
+                    transcript = str(transcript)
+                    results = "Quote: " + quote + "<br>YouTube Video ID: " + ytVidId(source) + "<br>Results: <br>" + transcript
+                    transcriber.convertToJSON("jsonTranscripts/transcript.json")
+                else:
+                    results = transcript
             else:
                 results = "ERROR: Invalid YouTube link"
         else:

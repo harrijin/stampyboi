@@ -7,7 +7,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from .transcriber import Transcriber
 from .utils import extract_words
 
-ERROR_MESSAGE = "ERROR:YouTube video is unable to be searched, either because the video/captions are unavailable or the video is age-restricted."
 SPACE_REPLACEMENT_CHAR = '-'
 
 class YouTube(Transcriber):
@@ -24,8 +23,8 @@ class YouTube(Transcriber):
                 time = dic['start']
                 words = extract_words(phrase)
                 transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
-        except:
-            transcript = ERROR_MESSAGE
+        except Exception as err:
+            transcript = str(err)
         return transcript
 
     def convertToJSON(self, filepath):
