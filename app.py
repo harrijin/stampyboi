@@ -8,6 +8,7 @@ from .transcribers.file import FileExtractor
 from urllib.request import urlopen
 import json
 from pathlib import Path
+from enum import Enum
 
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
@@ -166,3 +167,16 @@ def stringToTimestamps(script):
             result.append(len(script[0:indexOfTag].split()))
             prevIndex = indexOfTag + tagLength
     return result
+
+class Source(Enum):
+	YOUTUBE = 1
+	NETFLIX = 2
+	UPLOAD = 3
+	OTHER = 4
+
+def sourceFromURL(url):
+	if "netflix.com" in url:
+		return Source.NETFLIX
+	if "youtube.com" in url or "youtu.be" in url
+		return Source.YOUTUBE
+	return Source.OTHER
