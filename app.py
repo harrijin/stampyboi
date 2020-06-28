@@ -78,8 +78,13 @@ def search_solr(quote, source='none', title=''):
 def render_index():
     return render_template('searchPage.html')
 
+@app.route('/suggest', methods=['POST'])
+def get_suggestions():
+    query = request.form['q']
+    return str(query)
+
 @app.route('/results', methods=['POST'])
-def return_results():
+def render_results():
     quote = request.form['quote']
     # ===============Database Search===============
     if request.form['search_src'] == 'none':
