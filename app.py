@@ -169,14 +169,14 @@ def stringToTimestamps(script):
     return result
 
 class Source(Enum):
-	YOUTUBE = 1
-	NETFLIX = 2
-	UPLOAD = 3
-	OTHER = 4
+    YOUTUBE = 1
+    NETFLIX = 2
+    UPLOAD = 3
+    OTHER = 4
 
 def sourceFromURL(url):
-	if "netflix.com" in url:
-		return Source.NETFLIX
-	if "youtube.com" in url or "youtu.be" in url
-		return Source.YOUTUBE
-	return Source.OTHER
+    if "netflix.com" in url:
+        return Source.NETFLIX
+    if "youtube.com" in url or "youtu.be" in url:
+        return Source.YOUTUBE
+    return Source.OTHER
