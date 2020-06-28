@@ -17,6 +17,8 @@ class TranscriberPipeline:
         spider.start_time = datetime.now()
         spider.vid_count = 0
         spider.all_count = 0
+        self.model = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
+        self.model.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
     def close_spider(self, spider):
         run_time = datetime.now() - spider.start_time
@@ -30,7 +32,7 @@ class TranscriberPipeline:
         id = item['realid']
         transcriber = YouTube(id)
         transcript = transcriber.getTranscript()
-        if transcript == "ERROR:YouTube video is unable to be searched, either because the video/captions are unavailable or the video is age-restricted.":
+        if isinstance(transcript, str) # Returned error message instead of transcript list
             opts = {
                 'outtmpl' : '%(id)s.%(ext)s',
                 'postprocessors' : [{
@@ -45,18 +47,18 @@ class TranscriberPipeline:
 
             try:
                 with open(id + '.wav') as input:
-                    pass
+                    transcriber = FileExtractor(id + '.wav', self.model)
+                    transcript = transcriber.getTranscript()
             except FileNotFoundError:
                 raise DropItem("No captions: " + id)
 
-        else:
-            spider.vid_count += 1
-            print("COUNT: %d" % spider.vid_count)
-            print("ALL  : %d" % spider.all_count)
-            return {
-                'id' : id,
-                'transcript' : transcript
-            }
+        spider.vid_count += 1
+        print("COUNT: %d" % spider.vid_count)
+        print("ALL  : %d" % spider.all_count)
+        return {
+            'id' : id,
+            'transcript' : transcript
+        }
         # return item
 
         # TODO Fix the pipe to upload info to the database
