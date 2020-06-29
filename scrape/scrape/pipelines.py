@@ -6,10 +6,10 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 from transcribers.youtube import YouTube
-from transcribers.file import FileExtractor
 from scrapy.exceptions import DropItem
 from datetime import datetime
-import youtube_dl
+# from transcribers.file import FileExtractor
+# import youtube_dl
 
 class TranscriberPipeline:
 
@@ -17,8 +17,8 @@ class TranscriberPipeline:
         spider.start_time = datetime.now()
         spider.vid_count = 0
         spider.all_count = 0
-        self.model = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
-        self.model.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
+        # self.model = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
+        # self.model.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
     def close_spider(self, spider):
         run_time = datetime.now() - spider.start_time
@@ -32,43 +32,35 @@ class TranscriberPipeline:
         id = item['realid']
         transcriber = YouTube(id)
         transcript = transcriber.getTranscript()
-        if isinstance(transcript, str) # Returned error message instead of transcript list
-            opts = {
-                'outtmpl' : '%(id)s.%(ext)s',
-                'postprocessors' : [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'wav',
-                }],
-                'logger': MyLogger(),
-                'cookiefile' : 'cookies.txt',
+
+        # if isinstance(transcript, str) # Returned error message instead of transcript list
+        #     opts = {
+        #         'outtmpl' : '%(id)s.%(ext)s',
+        #         'postprocessors' : [{
+        #             'key': 'FFmpegExtractAudio',
+        #             'preferredcodec': 'wav',
+        #         }],
+        #         'cookiefile' : 'cookies.txt',
+        #     }
+        #     with youtube_dl.YoutubeDL(opts) as ydl:
+        #         ydl.download(['https://www.youtube.com/watch?v=' + id])
+
+        #     try:
+        #         with open(id + '.wav') as input:
+        #             transcriber = FileExtractor(id + '.wav', self.model)
+        #             transcript = transcriber.getTranscript()
+        #     except FileNotFoundError:
+        #         raise DropItem("No captions: " + id)
+
+        if not isinstance(transcript, str):
+            spider.vid_count += 1
+            print("COUNT: %d" % spider.vid_count)
+            print("ALL  : %d" % spider.all_count)
+            return {
+                'id' : id,
+                'transcript' : transcript
             }
-            with youtube_dl.YoutubeDL(opts) as ydl:
-                ydl.download(['https://www.youtube.com/watch?v=' + id])
 
-            try:
-                with open(id + '.wav') as input:
-                    transcriber = FileExtractor(id + '.wav', self.model)
-                    transcript = transcriber.getTranscript()
-            except FileNotFoundError:
-                raise DropItem("No captions: " + id)
-
-        spider.vid_count += 1
-        print("COUNT: %d" % spider.vid_count)
-        print("ALL  : %d" % spider.all_count)
-        return {
-            'id' : id,
-            'transcript' : transcript
-        }
-        # return item
+        return item
 
         # TODO Fix the pipe to upload info to the database
-
-class MyLogger(object):
-    def debug(self, msg):
-        pass
-
-    def warning(self, msg):
-        pass
-
-    def error(self, msg):
-        print(msg)
