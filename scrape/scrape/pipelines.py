@@ -8,6 +8,7 @@
 from transcribers.youtube import YouTube
 from scrapy.exceptions import DropItem
 from datetime import datetime
+import json, subprocess
 # from transcribers.file import FileExtractor
 # import youtube_dl
 
@@ -31,7 +32,7 @@ class TranscriberPipeline:
 
         id = item['realid']
         transcriber = YouTube(id)
-        transcript = transcriber.getTranscript()
+        transcriptJSON = transcriber.getJSON()
 
         # if isinstance(transcript, str) # Returned error message instead of transcript list
         #     opts = {
@@ -52,15 +53,12 @@ class TranscriberPipeline:
         #     except FileNotFoundError:
         #         raise DropItem("No captions: " + id)
 
-        if not isinstance(transcript, str):
+        if not isinstance(transcriptJSON, str): # No error message
             spider.vid_count += 1
             print("COUNT: %d" % spider.vid_count)
             print("ALL  : %d" % spider.all_count)
-            return {
-                'id' : id,
-                'transcript' : transcript
-            }
+
+            command = ["curl", "-X", "POST", "-H", "Content-Type: application/json", DEST_PATH, "--data-binary", json.dumps(transcriptJSON)]
+            subprocess.run(command)
 
         return item
-
-        # TODO Fix the pipe to upload info to the database
