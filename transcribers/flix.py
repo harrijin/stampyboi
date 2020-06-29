@@ -3,6 +3,7 @@ from .utils import get_pdf_text, extract_words
 from .transcriber import Transcriber
 import requests
 import re
+import json
 
 BASE_URL = 'https://8flix.com'
 SHOW_TRANSCRIPTS_URL = 'https://8flix.com/transcripts/shows/'
@@ -20,6 +21,8 @@ BLOCK_NUMBER_REGEX = '\s+\d+\s+(?=\d{2}:\d{2}:\d{2},\d{3})'
 TIMESTAMP_COMPONENTS_REGEX = '[:,]'
 
 TIMESTAMP_LEN = 12
+
+SPACE_REPLACEMENT_CHAR = '-'
 
 
 """
@@ -39,7 +42,9 @@ class FlixExtractor(Transcriber):
     def __init__(self, title, season, episode):
 
         super().__init__()
-
+        self.show=title
+        self.szn=season
+        self.epis=episode
         # Get list of shows and transcripts from 8flix
         r = requests.get(SHOW_TRANSCRIPTS_URL)
         soup = BeautifulSoup(r.content)
@@ -95,11 +100,29 @@ class FlixExtractor(Transcriber):
 
             phrase = component[TIMESTAMP_LEN:]
             words = extract_words(phrase)
-            for word in words:
-                transcript.append((word, time))
+            transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
         
         return transcript
     
+    def convertToJSON(self, filepath):
+        transcript=self.getTranscript()
+        text=""
+        times=[]
+        #this following line is the only weird one for me. not sure if those variables are local or not
+        identification = self.show + "^!" + str(self.szn) + "_"+str(self.epis)
+        for timestamp in transcript:
+            text+=(timestamp[0]+" ")
+            times.append(timestamp[1])
+        jsonObject={
+            "id":identification,
+            "type":"flix",
+            "script":text,
+            "times":times,
+            "title":self.show
+        }
+        with open(filepath, "w") as outfile:
+            json.dump(jsonObject, outfile)
+        
     @staticmethod
     def __convert_to_seconds(timestamp):
         components = re.split(TIMESTAMP_COMPONENTS_REGEX, timestamp)

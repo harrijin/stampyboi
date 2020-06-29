@@ -1,5 +1,5 @@
 # stampyboi
-Search for timestamped video clips
+Search for timestamped video clips. Powered by [Apache Solr](https://lucene.apache.org/solr/).
 
 ## APIs/Frameworks/Libraries/etc
 ### Interface:
