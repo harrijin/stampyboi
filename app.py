@@ -20,7 +20,7 @@ SOLR_COLLECTION = 'stampyboi'
 SOLR_HOST_DIR = '/Documents'
 
 MAX_SUGGESTIONS = 7 # maximum number of videos to return for suggestions
-SUGGESTION_REGEX = '(?:<b>)(.+?)(?:[\s])'
+SUGGESTION_REGEX = '(?:<b>)(.+?)(?:[\s.,:;!?])'
 
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
@@ -119,7 +119,10 @@ def render_results():
 def get_suggestions():
     query = request.form['q']
     suggestionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/suggest?wt=json&suggest.count=' + str(MAX_SUGGESTIONS) + '&suggest.q=' + query.replace(" ", "+")
-    response = json.load(urlopen(suggestionURL))
+    try:
+        response = json.load(urlopen(suggestionURL))
+    except:
+        return str([""])
     suggestions = response['suggest']['mySuggester'][query]['suggestions']
     truncSuggestions = []
     for script in suggestions:
