@@ -15,7 +15,10 @@
     <br>
     <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
       <label for="quote">Quote to search for:</label>
-      <input type="text" id="quote" name="quote" autofocus required/> 
+      <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest"/>
+      <br>
+      <datalist id="autosuggest"></datalist>
+      <br>
       <p>in this video/audio file:</p>
       <br>
 
@@ -33,7 +36,7 @@
       <br>
 
       <label for="flix_szn">Season #:</label>
-      <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 /> 
+      <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 />
 
       <br>
       <br>
@@ -42,7 +45,7 @@
       <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 />
 
       <input type="text" id="search_src" name="search_src" style="display: none;" />
-      <br> 
+      <br>
       <br>
       <input type="file" id="vid_upload" name="vid_upload" disabled=true required/>
       <br>
@@ -52,7 +55,7 @@
 
     </form>
   </body>
-
+  <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>
     //for hiding the labels
     // var labels = document.getElementsByTagName('LABEL');
@@ -60,52 +63,73 @@
     //     if (labels[i].htmlFor != '') {
     //          var elem = document.getElementById(labels[i].htmlFor);
     //          if (elem)
-    //             elem.label = labels[i];         
+    //             elem.label = labels[i];
     //     }
     // }
-    var searchSrc="none"
+
+    var searchSrc="none";
     document.getElementById('search_src').value=searchSrc;
     //yt = youtube (default)
     //flix = netflix
     //file = file
-    function toggleFile(state){ 
-      document.getElementById("vid_upload").disabled = !state;
+    function toggleFile(state){
+        document.getElementById("vid_upload").disabled = !state;
     }
     function toggleYt(state){
-      document.getElementById("yt_source").disabled = !state;
+        document.getElementById("yt_source").disabled = !state;
     }
     function toggleFlix(state){
-      document.getElementById("flix_title").disabled = !state;
-      document.getElementById("flix_szn").disabled = !state;
-      document.getElementById("flix_ep").disabled = !state;
+        document.getElementById("flix_title").disabled = !state;
+        document.getElementById("flix_szn").disabled = !state;
+        document.getElementById("flix_ep").disabled = !state;
     }
     function ytSearch(){
-      searchSrc="yt"
-      document.getElementById('search_src').value=searchSrc;
-      toggleYt(true);
-      toggleFlix(false);
-      toggleFile(false);
+        searchSrc="yt";
+        document.getElementById('search_src').value=searchSrc;
+        toggleYt(true);
+        toggleFlix(false);
+        toggleFile(false);
     }
     function flixSearch(){
-      searchSrc="flix"
-      document.getElementById('search_src').value=searchSrc;
-      toggleYt(false);
-      toggleFlix(true);
-      toggleFile(false);
+        searchSrc="flix";
+        document.getElementById('search_src').value=searchSrc;
+        toggleYt(false);
+        toggleFlix(true);
+        toggleFile(false);
     }
     function fileSearch(){
-      searchSrc="file"
-      document.getElementById('search_src').value=searchSrc;
-      toggleYt(false);
-      toggleFlix(false);
-      toggleFile(true);
+        searchSrc="file";
+        document.getElementById('search_src').value=searchSrc;
+        toggleYt(false);
+        toggleFlix(false);
+        toggleFile(true);
     }
     function noneSearch(){
-      searchSrc="none"
-      document.getElementById('search_src').value=searchSrc;
-      toggleYt(false);
-      toggleFlix(false);
-      toggleFile(false);
+        searchSrc="none";
+        document.getElementById('search_src').value=searchSrc;
+        toggleYt(false);
+        toggleFlix(false);
+        toggleFile(false);
+    }
+    function suggest(){
+        var userIn=encodeURIComponent(document.getElementById('quote').value);
+        var suggestRequest = new XMLHttpRequest();
+        var suggestions;
+        suggestRequest.open('POST','/suggest', true);
+        suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        suggestRequest.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                suggestions = JSON5.parse(this.responseText);
+                document.getElementById('autosuggest').innerHTML= ("<option value=" + document.getElementById('quote').value + ">");
+                suggestions.forEach(addSuggestion);
+            }
+
+        };
+        suggestRequest.send("q="+userIn);
+
+    }
+    function addSuggestion(suggestion){
+        document.getElementById('autosuggest').innerHTML += ("<option value=\"" + suggestion.toLowerCase() + "\">");
     }
   </script>
 
