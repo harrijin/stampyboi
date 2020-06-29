@@ -15,9 +15,9 @@
     <br>
     <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
       <label for="quote">Quote to search for:</label>
-      <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required/>
+      <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest"/>
       <br>
-      <p id="autosuggest"></p>
+      <datalist id="autosuggest"></datalist>
       <br>
       <p>in this video/audio file:</p>
       <br>
@@ -55,7 +55,7 @@
 
     </form>
   </body>
-
+  <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>
     //for hiding the labels
     // var labels = document.getElementsByTagName('LABEL');
@@ -113,15 +113,23 @@
     }
     function suggest(){
         var userIn=encodeURIComponent(document.getElementById('quote').value);
-        var suggestRequest= new XMLHttpRequest();
+        var suggestRequest = new XMLHttpRequest();
+        var suggestions;
         suggestRequest.open('POST','/suggest', true);
         suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                document.getElementById('autosuggest').innerHTML = this.responseText;
+                suggestions = JSON5.parse(this.responseText);
+                document.getElementById('autosuggest').innerHTML= ("<option value=" + document.getElementById('quote').value + ">");
+                suggestions.forEach(addSuggestion);
             }
+
         };
         suggestRequest.send("q="+userIn);
+
+    }
+    function addSuggestion(suggestion){
+        document.getElementById('autosuggest').innerHTML += ("<option value=\"" + suggestion.toLowerCase() + "\">");
     }
   </script>
 

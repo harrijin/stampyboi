@@ -18,6 +18,7 @@ MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
 SOLR_COLLECTION = 'stampyboi'
 SOLR_HOST_DIR = '/Documents'
+MAX_SUGGESTIONS = 7 # maximum number of videos to return for suggestions
 
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
@@ -31,57 +32,11 @@ os.chdir(WORKING_DIRECTORY)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def ytVidId(url):
-    ytRegEx = re.compile('(?:/|%3D|v=|vi=)([0-9A-z-_]{11})(?:[%#?&]|$)')
-    valid = ytRegEx.search(url)
-    if valid:
-        return valid.group(1)
-    return False
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def search_solr(quote, source='none', title=''):
-    quote = '\"'+quote.replace(" ", "+")+'\"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified'
-    # ===============Database Search===============
-    if source == 'yt':
-        connectionURL = connectionURL + '&fq=type:yt'
-    elif source == 'flix':
-        if len(title) > 0:
-            connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
-        else:
-            connectionURL = connectionURL + '&fq=type:flix'
-    connection = urlopen(connectionURL)
-    response = json.load(connection)
-    resultIDs = []
-    resultTypes = []
-    resultTimes = []
-    resultScripts = []
-    results = ""
-    for document in response['response']['docs']:
-        resultIDs.append(document['id'])
-        resultTypes.append(document['type'])
-        resultTimes.append(document['times'])
-        hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
-        resultScripts.append(hilitedScript)
-        timestampIndices=stringToTimestamps(hilitedScript)
-        resultTimestamps=[]
-        for index in timestampIndices:
-            resultTimestamps.append(resultTimes[-1][index])
-        #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
-    #results = str(response) # use this to see all the info that solr returns
-    results = str(resultIDs) + str(resultTypes) + str(resultTimes) + str(resultScripts)
-    return results
+# ===========Index pages===========
 
 @app.route('/', methods=['GET'])
 def render_index():
     return render_template('searchPage.html')
-
-@app.route('/suggest', methods=['POST'])
-def get_suggestions():
-    query = request.form['q']
-    return str(query)
 
 @app.route('/results', methods=['POST'])
 def render_results():
@@ -158,6 +113,23 @@ def render_results():
 
     return render_template("results.html", result=results)
 
+@app.route('/suggest', methods=['POST'])
+def get_suggestions():
+    query = request.form['q']
+    suggestionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/suggest?wt=json&suggest.count=' + str(MAX_SUGGESTIONS) + '&suggest.q=' + query.replace(" ", "+")
+    response = json.load(urlopen(suggestionURL))
+    suggestions = response['suggest']['mySuggester'][query]['suggestions']
+    truncSuggestions = []
+    for script in suggestions:
+        results = stringToSuggestions(script["term"])
+        for result in results:
+            if result not in truncSuggestions and result != query:
+                truncSuggestions.append(result)
+                if len(truncSuggestions) >= MAX_SUGGESTIONS:
+                    break
+    return str(truncSuggestions).replace("-"," ")
+# ==============Helper Methods==============
+
 def stringToTimestamps(script):
     tagLength = 4
     result = []
@@ -173,6 +145,22 @@ def stringToTimestamps(script):
             prevIndex = indexOfTag + tagLength
     return result
 
+def stringToSuggestions(script):
+    tagLength = 3
+    result = []
+    indexOfTag = 0
+    prevIndex = 0
+    while indexOfTag != -1:
+        try:
+            indexOfTag = script.index('<b>', prevIndex)
+        except Exception:
+            indexOfTag = -1
+        if indexOfTag != -1:
+            indexOfEndTag = script.index('</b>', prevIndex)
+            result.append((script[indexOfTag+tagLength:indexOfEndTag]+script[indexOfEndTag+tagLength+1:script.index(' ', indexOfEndTag+tagLength+1)]).replace("<b>", "").replace("</b>", ""))
+            prevIndex = indexOfEndTag + tagLength + 1
+    return result # returns a list of strings to use as suggestions
+
 class Source(Enum):
     YOUTUBE = 1
     NETFLIX = 2
@@ -185,3 +173,46 @@ def sourceFromURL(url):
     if "youtube.com" in url or "youtu.be" in url:
         return Source.YOUTUBE
     return Source.OTHER
+
+def ytVidId(url):
+    ytRegEx = re.compile('(?:/|%3D|v=|vi=)([0-9A-z-_]{11})(?:[%#?&]|$)')
+    valid = ytRegEx.search(url)
+    if valid:
+        return valid.group(1)
+    return False
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def search_solr(quote, source='none', title=''):
+    quote = '\"'+quote.replace(" ", "+")+'\"'
+    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified'
+    # ===============Database Search===============
+    if source == 'yt':
+        connectionURL = connectionURL + '&fq=type:yt'
+    elif source == 'flix':
+        if len(title) > 0:
+            connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
+        else:
+            connectionURL = connectionURL + '&fq=type:flix'
+    connection = urlopen(connectionURL)
+    response = json.load(connection)
+    resultIDs = []
+    resultTypes = []
+    resultTimes = []
+    resultScripts = []
+    results = ""
+    for document in response['response']['docs']:
+        resultIDs.append(document['id'])
+        resultTypes.append(document['type'])
+        resultTimes.append(document['times'])
+        hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
+        resultScripts.append(hilitedScript)
+        timestampIndices=stringToTimestamps(hilitedScript)
+        resultTimestamps=[]
+        for index in timestampIndices:
+            resultTimestamps.append(resultTimes[-1][index])
+        #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
+    #results = str(response) # use this to see all the info that solr returns
+    results = str(resultIDs) + str(resultTypes) + str(resultTimes) + str(resultScripts)
+    return results
