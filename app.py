@@ -18,7 +18,9 @@ MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
 SOLR_COLLECTION = 'stampyboi'
 SOLR_HOST_DIR = '/Documents'
+
 MAX_SUGGESTIONS = 7 # maximum number of videos to return for suggestions
+SUGGESTION_REGEX = '(?:<b>)(.+?)(?:[\s])'
 
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
@@ -146,19 +148,8 @@ def stringToTimestamps(script):
     return result
 
 def stringToSuggestions(script):
-    tagLength = 3
-    result = []
-    indexOfTag = 0
-    prevIndex = 0
-    while indexOfTag != -1:
-        try:
-            indexOfTag = script.index('<b>', prevIndex)
-        except Exception:
-            indexOfTag = -1
-        if indexOfTag != -1:
-            indexOfEndTag = script.index('</b>', prevIndex)
-            result.append((script[indexOfTag+tagLength:indexOfEndTag]+script[indexOfEndTag+tagLength+1:script.index(' ', indexOfEndTag+tagLength+1)]).replace("<b>", "").replace("</b>", ""))
-            prevIndex = indexOfEndTag + tagLength + 1
+    suggestions = re.findall(SUGGESTION_REGEX, script)
+    result = [suggestion.replace("<b>","").replace("</b>","") for suggestion in suggestions]
     return result # returns a list of strings to use as suggestions
 
 class Source(Enum):
