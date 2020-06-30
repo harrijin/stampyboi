@@ -55,7 +55,7 @@ def render_results():
                 transcript = transcriber.getTranscript()
                 if not isinstance(transcript, str): # Check if getTranscript returned an error message
                     transcript = str(transcript)
-                    results = "Quote: " + quote + "<br>YouTube Video ID: " + ytVidId(source) + "<br>Results: <br>" + transcript
+                    results = "<br>YouTube Video ID: " + ytVidId(source) + "<br>Results: <br>" + transcript
                     transcriber.convertToJSON("jsonTranscripts/transcript.json")
                 else:
                     results = transcript
@@ -113,7 +113,7 @@ def render_results():
     else:
         results = "ERROR: Invalid searchsearch_src"
 
-    return render_template("results.html", result=results)
+    return render_template("results.html", result=results, query=quote)
 
 @app.route('/suggest', methods=['POST'])
 def get_suggestions():
@@ -133,6 +133,18 @@ def get_suggestions():
                 if len(truncSuggestions) >= MAX_SUGGESTIONS:
                     break
     return str(truncSuggestions).replace("-"," ")
+
+@app.route('/spellcheck', methods=['POST'])
+def check_spelling():
+    query = request.form['q']
+    spellcheckURL = 'http://' + SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/spell?wt=json&q='+query.replace(' ', '+')
+    try:
+        response = json.load(urlopen(spellcheckURL))
+    except:
+        return str([""])
+    suggestions = response['spellcheck']['collations'][1::2]
+    return str(suggestions)
+
 # ==============Helper Methods==============
 
 def stringToTimestamps(script):
@@ -143,7 +155,7 @@ def stringToTimestamps(script):
     while indexOfTag != -1:
         try:
             indexOfTag = script.index('<em>', prevIndex)
-        except Exception:
+        except:
             indexOfTag = -1
         if indexOfTag != -1:
             result.append(len(script[0:indexOfTag].split()))
@@ -163,7 +175,7 @@ class Source(Enum):
 
 def sourceFromURL(url):
     if "netflix.com" in url:
-        return Source.NETFLIX
+         return Source.NETFLIX
     if "youtube.com" in url or "youtu.be" in url:
         return Source.YOUTUBE
     return Source.OTHER
@@ -189,8 +201,11 @@ def search_solr(quote, source='none', title=''):
             connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
         else:
             connectionURL = connectionURL + '&fq=type:flix'
-    connection = urlopen(connectionURL)
-    response = json.load(connection)
+    try:
+        connection = urlopen(connectionURL)
+        response = json.load(connection)
+    except:
+        return "Sorry, the search server is currently down."
     resultIDs = []
     resultTypes = []
     resultTimes = []

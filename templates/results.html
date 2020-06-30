@@ -1,31 +1,46 @@
-<html>  
-  <head>  
+<html>
+  <head>
     Results
-  </head>  
-  <body>  
+  </head>
+  <body>
 
     <br>
     <form action='/'>
       <input type='submit' value='New search'>
     </form>
-    <p id="results">Results: {{result}}</p>  
+    <br>
+    <p id="userQuery">Searched quote: {{query}}</p>
+    <br>
+    <input type='text' id="quote" style="display: none;" value="{{query}}">
+    <button onclick="check_spelling()">Check spelling</button>
+    <br>
+    <p id="didYouMean" style="color:red"></p>
+    <p id="spellSuggestions"></p>
+    <br>
+    <p id="results">Results: {{result}}</p>
     <p id="testing"></p>
-  </body>  
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  </body>
+  <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>
-    /*var timeRegex =/(\d+\.\d*)/g;
-    var idRegex = /([0-9A-z-_]{11})/g;
-    var times = document.getElementById('results').innerHTML.match(timeRegex);
-    document.getElementById('testing').innerHTML=times;
-    times = parseFloat(times);
+    function check_spelling(){
+        var userIn=encodeURIComponent(document.getElementById('quote').value);
+        var suggestRequest = new XMLHttpRequest();
+        var suggestions;
+        suggestRequest.open('POST','/spellcheck', true);
+        suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        suggestRequest.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                suggestions = JSON5.parse(this.responseText);
+                document.getElementById('didYouMean').innerHTML= "Did you mean:";
+                document.getElementById('spellSuggestions').innerHTML=JSON.stringify(suggestions);
+            }
 
-    var vidID = document.getElementById('results').innerHTML.match(idRegex);
-    roundedTime = Math.floor(times);
-    var htmlString="<iframe title='YouTube video player' type=\"text/html\" width='640' height='390' src='http://www.youtube.com/embed/" + vidID + "?start="+roundedTime+"' frameborder='0' allowFullScreen></iframe>";
+        };
+        suggestRequest.send("q="+userIn);
 
-    document.write(htmlString);*/
+    }
 
   </script>
-</html>  
+</html>
 
- 
+
