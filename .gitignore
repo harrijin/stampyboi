@@ -5,3 +5,4 @@
 *.mp4
 transcribers/uploadedFiles/*.wav
 jsonTranscripts/*.json
+*.tfrecord

@@ -27,6 +27,25 @@ class YouTube(Transcriber):
             transcript = str(err)
         return transcript
 
+    def getJSON(self):
+        try:
+            listTranscript = YouTubeTranscriptApi.get_transcript(self.source)
+            phrase_list = []
+            time_list = []
+            for dic in listTranscript:
+                words = extract_words(dic['text'])
+                time = dic['start']
+                phrase_list.append(SPACE_REPLACEMENT_CHAR.join(words))
+                time_list.append(time)
+            return {
+                "id":self.source,
+                "type":"yt",
+                "script":' '.join(phrase_list),
+                "times":time_list
+            }
+        except Exception as err:
+            return str(err)
+
     def convertToJSON(self, filepath):
         transcript=self.getTranscript()
         text=""
