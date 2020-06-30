@@ -6,3 +6,4 @@
 transcribers/uploadedFiles/*.wav
 jsonTranscripts/*.json
 *.tfrecord
+ids.txt
