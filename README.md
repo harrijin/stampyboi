@@ -6,7 +6,7 @@ Search for timestamped video clips. Powered by [Apache Solr](https://lucene.apac
 
 -Flask
 
--Ajax
+-[JSON5](https://json5.org/)
 
 ### Transcribers:
 
