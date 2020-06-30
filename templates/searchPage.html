@@ -5,55 +5,55 @@
   </head>
 
   <body>
-    <br>
-    <button onclick="ytSearch()">Search YouTube video</button>
-    <button onclick="flixSearch()">Search Netflix show</button>
-    <button onclick="fileSearch()">Search a video/audio file</button>
-    <button onclick="noneSearch()">Search with only a quote</button>
+    <div>
+        <button onclick="ytSearch()">Search YouTube video</button>
+        <button onclick="flixSearch()">Search Netflix show</button>
+        <button onclick="fileSearch()">Search a video/audio file</button>
+        <button onclick="noneSearch()">Search with only a quote</button>
+    </div>
+    <div>
+        <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
+          <label for="quote">Quote to search for:</label>
+          <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest">
+          <br>
+          <datalist id="autosuggest"></datalist>
+          <br>
+          <p>in this video/audio file:</p>
+          <br>
 
-    <br>
-    <br>
-    <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
-      <label for="quote">Quote to search for:</label>
-      <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest">
-      <br>
-      <datalist id="autosuggest"></datalist>
-      <br>
-      <p>in this video/audio file:</p>
-      <br>
-
-      <label for="yt_source">YouTube video to search in:</label>
-      <input type="text" id="yt_source" name="yt_source" disabled=true >
-
-
-      <br>
-      <br>
-
-      <label for="flix_title">Name of Netflix show:</label>
-      <input type="text" id="flix_title" name="flix_title" disabled=true >
-
-      <br>
-      <br>
-
-      <label for="flix_szn">Season #:</label>
-      <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
-      <br>
-      <br>
-
-      <label for="flix_ep">Episode #:</label>
-      <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
-      <input type="text" id="search_src" name="search_src" style="display: none;" >
-      <br>
-      <br>
-      <input type="file" id="vid_upload" name="vid_upload" disabled=true required>
-      <br>
-      <br>
-      <input type="submit" value="Search">
+          <label for="yt_source">YouTube video to search in:</label>
+          <input type="text" id="yt_source" name="yt_source" disabled=true >
 
 
-    </form>
+          <br>
+          <br>
+
+          <label for="flix_title">Name of Netflix show:</label>
+          <input type="text" id="flix_title" name="flix_title" disabled=true >
+
+          <br>
+          <br>
+
+          <label for="flix_szn">Season #:</label>
+          <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
+
+          <br>
+          <br>
+
+          <label for="flix_ep">Episode #:</label>
+          <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
+
+          <input type="text" id="search_src" name="search_src" style="display: none;" >
+          <br>
+          <br>
+          <input type="file" id="vid_upload" name="vid_upload" disabled=true required>
+          <br>
+          <br>
+          <input type="submit" value="Search">
+
+
+        </form>
+    </div>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>

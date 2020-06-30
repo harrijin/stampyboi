@@ -4,26 +4,29 @@
   </head>
   <body>
 
-    <br>
+    <div>
     <form action='/'>
       <input type='submit' value='New search'>
     </form>
-    <br>
-    <p id="userQuery">Searched quote: {{query}}</p>
-    <br>
-    <input type='text' id="quote" style="display: none;" value="{{query}}">
-    <button onclick="check_spelling()">Check spelling</button>
-    <br>
-    <p id="didYouMean" style="color:red"></p>
-    <p id="spellSuggestions"></p>
-    <br>
-    <p id="results">Results: {{result}}</p>
-    <p id="testing"></p>
+    </div>
+
+    <div id='spellchecking'>
+        <p id="userQuery">Searched quote: {{query}}</p>
+        <br>
+        <input type='text' id="inputQuote" style="display: none;" value="{{query}}">
+        <button id = 'spellcheckButton' onclick='check_spelling()'>Check spelling</button>
+        <br>
+    </div>
+
+    <div>
+        <p id="results">Results: {{result}}</p>
+    </div>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>
     function check_spelling(){
-        var userIn=encodeURIComponent(document.getElementById('quote').value);
+        document.getElementById('spellcheckButton').style='display:none';
+        var userIn=encodeURIComponent(document.getElementById('inputQuote').value);
         var suggestRequest = new XMLHttpRequest();
         var suggestions;
         suggestRequest.open('POST','/spellcheck', true);
@@ -31,13 +34,48 @@
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 suggestions = JSON5.parse(this.responseText);
-                document.getElementById('didYouMean').innerHTML= "Did you mean:";
-                document.getElementById('spellSuggestions').innerHTML=JSON.stringify(suggestions);
+                generateSpellcheck(suggestions);
             }
-
         };
         suggestRequest.send("q="+userIn);
 
+    }
+
+    function generateSpellcheck(suggestions){
+        let prefix = document.createElement('span');
+        let form = document.createElement('form');
+        let searchSrc = document.createElement('input');
+        let dropdown = document.createElement('select');
+        let submitButton = document.createElement('input');
+        prefix.style = 'color:red';
+        prefix.innerHTML = "Did you mean:";
+        form.action = '/results';
+        form.id = 'searchSuggestion';
+        form.enctype = 'application/x-www-form-urlencoded';
+        form.method = 'POST';
+        form.style = 'display:inline';
+        searchSrc.type = 'text';
+        searchSrc.id='search_src';
+        searchSrc.style='display:none'; // this line BAD (limits searching to only solr search, can't set additional options)
+        searchSrc.value='none';
+        searchSrc.name='search_src';
+        dropdown.id='quote';
+        dropdown.name='quote';
+        submitButton.type='submit';
+        submitButton.value='Search';
+        form.appendChild(searchSrc);
+        form.appendChild(dropdown);
+        form.appendChild(submitButton);
+        document.getElementById('spellchecking').appendChild(prefix);
+        document.getElementById('spellchecking').appendChild(form);
+        suggestions.forEach(addSuggestion);
+    }
+
+    function addSuggestion(suggestion){
+        let option = document.createElement('option');
+        option.value="'" + suggestion + "'";
+        option.innerHTML=suggestion;
+        document.getElementById("quote").appendChild(option);
     }
 
   </script>
