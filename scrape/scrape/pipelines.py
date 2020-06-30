@@ -6,7 +6,6 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 from transcribers.youtube import YouTube
-from scrapy.exceptions import DropItem
 from datetime import datetime
 import json, subprocess
 import concurrent.futures
@@ -33,7 +32,6 @@ def extract(id):
 class TranscriberPipeline:
 
     def open_spider(self, spider):
-        spider.start_time = datetime.now()
         spider.executor = concurrent.futures.ThreadPoolExecutor()
         # self.model = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
         # self.model.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
