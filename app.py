@@ -128,11 +128,12 @@ def get_suggestions():
     for script in suggestions:
         results = stringToSuggestions(script["term"])
         for result in results:
-            if result not in truncSuggestions and result != query:
+            result = result.lower().replace("-"," ")
+            if result not in truncSuggestions and result != query.lower():
                 truncSuggestions.append(result)
                 if len(truncSuggestions) >= MAX_SUGGESTIONS:
                     break
-    return str(truncSuggestions).replace("-"," ")
+    return str(truncSuggestions)
 
 @app.route('/spellcheck', methods=['POST'])
 def check_spelling():

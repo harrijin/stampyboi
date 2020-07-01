@@ -120,7 +120,10 @@
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 suggestions = JSON5.parse(this.responseText);
-                document.getElementById('autosuggest').innerHTML= ("<option value=" + document.getElementById('quote').value + ">");
+                document.getElementById('autosuggest').innerHTML= "";
+                let userOption = document.createElement('option');
+                userOption.value = document.getElementById('quote').value;
+                document.getElementById('autosuggest').appendChild(userOption);
                 suggestions.forEach(addSuggestion);
             }
 
@@ -129,7 +132,9 @@
 
     }
     function addSuggestion(suggestion){
-        document.getElementById('autosuggest').innerHTML += ("<option value=\"" + suggestion.toLowerCase() + "\">");
+        let option = document.createElement('option');
+        option.value = suggestion.toLowerCase();
+        document.getElementById('autosuggest').appendChild(option);
     }
   </script>
 

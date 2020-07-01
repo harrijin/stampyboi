@@ -34,7 +34,9 @@
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 suggestions = JSON5.parse(this.responseText);
-                generateSpellcheck(suggestions);
+                if(suggestions.length > 0){
+                    generateSpellcheck(suggestions);
+                }
             }
         };
         suggestRequest.send("q="+userIn);
