@@ -12,7 +12,7 @@ from enum import Enum
 
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
-ALLOWED_EXTENSIONS = {'wav'}
+ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}
 MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
 MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
