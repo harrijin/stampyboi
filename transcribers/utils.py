@@ -3,7 +3,8 @@ import requests
 import PyPDF2
 import re
 
-WORDS_REGEX = r"[\w']+"
+WORDS_REGEX = r"[\w'`.,:;!?]+"
+EXCLUDE_REGEX = r"[[].*[]]|[(].*[)]"
 
 """
 Extracts text from pdf file
@@ -36,4 +37,5 @@ Extracts words from a given phrase or text
 returns list of words
 '''
 def extract_words(phrase):
+    phrase = re.sub(EXCLUDE_REGEX, '', phrase)
     return re.compile(WORDS_REGEX).findall(phrase)
