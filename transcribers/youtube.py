@@ -13,51 +13,42 @@ class YouTube(Transcriber):
     def __init__(self, source):
         super().__init__()
         self.source = source
+        try:
+            self.transcript = YouTubeTranscriptApi.get_transcript(self.source)
+        except Exception as err:
+            self.transcript = str(err)
 
     def getTranscript(self):
-        try:
-            listTranscript = YouTubeTranscriptApi.get_transcript(self.source)
-            transcript = list()
-            for dic in listTranscript:
-                phrase = dic['text']
-                time = dic['start']
-                words = extract_words(phrase)
-                transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
-        except Exception as err:
-            transcript = str(err)
-        return transcript
+        if isinstance(self.transcript, str):
+            return self.transcript
+
+        result = list()
+        for dic in self.transcript:
+            phrase = dic['text']
+            time = dic['start']
+            words = extract_words(phrase)
+            result.append((SPACE_REPLACEMENT_CHAR.join(words), time))
+        return result
 
     def getJSON(self):
-        try:
-            listTranscript = YouTubeTranscriptApi.get_transcript(self.source)
-            phrase_list = []
-            time_list = []
-            for dic in listTranscript:
-                words = extract_words(dic['text'])
-                time = dic['start']
-                phrase_list.append(SPACE_REPLACEMENT_CHAR.join(words))
-                time_list.append(time)
-            return {
-                "id":self.source,
-                "type":"yt",
-                "script":' '.join(phrase_list),
-                "times":time_list
-            }
-        except Exception as err:
-            return str(err)
+        if isinstance(self.transcript, str):
+            return self.transcript
 
-    def convertToJSON(self, filepath):
-        transcript=self.getTranscript()
-        text=""
-        times=[]
-        for timestamp in transcript:
-            text+=(timestamp[0]+" ")
-            times.append(timestamp[1])
-        jsonObject={
+        phrase_list = []
+        time_list = []
+        for dic in self.transcript:
+            words = extract_words(dic['text'])
+            time = dic['start']
+            phrase_list.append(SPACE_REPLACEMENT_CHAR.join(words))
+            time_list.append(time)
+        return {
             "id":self.source,
             "type":"yt",
-            "script":text,
-            "times":times
+            "script":' '.join(phrase_list),
+            "times":time_list
         }
+
+    def convertToJSON(self, filepath):
+        jsonObject = self.getJSON()
         with open(filepath, "w") as outfile:
             json.dump(jsonObject, outfile)
