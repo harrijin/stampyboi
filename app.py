@@ -118,7 +118,7 @@ def render_results():
 @app.route('/suggest', methods=['POST'])
 def get_suggestions():
     query = request.form['q']
-    suggestionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/suggest?wt=json&suggest.count=' + str(MAX_SUGGESTIONS) + '&suggest.q=' + query.replace(" ", "+")
+    suggestionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/suggest?wt=json&omitHeader=true&suggest.count=' + str(MAX_SUGGESTIONS) + '&suggest.q=' + query.replace(" ", "+")
     try:
         response = json.load(urlopen(suggestionURL))
     except:
@@ -138,7 +138,7 @@ def get_suggestions():
 @app.route('/spellcheck', methods=['POST'])
 def check_spelling():
     query = request.form['q']
-    spellcheckURL = 'http://' + SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/spell?wt=json&q='+query.replace(' ', '+')
+    spellcheckURL = 'http://' + SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/spell?wt=json&omitHeader=true&q='+query.replace(' ', '+')
     try:
         response = json.load(urlopen(spellcheckURL))
     except:
@@ -193,7 +193,7 @@ def allowed_file(filename):
 
 def search_solr(quote, source='none', title=''):
     quote = '\"'+quote.replace(" ", "+")+'\"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified'
+    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true'
     # ===============Database Search===============
     if source == 'yt':
         connectionURL = connectionURL + '&fq=type:yt'
@@ -209,20 +209,19 @@ def search_solr(quote, source='none', title=''):
         return "Sorry, the search server is currently down."
     resultIDs = []
     resultTypes = []
-    resultTimes = []
     resultScripts = []
     results = ""
+    resultTimestamps=[]
     for document in response['response']['docs']:
         resultIDs.append(document['id'])
         resultTypes.append(document['type'])
-        resultTimes.append(document['times'])
+        times = document['times']
         hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
         resultScripts.append(hilitedScript)
         timestampIndices=stringToTimestamps(hilitedScript)
-        resultTimestamps=[]
+        docTimestamps=[]
         for index in timestampIndices:
-            resultTimestamps.append(resultTimes[-1][index])
-        #results = results + resultIDs[-1] + ": " + hilitedScript + "============" + resultTypes[-1] + "===========" + str(resultTimes[-1])
-    #results = str(response) # use this to see all the info that solr returns
-    results = str(resultIDs) + str(resultTypes) + str(resultTimes) + str(resultScripts)
+            docTimestamps.append(times[index])
+        resultTimestamps.append(docTimestamps)
+    results = str(resultIDs) + str(resultTypes) + str(resultTimestamps) + str(resultScripts)
     return results

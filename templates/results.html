@@ -75,7 +75,7 @@
 
     function addSuggestion(suggestion){
         let option = document.createElement('option');
-        option.value="'" + suggestion + "'";
+        option.value=suggestion;
         option.innerHTML=suggestion;
         document.getElementById("quote").appendChild(option);
     }
