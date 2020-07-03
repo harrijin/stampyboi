@@ -149,18 +149,10 @@ def check_spelling():
 # ==============Helper Methods==============
 
 def stringToTimestamps(script):
-    tagLength = 4
     result = []
-    indexOfTag = 0
-    prevIndex = 0
-    while indexOfTag != -1:
-        try:
-            indexOfTag = script.index('<em>', prevIndex)
-        except:
-            indexOfTag = -1
-        if indexOfTag != -1:
-            result.append(len(script[0:indexOfTag].split()))
-            prevIndex = indexOfTag + tagLength
+    for index, phrase in enumerate(script.split()):
+        if '<em>' in phrase:
+            result.append(index)
     return result
 
 def stringToSuggestions(script):
