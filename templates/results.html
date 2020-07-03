@@ -35,7 +35,8 @@
             if (this.readyState == 4 && this.status == 200) {
                 suggestions = JSON5.parse(this.responseText);
                 if(suggestions.length > 0){
-                    generateSpellcheck(suggestions);
+                    generateSpellcheck();
+                    suggestions.forEach(addSuggestion);
                 }
             }
         };
@@ -43,7 +44,7 @@
 
     }
 
-    function generateSpellcheck(suggestions){
+    function generateSpellcheck(){
         let prefix = document.createElement('span');
         let form = document.createElement('form');
         let searchSrc = document.createElement('input');
@@ -70,11 +71,11 @@
         form.appendChild(submitButton);
         document.getElementById('spellchecking').appendChild(prefix);
         document.getElementById('spellchecking').appendChild(form);
-        suggestions.forEach(addSuggestion);
     }
 
     function addSuggestion(suggestion){
         let option = document.createElement('option');
+        suggestion = suggestion.substring('script:'.length);//gets rid of 'script:'' from query
         option.value=suggestion;
         option.innerHTML=suggestion;
         document.getElementById("quote").appendChild(option);

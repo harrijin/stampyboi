@@ -137,14 +137,14 @@ def get_suggestions():
 
 @app.route('/spellcheck', methods=['POST'])
 def check_spelling():
-    query = request.form['q']
-    spellcheckURL = 'http://' + SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/spell?wt=json&omitHeader=true&q='+query.replace(' ', '+')
+    query = '"' + request.form['q'] + '"'
+    spellcheckURL = 'http://' + SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/spell?wt=json&omitHeader=true&q=script:'+query.replace(' ', '+')
     try:
         response = json.load(urlopen(spellcheckURL))
     except:
         return str([""])
     suggestions = response['spellcheck']['collations'][1::2]
-    return str(suggestions)
+    return str(suggestions).replace('"','')
 
 # ==============Helper Methods==============
 
@@ -192,7 +192,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def search_solr(quote, source='none', title=''):
-    quote = '\"'+quote.replace(" ", "+")+'\"'
+    quote = '"'+quote.replace(" ", "+")+'"'
     connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true'
     # ===============Database Search===============
     if source == 'yt':
