@@ -26,7 +26,7 @@ SPACE_REPLACEMENT_CHAR = '-'
 
 
 """
-FlixExtractor is the caption extractor for video sources where 
+FlixExtractor is the caption extractor for video sources where
 captions are available on 8flix.
 """
 
@@ -72,8 +72,8 @@ class FlixExtractor(Transcriber):
         pdf_soup = BeautifulSoup(e.content)
         buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
         self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
-        
-    
+
+
     def getTranscript(self):
         # Extract text from PDF
         transcript = get_pdf_text(self.pdf_url)
@@ -100,10 +100,11 @@ class FlixExtractor(Transcriber):
 
             phrase = component[TIMESTAMP_LEN:]
             words = extract_words(phrase)
-            transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
-        
+            if len(words) != 0:
+                transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
+
         return transcript
-    
+
     def convertToJSON(self, filepath):
         transcript=self.getTranscript()
         text=""
@@ -122,7 +123,7 @@ class FlixExtractor(Transcriber):
         }
         with open(filepath, "w") as outfile:
             json.dump(jsonObject, outfile)
-        
+
     @staticmethod
     def __convert_to_seconds(timestamp):
         components = re.split(TIMESTAMP_COMPONENTS_REGEX, timestamp)

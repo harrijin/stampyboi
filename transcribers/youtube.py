@@ -27,7 +27,8 @@ class YouTube(Transcriber):
             phrase = dic['text']
             time = dic['start']
             words = extract_words(phrase)
-            result.append((SPACE_REPLACEMENT_CHAR.join(words), time))
+            if len(words) != 0:
+                result.append((SPACE_REPLACEMENT_CHAR.join(words), time))
         return result
 
     def getJSON(self):
@@ -39,8 +40,9 @@ class YouTube(Transcriber):
         for dic in self.transcript:
             words = extract_words(dic['text'])
             time = dic['start']
-            phrase_list.append(SPACE_REPLACEMENT_CHAR.join(words))
-            time_list.append(time)
+            if len(words) != 0:
+                phrase_list.append(SPACE_REPLACEMENT_CHAR.join(words))
+                time_list.append(time)
         return {
             "id":self.source,
             "type":"yt",

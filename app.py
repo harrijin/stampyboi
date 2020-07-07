@@ -185,7 +185,7 @@ def allowed_file(filename):
 
 def search_solr(quote, source='none', title=''):
     quote = '"'+quote.replace(" ", "+")+'"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true'
+    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true'
     # ===============Database Search===============
     if source == 'yt':
         connectionURL = connectionURL + '&fq=type:yt'
