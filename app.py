@@ -104,7 +104,11 @@ def render_results():
             # while not os.path.exists(audioPath):
             #     pass
             transcriber = FileExtractor(audioPath, MODEL)
-            results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
+            transcriptList = transcriber.getTranscript()
+            tupleList = findStringInTranscript(transcriptList, quote)
+            results = formatTranscriptToDictionary("Upload", filename, tupleList)
+            #old
+            #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
             os.remove(audioPath)
 
         else:
@@ -217,3 +221,12 @@ def search_solr(quote, source='none', title=''):
         resultTimestamps.append(docTimestamps)
     results = str(resultIDs) + str(resultTypes) + str(resultTimestamps) + str(resultScripts)
     return results
+
+def findStringInTranscript(transcriptList, targetString):
+    firstWord = targetString.split()[0]
+    targetTuples = list(filter(lambda x:firstWord in x, transcriptList))
+    return targetTuples
+
+def formatTranscriptToDictionary(type, id, tupleList):
+    resultDict = {"Type": type, "ID": id, "List": tupleList}
+    return resultDict
