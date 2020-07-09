@@ -5,11 +5,11 @@ This spider reads from ids.txt and converts it to the real video ids. The pipeli
 
 import scrapy
 import re
+import os
 
 class YoutubeSpider(scrapy.Spider):
     name = "youtube"
     start_urls = []
-
     input = open("ids.txt")
     template = "http://data.yt8m.org/2/j/i/{}/{}.js"
 

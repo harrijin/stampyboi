@@ -13,7 +13,7 @@ import concurrent.futures
 # from transcribers.file import FileExtractor
 # import youtube_dl
 
-DEST_PATH = 'http://localhost:8983/solr/my_collection/update/json/docs'
+DEST_PATH = 'http://localhost:8983/solr/stampyboi/update/json/docs'
 successes = 0
 
 def extract(id):

@@ -7,3 +7,4 @@ transcribers/uploadedFiles/*.wav
 jsonTranscripts/*.json
 *.tfrecord
 ids.txt
+scrape/scrape/spiders/yt8m/records/*

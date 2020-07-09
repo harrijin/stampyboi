@@ -10,11 +10,11 @@ import tensorflow as tf
 import numpy as np
 import os
 
-filenames = []
+filenames = ['train0093.tfrecord']
 
-for file in os.listdir(os.getcwd() + "/records"):
-    if file.endswith(".tfrecord"):
-        filenames.append("records/" + file)
+# for file in os.listdir(os.getcwd() + "/records"):
+#     if file.endswith(".tfrecord"):
+#         filenames.append("records/" + file)
 
 raw_dataset = tf.data.TFRecordDataset(filenames)
 
