@@ -106,7 +106,7 @@ def render_results():
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote)
-            results = formatTranscriptToDictionary("Upload", filename, tupleList)
+            results = formatTranscriptToDictionary("file", filename, tupleList)
             #old
             #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
             os.remove(audioPath)
