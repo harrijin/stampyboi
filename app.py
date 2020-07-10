@@ -22,6 +22,8 @@ SOLR_HOST_DIR = '/Documents'
 MAX_SUGGESTIONS = 7 # maximum number of videos to return for suggestions
 SUGGESTION_REGEX = '(?:<b>)(.+?)(?:[\s.,:;!?])'
 
+WORDS_OF_CONTEXT = 2 # the number of words on either side of the target to return as context
+
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
 WORKING_DIRECTORY = os.getcwd()
@@ -223,8 +225,30 @@ def search_solr(quote, source='none', title=''):
     return results
 
 def findStringInTranscript(transcriptList, targetString):
-    firstWord = targetString.split()[0]
-    targetTuples = list(filter(lambda x:firstWord in x, transcriptList))
+    targetStringSplit = targetString.split()
+    firstWord = targetStringSplit[0]
+    targetTuples = []
+    x = 0
+    while x < len(transcriptList):
+        if (transcriptList[x])[0] == firstWord:
+            y = 1
+            equal = True
+            while y < len(targetString.split()) and x + y < len(transcriptList):
+                if (transcriptList[x + y])[0] != targetStringSplit[y]:
+                    equal = False
+                y += 1
+            if equal:
+                z = 1
+                resultString = targetString
+                while z <= WORDS_OF_CONTEXT:
+                    if x - z >= 0:
+                        resultString = (transcriptList[x - z])[0] + " "  + resultString
+                    if x + len(targetStringSplit) + z - 1 < len(transcriptList):
+                        resultString = resultString + " " + (transcriptList[x + len(targetStringSplit) + z - 1])[0]
+                    z += 1
+                targetTuples.append((resultString, (transcriptList[x])[1]))
+        x += 1
+    #targetTuples = list(filter(lambda x:firstWord in x, transcriptList))
     return targetTuples
 
 def formatTranscriptToDictionary(type, id, tupleList):
