@@ -111,7 +111,8 @@ def render_results():
             results = formatTranscriptToDictionary("file", filename, tupleList)
             #old
             #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
-            os.remove(audioPath)
+            if os.path.exists(audioPath):
+                os.remove(audioPath)
 
         else:
             results = 'ERROR: incorrect file format'
