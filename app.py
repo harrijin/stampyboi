@@ -108,7 +108,7 @@ def render_results():
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote)
-            results = formatTranscriptToDictionary("file", filename, tupleList)
+            results = [formatTranscriptToDictionary("file", filename, tupleList)]
             #old
             #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
             if os.path.exists(audioPath):
@@ -225,7 +225,7 @@ def search_solr(quote, source='none', title=''):
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], document['id'], highlights)
         results.append(videoInfo)
-        
+
     return results
 
 def findStringInTranscript(transcriptList, targetString):
