@@ -1,5 +1,5 @@
 import os, re
-from flask import Flask, send_file, request, flash, redirect, url_for, render_template
+from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
@@ -168,9 +168,9 @@ def extractHighlights(script, times):
                     buildPhrase.append((re.sub('-', ' ', phrase)))
                     if ('</em>' in script_list[i]):
                         break
-                result.append((' '.join(buildPhrase), times[index]))
+                result.append((Markup(' '.join(buildPhrase)), times[index]))
             else:
-                result.append((re.sub('-', ' ', phrase), times[index]))
+                result.append((Markup(re.sub('-', ' ', phrase)), times[index]))
     return result
 
 def stringToSuggestions(script):
