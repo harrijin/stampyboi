@@ -23,21 +23,14 @@
             {% if result is not string %}
                 {% for doc in result %}
                     <div>
-                    {% for key, value in result.items() %}
-                        {% if key is equalto "Type" %}
-                            <h1>Type: {{value}}</h1>
-                        {% elif key is equalto "ID" %}
-                            <h2>ID: {{value}}</h2>
-                        {% else %}
-                            <ol>
-                                {% for tuple in value %}
-                                    <li>{{tuple[0]}} {{tuple[1]}}</li>
-                                {% endfor %}
-                            </ol>
-                        {% endif %}
-                    {% endfor %}
+                        <h1>Type: {{doc['type']}}</h1>
+                        <h2>ID: {{doc['id']}}</h2>
+                        <ol>
+                            {% for tuple in doc['list'] %}
+                                <li>{{tuple[0]}} {{tuple[1]}}</li>
+                            {% endfor %}
+                        </ol>
                     </div>
-                    <br>
                 {% endfor %}
             {% else %}
                 Results: {{result}}

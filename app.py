@@ -165,8 +165,8 @@ def extractHighlights(script, times):
             if end < begin:
                 buildPhrase = []
                 for i in range(index + 1, len(script_list)):
-                    buildPhrase.append((re.sub('-', ' ', phrase))
-                    if '</em>' in script_list[i]:
+                    buildPhrase.append((re.sub('-', ' ', phrase)))
+                    if ('</em>' in script_list[i]):
                         break
                 result.append((' '.join(buildPhrase), times[index]))
             else:
@@ -256,5 +256,5 @@ def findStringInTranscript(transcriptList, targetString):
     return targetTuples
 
 def formatTranscriptToDictionary(type, id, tupleList):
-    resultDict = {"Type": type, "ID": id, "List": tupleList}
+    resultDict = {"type": type, "id": id, "list": tupleList}
     return resultDict
