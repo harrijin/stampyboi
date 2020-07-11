@@ -10,9 +10,6 @@ from datetime import datetime
 import json, subprocess
 import concurrent.futures
 
-# from transcribers.file import FileExtractor
-# import youtube_dl
-
 DEST_PATH = 'http://localhost:8983/solr/stampyboi/update/json/docs'
 successes = 0
 
@@ -33,8 +30,6 @@ class TranscriberPipeline:
 
     def open_spider(self, spider):
         spider.executor = concurrent.futures.ThreadPoolExecutor()
-        # self.model = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
-        # self.model.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
     def close_spider(self, spider):
         spider.executor.shutdown()
@@ -44,23 +39,3 @@ class TranscriberPipeline:
         id = item['realid']
         spider.executor.submit(extract, id)
         return item
-
-# STT processing of YT videos - unnecessary due to autocaptions applying on all convertible audio
-# if isinstance(transcript, str) # Returned error message instead of transcript list
-#     opts = {
-#         'outtmpl' : '%(id)s.%(ext)s',
-#         'postprocessors' : [{
-#             'key': 'FFmpegExtractAudio',
-#             'preferredcodec': 'wav',
-#         }],
-#         'cookiefile' : 'cookies.txt',
-#     }
-#     with youtube_dl.YoutubeDL(opts) as ydl:
-#         ydl.download(['https://www.youtube.com/watch?v=' + id])
-
-#     try:
-#         with open(id + '.wav') as input:
-#             transcriber = FileExtractor(id + '.wav', self.model)
-#             transcript = transcriber.getTranscript()
-#     except FileNotFoundError:
-#         raise DropItem("No captions: " + id)
