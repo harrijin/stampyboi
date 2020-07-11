@@ -1,5 +1,5 @@
 import os, re
-from flask import Flask, send_file, request, flash, redirect, url_for, render_template
+from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
@@ -108,7 +108,7 @@ def render_results():
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote)
-            results = formatTranscriptToDictionary("file", filename, tupleList)
+            results = [formatTranscriptToDictionary("file", filename, tupleList)]
             #old
             #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
             if os.path.exists(audioPath):
@@ -155,11 +155,22 @@ def check_spelling():
 
 # ==============Helper Methods==============
 
-def stringToTimestamps(script):
+def extractHighlights(script, times):
     result = []
-    for index, phrase in enumerate(script.split()):
-        if '<em>' in phrase:
-            result.append(index)
+    script_list = script.split()
+    for index, phrase in enumerate(script_list):
+        begin = phrase.rfind('<em>')
+        if begin != -1:
+            end = phrase.rfind('</em>')
+            if end < begin:
+                buildPhrase = []
+                for i in range(index + 1, len(script_list)):
+                    buildPhrase.append((re.sub('-', ' ', phrase)))
+                    if ('</em>' in script_list[i]):
+                        break
+                result.append((Markup(' '.join(buildPhrase)), times[index]))
+            else:
+                result.append((Markup(re.sub('-', ' ', phrase)), times[index]))
     return result
 
 def stringToSuggestions(script):
@@ -206,23 +217,18 @@ def search_solr(quote, source='none', title=''):
         response = json.load(connection)
     except:
         return "Sorry, the search server is currently down."
-    resultIDs = []
-    resultTypes = []
-    resultScripts = []
-    results = ""
-    resultTimestamps=[]
+    
+    results = []
+
     for document in response['response']['docs']:
-        resultIDs.append(document['id'])
-        resultTypes.append(document['type'])
-        times = document['times']
-        hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
-        resultScripts.append(hilitedScript)
-        timestampIndices=stringToTimestamps(hilitedScript)
-        docTimestamps=[]
-        for index in timestampIndices:
-            docTimestamps.append(times[index])
-        resultTimestamps.append(docTimestamps)
-    results = str(resultIDs) + str(resultTypes) + str(resultTimestamps) + str(resultScripts)
+        highlightedScript = response['highlighting'][document['id']]['script'][0]
+        highlights = extractHighlights(highlightedScript, document['times'])
+        videoInfo = formatTranscriptToDictionary(document['type'], document['id'], highlights)
+        results.append(videoInfo)
+
+    if not results:
+        return 'No results found.'
+
     return results
 
 def findStringInTranscript(transcriptList, targetString):
@@ -253,5 +259,5 @@ def findStringInTranscript(transcriptList, targetString):
     return targetTuples
 
 def formatTranscriptToDictionary(type, id, tupleList):
-    resultDict = {"Type": type, "ID": id, "List": tupleList}
+    resultDict = {"type": type, "id": id, "list": tupleList}
     return resultDict
