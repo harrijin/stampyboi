@@ -226,6 +226,9 @@ def search_solr(quote, source='none', title=''):
         videoInfo = formatTranscriptToDictionary(document['type'], document['id'], highlights)
         results.append(videoInfo)
 
+    if not results:
+        return 'No results found.'
+
     return results
 
 def findStringInTranscript(transcriptList, targetString):
