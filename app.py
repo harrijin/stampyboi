@@ -108,9 +108,11 @@ def render_results():
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote)
-            results = [formatTranscriptToDictionary("file", filename, tupleList)]
-            #old
-            #results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
+            if not tupleList:
+                results = 'No results found.'
+            else:
+                results = [formatTranscriptToDictionary("file", filename, tupleList)]
+            
             if os.path.exists(audioPath):
                 os.remove(audioPath)
 
