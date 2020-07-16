@@ -1,0 +1,40 @@
+<html>
+    <head>
+        Title Placeholder
+    </head>
+    <body>
+        
+        <iframe width="1519" height="554" src="{{'https://www.youtube.com/embed/' ~ id}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br>
+        {% for stamp in stamps %}
+            <div>
+                <a onclick="seek({{stamp['sec'] | safe}})">{{stamp['time']}}</a><span> {{stamp['text']}}</span>
+            </div>
+        {% endfor %}
+
+    </body>
+    <script src="http://www.youtube.com/player_api"></script>
+    <script>
+        var player;
+
+        function onYouTubeIframeAPIReady() {
+            console.log("player");
+            player = new YT.Player('player', {
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.seekTo()
+            event.target.playVideo();
+        }
+
+        function seek(sec) {
+            if (player) {
+                player.seekTo(sec, false);
+            }
+        }
+    </script>
+</html>
