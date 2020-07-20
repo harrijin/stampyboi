@@ -80,11 +80,11 @@ def render_results():
         title = request.form['flix_title']
         szn = request.form['flix_szn']
         ep = request.form['flix_ep']
-        if len(title) > 0: #and int(szn) > 0 and int(ep) > 0:
+        if len(title) > 0:
             videoID = title + "^!" + szn + "_"+ep
             results = search_solr(quote,'flix',videoID)
             if results == '[][][][]': # Check if solr found the video id in the index
-                if szn != '' and ep != '':
+                if szn != '' and ep != '': # Check if season and episode are provided
                     print('video not found. transcribing and indexing')
                     try:
                         transcriber = FlixExtractor(title, int(szn), int(ep))
