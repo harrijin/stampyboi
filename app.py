@@ -6,7 +6,7 @@ from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
 from .transcribers.file import FileExtractor
 from urllib.request import urlopen
-import json
+import json, datetime
 from pathlib import Path
 from enum import Enum
 
@@ -37,6 +37,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ===========Index pages===========
+
+current_results = "No results found."
 
 @app.route('/', methods=['GET'])
 def render_index():
@@ -122,6 +124,9 @@ def render_results():
     else:
         results = "ERROR: Invalid searchsearch_src"
 
+    global current_results
+    current_results = results
+
     return render_template("results.html", result=results, query=quote)
 
 @app.route('/suggest', methods=['POST'])
@@ -154,6 +159,22 @@ def check_spelling():
         return str([""])
     suggestions = response['spellcheck']['collations'][1::2]
     return str(suggestions).replace('"','')
+
+@app.route('/video')
+def render_video():
+    index = request.form['stamp']
+    if not isinstance(current_results, str):
+        stamps = []
+        doc = current_results[request.form['doc']]
+        for item in doc['list']:
+            text = item[0]
+            sec = int(item[1])
+            time = str(datetime.timedelta(seconds=sec))
+            stamps.append({'text':text, 'sec':sec, 'time':time})
+    else:
+        stamps = "Result error."
+
+    return render_template("video.html", stamps=stamps, index=index)
 
 # ==============Helper Methods==============
 

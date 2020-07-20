@@ -23,8 +23,8 @@
             {% if result is not string %}
                 {% for doc in result %}
                     <div>
-                        <h1>Type: {{doc['type']}}</h1>
-                        <h2>ID: {{doc['id']}}</h2>
+                        <a onclick='directToVideo("{{loop.index0}}", 1)'><h2>ID: {{doc['id']}}</h2></a>
+                        <h2>Type: {{doc['type']}}</h2>
                         <ol>
                             {% for tuple in doc['list'] %}
                                 <li>{{tuple[0]}} {{tuple[1]}}</li>
@@ -95,6 +95,16 @@
         option.value=suggestion;
         option.innerHTML=suggestion;
         document.getElementById("quote").appendChild(option);
+    }
+
+    function directToVideo(docIndex, stampIndex) {
+        var form = new FormData();
+        form.append('doc', docIndex);
+        form.append('stamp', stampIndex);
+
+        var req = new XMLHttpRequest();
+        req.open('GET','/video');
+        req.send(form)
     }
 
   </script>
