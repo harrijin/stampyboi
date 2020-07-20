@@ -10,6 +10,8 @@ from datetime import datetime
 import json, subprocess
 import concurrent.futures
 import pysolr
+import os
+from pathlib import Path
 # from transcribers.file import FileExtractor
 # import youtube_dl
 
