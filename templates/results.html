@@ -19,7 +19,23 @@
     </div>
 
     <div>
-        <p id="results">Results: {{result}}</p>
+        <p id="results">
+            {% if result is not string %}
+                {% for doc in result %}
+                    <div>
+                        <h1>Type: {{doc['type']}}</h1>
+                        <h2>ID: {{doc['id']}}</h2>
+                        <ol>
+                            {% for tuple in doc['list'] %}
+                                <li>{{tuple[0]}} {{tuple[1]}}</li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {{result}}
+            {% endif %}
+        </p>
     </div>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>

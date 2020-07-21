@@ -1,5 +1,5 @@
 import os, re
-from flask import Flask, send_file, request, flash, redirect, url_for, render_template
+from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
@@ -23,6 +23,8 @@ SOLR_HOST_DIR = '/Documents'
 
 MAX_SUGGESTIONS = 7 # maximum number of videos to return for suggestions
 SUGGESTION_REGEX = '(?:<b>)(.+?)(?:[\s.,:;!?])'
+
+WORDS_OF_CONTEXT = 2 # the number of words on either side of the target to return as context
 
 # Getting ip address of solr host from ~/Documents/solrhost.txt
 
@@ -119,8 +121,15 @@ def render_results():
             # while not os.path.exists(audioPath):
             #     pass
             transcriber = FileExtractor(audioPath, MODEL)
-            results = "Quote: " + quote + "<br>File: " + filename + "<br>Results: <br>" + str(transcriber.getTranscript())
-            os.remove(audioPath)
+            transcriptList = transcriber.getTranscript()
+            tupleList = findStringInTranscript(transcriptList, quote)
+            if not tupleList:
+                results = 'No results found.'
+            else:
+                results = [formatTranscriptToDictionary("file", filename, tupleList)]
+            
+            if os.path.exists(audioPath):
+                os.remove(audioPath)
 
         else:
             results = 'ERROR: incorrect file format'
@@ -163,11 +172,22 @@ def check_spelling():
 
 # ==============Helper Methods==============
 
-def stringToTimestamps(script):
+def extractHighlights(script, times):
     result = []
-    for index, phrase in enumerate(script.split()):
-        if '<em>' in phrase:
-            result.append(index)
+    script_list = script.split()
+    for index, phrase in enumerate(script_list):
+        begin = phrase.rfind('<em>')
+        if begin != -1:
+            end = phrase.rfind('</em>')
+            if end < begin:
+                buildPhrase = []
+                for i in range(index + 1, len(script_list)):
+                    buildPhrase.append((re.sub('-', ' ', phrase)))
+                    if ('</em>' in script_list[i]):
+                        break
+                result.append((Markup(' '.join(buildPhrase)), times[index]))
+            else:
+                result.append((Markup(re.sub('-', ' ', phrase)), times[index]))
     return result
 
 def stringToSuggestions(script):
@@ -228,12 +248,10 @@ def search_solr(quote, source='none', id=''):
         response = json.load(connection)
     except:
         return "Sorry, the search server is currently down."
-    resultIDs = []
-    resultTypes = []
-    resultScripts = []
-    results = ""
-    resultTimestamps=[]
+    
+    results = []
     search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
+
     for document in response['response']['docs']:
         docID = document['id']
         if search_netflix_season:
@@ -241,15 +259,43 @@ def search_solr(quote, source='none', id=''):
             docSzn = match.group(2)
             if docSzn != szn:
                 continue
-        resultIDs.append(docID)
-        resultTypes.append(document['type'])
-        times = document['times']
-        hilitedScript=response['highlighting'][resultIDs[-1]]['script'][0]
-        resultScripts.append(hilitedScript)
-        timestampIndices=stringToTimestamps(hilitedScript)
-        docTimestamps=[]
-        for index in timestampIndices:
-            docTimestamps.append(times[index])
-        resultTimestamps.append(docTimestamps)
-    results = str(resultIDs) + str(resultTypes) + str(resultTimestamps) + str(resultScripts)
+        highlightedScript = response['highlighting'][docID]['script'][0]
+        highlights = extractHighlights(highlightedScript, document['times'])
+        videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
+        results.append(videoInfo)
+
+    if not results:
+        return 'No results found.'
+
     return results
+
+def findStringInTranscript(transcriptList, targetString):
+    targetStringSplit = targetString.split()
+    firstWord = targetStringSplit[0]
+    targetTuples = []
+    x = 0
+    while x < len(transcriptList):
+        if (transcriptList[x])[0] == firstWord:
+            y = 1
+            equal = True
+            while y < len(targetString.split()) and x + y < len(transcriptList):
+                if (transcriptList[x + y])[0] != targetStringSplit[y]:
+                    equal = False
+                y += 1
+            if equal:
+                z = 1
+                resultString = targetString
+                while z <= WORDS_OF_CONTEXT:
+                    if x - z >= 0:
+                        resultString = (transcriptList[x - z])[0] + " "  + resultString
+                    if x + len(targetStringSplit) + z - 1 < len(transcriptList):
+                        resultString = resultString + " " + (transcriptList[x + len(targetStringSplit) + z - 1])[0]
+                    z += 1
+                targetTuples.append((resultString, (transcriptList[x])[1]))
+        x += 1
+    #targetTuples = list(filter(lambda x:firstWord in x, transcriptList))
+    return targetTuples
+
+def formatTranscriptToDictionary(type, id, tupleList):
+    resultDict = {"type": type, "id": id, "list": tupleList}
+    return resultDict
