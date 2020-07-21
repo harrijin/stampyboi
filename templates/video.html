@@ -1,0 +1,53 @@
+<html>
+    <head>
+        Title Placeholder (TODO)
+    </head>
+    <body>
+        <div>
+            <form action='/'>
+              <input type='submit' value='New search'>
+            </form>
+        </div>
+
+        {% if stamps is not string %}
+        <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ id ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br>
+
+        <p>
+            {% for stamp in stamps %}
+            <div>
+                {% set sec = stamp['sec'] %}
+                <span><a href='javascript:;' onclick="seek('{{sec}}')">{{stamp['time']}}</a> {{stamp['text']}}</span>
+            </div>
+            {% endfor %}
+        </p>
+        {% else %}
+        <p>{{stamps}}</p>
+        {% endif %}
+        
+        <script src="http://www.youtube.com/player_api"></script>
+        <script>
+            var player;
+
+            function onYouTubeIframeAPIReady() {
+                console.log("player");
+                player = new YT.Player('player', {
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
+            }
+
+            function onPlayerReady(event) {
+                event.target.playVideo();
+                console.log("ready");
+            }
+
+            function seek(sec) {
+                if (player) {
+                    player.seekTo(parseInt(sec), true);
+                }
+            }
+        </script>
+    </body>
+</html>

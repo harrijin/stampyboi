@@ -23,8 +23,13 @@
             {% if result is not string %}
                 {% for doc in result %}
                     <div>
-                        <h1>Type: {{doc['type']}}</h1>
+                        {% if doc['type'] == 'yt' %}
+                        <h2><a href='javascript:directToVideo("{{loop.index0}}", "0")'>ID: {{doc['id']}}</a></h2>
+                        {% else %}
                         <h2>ID: {{doc['id']}}</h2>
+                        {% endif %}
+
+                        <h2>Type: {{doc['type']}}</h2>
                         <ol>
                             {% for tuple in doc['list'] %}
                                 <li>{{tuple[0]}} {{tuple[1]}}</li>
@@ -95,6 +100,21 @@
         option.value=suggestion;
         option.innerHTML=suggestion;
         document.getElementById("quote").appendChild(option);
+    }
+
+    function directToVideo(docIndex, stampIndex) {
+        var form = new FormData();
+        form.append('doc', docIndex);
+        form.append('stamp', stampIndex);
+
+        var req = new XMLHttpRequest();
+        req.open('POST','/receive-video');
+        req.onreadystatechange = function() {
+            if(req.readyState == XMLHttpRequest.DONE && req.status == 200) {
+                window.location.href = '/video';
+            }
+        }
+        req.send(form);
     }
 
   </script>
