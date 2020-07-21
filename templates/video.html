@@ -3,46 +3,46 @@
         Title Placeholder (TODO)
     </head>
     <body>
-
-        <iframe width="1519" height="554" src="{{'https://www.youtube.com/embed/' ~ id}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        {% if stamps is not string %}
+        <iframe id="player" width="1519" height="554" src="{{'https://www.youtube.com/embed/' ~ id ~ '?enablejsapi=true'}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         <br>
 
         <p>
-            {% if stamps is not string %}
-                {% for stamp in stamps %}
-                <div>
-                    {% set sec = stamp['sec'] %}
-                    <span><a href='javascript:;' onclick="seek('{{sec}}')">{{stamp['time']}}</a> {{stamp['text']}}</span>
-                </div>
-                {% endfor %}
-            {% else %}
-                {{stamps}}
-            {% endif %}
+            {% for stamp in stamps %}
+            <div>
+                {% set sec = stamp['sec'] %}
+                <span><a href='javascript:;' onclick="seek('{{sec}}')">{{stamp['time']}}</a> {{stamp['text']}}</span>
+            </div>
+            {% endfor %}
         </p>
+        {% else %}
+        <p>{{stamps}}</p>
+        {% endif %}
+        
+        <script src="http://www.youtube.com/player_api"></script>
+        <script>
+            var player;
 
-    </body>
-    <script src="http://www.youtube.com/player_api"></script>
-    <script>
-        var player;
-
-        function onYouTubeIframeAPIReady() {
-            console.log("player");
-            player = new YT.Player('player', {
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            event.target.seekTo()
-            event.target.playVideo();
-        }
-
-        function seek(sec) {
-            if (player) {
-                player.seekTo(sec, false);
+            function onYouTubeIframeAPIReady() {
+                console.log("player");
+                player = new YT.Player('player', {
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
             }
-        }
-    </script>
+
+            function onPlayerReady(event) {
+                event.target.playVideo();
+                event.target.seekTo(parseInt("{{start}}"), true);
+                console.log("ready");
+            }
+
+            function seek(sec) {
+                if (player) {
+                    player.seekTo(parseInt(sec), true);
+                }
+            }
+        </script>
+    </body>
 </html>

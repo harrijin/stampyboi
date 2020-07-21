@@ -1,5 +1,5 @@
 import os, re
-from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup
+from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup, session
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
@@ -35,10 +35,9 @@ os.chdir(WORKING_DIRECTORY)
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = b'\xee\xe7\x0e\xe8\x1c\x87x%\xc3\x95\xfd\xb1wI\x96\x97' # MUST CHANGE IF APP IS DEPLOYED
 
 # ===========Index pages===========
-
-current_results = "No results found."
 
 @app.route('/', methods=['GET'])
 def render_index():
@@ -124,8 +123,7 @@ def render_results():
     else:
         results = "ERROR: Invalid searchsearch_src"
 
-    global current_results
-    current_results = results
+    session['results'] = results
 
     return render_template("results.html", result=results, query=quote)
 
@@ -160,21 +158,39 @@ def check_spelling():
     suggestions = response['spellcheck']['collations'][1::2]
     return str(suggestions).replace('"','')
 
-@app.route('/video')
-def render_video():
-    index = request.form['stamp']
-    if not isinstance(current_results, str):
+@app.route('/receive-video', methods=['POST'])
+def receive_video():
+    id, start = None, None
+    if 'results' in session and not isinstance(session['results'], str):
         stamps = []
-        doc = current_results[request.form['doc']]
+        doc = session['results'][int(request.form['doc'])]  # Get the doc result that the user wants to go to
+        id = doc['id']
         for item in doc['list']:
             text = item[0]
             sec = int(item[1])
             time = str(datetime.timedelta(seconds=sec))
             stamps.append({'text':text, 'sec':sec, 'time':time})
+        stampIndex = int(request.form['stamp'])
+        start = stamps[stampIndex]['sec']
     else:
-        stamps = "Result error."
+        stamps = "ERROR: No video loaded."
 
-    return render_template("video.html", stamps=stamps, index=index)
+    session['stamps'] = stamps
+    session['start'] = start
+    session['id'] = id
+
+    return redirect(url_for('render_video'))
+
+@app.route('/video')
+def render_video():
+    if all(x in session for x in ['stamps', 'start', 'id']):
+        stamps = session['stamps']
+        start = session['start']
+        id = session['id']
+    else:
+        stamps = "ERROR: No video loaded."
+        start, id = None, None
+    return render_template("video.html", stamps=stamps, start=start, id=id)
 
 # ==============Helper Methods==============
 
