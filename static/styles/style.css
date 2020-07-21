@@ -1,0 +1,16 @@
+:root {
+    --BACKGROUND: #383B3F;
+    --ACCENT: #00b3ff;
+    --TEXT: #fff;
+    --LOGO: url('./images/logo.png');
+    --FONT-FACE: system-ui
+}
+html {
+    background-color: var(--BACKGROUND);
+    color: var(--TEXT);
+    font-family: var(--FONT-FACE);
+}
+h1{
+    color: var(--ACCENT);
+}
+
