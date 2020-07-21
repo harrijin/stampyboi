@@ -58,7 +58,7 @@ def render_results():
             videoID = ytVidId(source)
             if videoID: # Check if provided link is valid
                 results = search_solr(quote,'yt',videoID)
-                if results == '[][][][]': # Check if solr found the video id in the index. 8 is the length of [][][][]
+                if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
                     transcriber = YouTube(videoID)
                     transcript = transcriber.getTranscript()
@@ -85,7 +85,7 @@ def render_results():
         if len(title) > 0:
             videoID = title + "^!" + szn + "_"+ep
             results = search_solr(quote,'flix',videoID)
-            if results == '[][][][]': # Check if solr found the video id in the index
+            if results == 'No results found.': # Check if solr found the video id in the index
                 if szn != '' and ep != '': # Check if season and episode are provided
                     print('video not found. transcribing and indexing')
                     try:
@@ -127,7 +127,7 @@ def render_results():
                 results = 'No results found.'
             else:
                 results = [formatTranscriptToDictionary("file", filename, tupleList)]
-            
+
             if os.path.exists(audioPath):
                 os.remove(audioPath)
 
@@ -248,7 +248,7 @@ def search_solr(quote, source='none', id=''):
         response = json.load(connection)
     except:
         return "Sorry, the search server is currently down."
-    
+
     results = []
     search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
 
