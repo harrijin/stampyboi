@@ -3,8 +3,14 @@
         Title Placeholder (TODO)
     </head>
     <body>
+        <div>
+            <form action='/'>
+              <input type='submit' value='New search'>
+            </form>
+        </div>
+
         {% if stamps is not string %}
-        <iframe id="player" width="1519" height="554" src="{{'https://www.youtube.com/embed/' ~ id ~ '?enablejsapi=true'}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ id ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         <br>
 
         <p>
@@ -34,7 +40,6 @@
 
             function onPlayerReady(event) {
                 event.target.playVideo();
-                event.target.seekTo(parseInt("{{start}}"), true);
                 console.log("ready");
             }
 
