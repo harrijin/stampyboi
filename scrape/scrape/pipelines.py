@@ -10,7 +10,24 @@ from datetime import datetime
 import json, subprocess
 import concurrent.futures
 
-DEST_PATH = 'http://localhost:8983/solr/stampyboi/update/json/docs'
+import pysolr
+import os
+from pathlib import Path
+# from transcribers.file import FileExtractor
+# import youtube_dl
+
+SOLR_COLLECTION = 'stampyboi'
+SOLR_HOST_DIR = '/Documents'
+WORKING_DIRECTORY = os.getcwd()
+HOME = str(Path.home())
+os.chdir(HOME + SOLR_HOST_DIR)
+file = open("solrhost.txt", "r")
+SOLR_HOST = str(file.read())
+os.chdir(WORKING_DIRECTORY)
+solr = pysolr.Solr('http://'+SOLR_HOST+'/solr/'+SOLR_COLLECTION)
+
+# DEST_PATH = 'http://localhost:8983/solr/stampyboi/update/json/docs'
+
 successes = 0
 
 def extract(id):
@@ -18,8 +35,10 @@ def extract(id):
     transcriptJSON = transcriber.getJSON()
 
     if not isinstance(transcriptJSON, str): # No error message
-        command = ["curl", "-X", "POST", "-H", "Content-Type: application/json", DEST_PATH, "--data-binary", json.dumps(transcriptJSON)]
-        subprocess.run(command)
+        transcriptJSON = transcriber.getJSON()
+        solr.add(transcriptJSON, commit=True)
+        # command = ["curl", "-X", "POST", "-H", "Content-Type: application/json", DEST_PATH, "--data-binary", json.dumps(transcriptJSON)]
+        # subprocess.run(command)
         # print(" ".join(command))
         global successes
         successes += 1
