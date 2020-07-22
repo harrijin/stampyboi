@@ -1,0 +1,30 @@
+/*
+Global constants defined in style.css.
+:root {
+    --BACKGROUND: #383B3F;
+    --ACCENT: #00b3ff;
+    --TEXT: #fff;
+    --FONT-FACE: system-ui
+}*/
+img{
+    display: block;
+    margin: 0 auto;
+    margin-top: 15vh;
+}
+.group        {
+  position:relative;
+  margin-bottom:45px;
+}
+
+input[name=quote] {
+    width: 50%;
+    margin: 5vh auto;
+    margin-bottom: 0;
+    font-size: 22px;
+}
+.bar[name=quote]  {width:50%; margin: 0 auto;}
+
+div.searchSources{
+    margin-bottom: 20px;
+}
+

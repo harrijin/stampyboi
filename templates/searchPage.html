@@ -1,56 +1,60 @@
 <html>
 
   <head>
-    StampyBoi
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/home.css') }}">
+
   </head>
 
   <body>
-    <div>
-        <button onclick="ytSearch()">Search YouTube video</button>
-        <button onclick="flixSearch()">Search Netflix show</button>
-        <button onclick="fileSearch()">Search a video/audio file</button>
-        <button onclick="noneSearch()">Search with only a quote</button>
-    </div>
+    <img class="center" src="/static/images/logo.png" alt="Stampyboi">
     <div>
         <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
-          <label for="quote">Quote to search for:</label>
-          <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest">
-          <br>
+            <div class="group" id="quoteDiv">
+                <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest" placeholder="Come with me if you want to live">
+                <span class="bar" name="quote"></span>
+                <span>
+                    <input type="submit" value="Search" id="searchButton">
+                </span>
+            </div>
           <datalist id="autosuggest"></datalist>
-          <br>
-          <p>in this video/audio file:</p>
-          <br>
-
-          <label for="yt_source">YouTube video to search in:</label>
-          <input type="text" id="yt_source" name="yt_source" disabled=true >
-
 
           <br>
-          <br>
+          <div class="searchSources">
+            <button onclick="ytSearch()">Search YouTube video</button>
+            <button onclick="flixSearch()">Search Netflix show</button>
+            <button onclick="fileSearch()">Search a video/audio file</button>
+            <button onclick="noneSearch()">Search with only a quote</button>
+          </div>
+            <div class="group">
+              <input type="text" id="yt_source" name="yt_source" disabled placeholder=" ">
+              <span class="bar"></span>
+              <span class="highlight"></span>
+              <label for="yt_source">YouTube video link</label>
+            </div>
+            <div class="group">
+              <input type="text" id="flix_title" name="flix_title" disabled placeholder=" ">
+              <span class="bar"></span>
+              <span class="highlight"></span>
+              <label for="flix_title">Show Name</label>
 
-          <label for="flix_title">Name of Netflix show:</label>
-          <input type="text" id="flix_title" name="flix_title" disabled=true >
+            </div>
+            <div class="group">
+              <input type="text" id="flix_szn" name="flix_szn" disabled pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" ">
+              <span class="bar"></span>
+              <span class="highlight"></span>
+              <label for="flix_szn">Season #</label>
 
-          <br>
-          <br>
-
-          <label for="flix_szn">Season #:</label>
-          <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
-          <br>
-          <br>
-
-          <label for="flix_ep">Episode #:</label>
-          <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
+            </div>
+            <div class="group">
+              <input type="text" id="flix_ep" name="flix_ep" disabled pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" ">
+              <span class="bar"></span>
+              <span class="highlight"></span>
+              <label for="flix_ep">Episode #</label>
+            </div>
           <input type="text" id="search_src" name="search_src" style="display: none;" >
-          <br>
-          <br>
-          <input type="file" id="vid_upload" name="vid_upload" disabled=true required>
-          <br>
-          <br>
-          <input type="submit" value="Search">
+          <input type="file" id="vid_upload" name="vid_upload" disabled required>
+
 
 
         </form>
