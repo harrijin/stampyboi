@@ -17,12 +17,46 @@ img{
 }
 
 input[name=quote] {
-    width: 50%;
-    margin: 5vh auto;
-    margin-bottom: 0;
+    width: 100%;
     font-size: 22px;
 }
-.bar[name=quote]  {width:50%; margin: 0 auto;}
+.bar[name=quote],.bar[name=quoteTop]  {width:100%; margin: 0 auto;}
+.bar[name=quoteTop] {bottom:100%;}
+
+.vertBar:before, .vertBar:after   {
+  content:'';
+  width:3px;
+  height:100%;
+  left:0px;
+  position:absolute;
+  background:var(--ACCENT);
+  transition:0.2s ease all;
+  margin:auto 0;
+}
+.vertBar[name=right] {left:100%;}
+.vertBar:before {
+  bottom:100%;
+}
+.vertBar:after {
+  top:100%;
+}
+
+/* active state */
+input:focus ~ .vertBar:before, input:focus ~ .vertBar:after {
+  width:50%;
+}
+#searchDiv{
+    margin: 5vh auto;
+    margin-bottom: 0;
+    width: 50%;
+    display:flex;
+    padding:0;
+    justify-content: center;
+}
+
+#quoteDiv{
+    width:100%;
+}
 
 div.searchSources{
     margin-bottom: 20px;

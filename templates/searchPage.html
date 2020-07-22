@@ -10,22 +10,20 @@
     <img class="center" src="/static/images/logo.png" alt="Stampyboi">
     <div>
         <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
-            <div class="group" id="quoteDiv">
-                <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest" placeholder="Come with me if you want to live">
-                <span class="bar" name="quote"></span>
-                <span>
-                    <input type="submit" value="Search" id="searchButton">
-                </span>
+            <div class="group" id="searchDiv">
+                <div id="quoteDiv">
+                    <input type="text" id="quote" name="quote" oninput="suggest()" autofocus list="autosuggest" placeholder="Come with me if you want to live">
+                    <span class="bar" name="quoteTop"></span>
+                    <span class="bar" name="quote"></span><!--
+                    <span class="vertBar" name="left"></span>
+                    <span class="vertBar" name="right"></span> -->
+                </div>
+                <input type="submit" value="Search" id="searchButton">
             </div>
           <datalist id="autosuggest"></datalist>
 
           <br>
-          <div class="searchSources">
-            <button onclick="ytSearch()">Search YouTube video</button>
-            <button onclick="flixSearch()">Search Netflix show</button>
-            <button onclick="fileSearch()">Search a video/audio file</button>
-            <button onclick="noneSearch()">Search with only a quote</button>
-          </div>
+
             <div class="group">
               <input type="text" id="yt_source" name="yt_source" disabled placeholder=" ">
               <span class="bar"></span>
@@ -54,10 +52,13 @@
             </div>
           <input type="text" id="search_src" name="search_src" style="display: none;" >
           <input type="file" id="vid_upload" name="vid_upload" disabled required>
-
-
-
         </form>
+        <div class="searchSources">
+            <button onclick="ytSearch()">Search YouTube video</button>
+            <button onclick="flixSearch()">Search Netflix show</button>
+            <button onclick="fileSearch()">Search a video/audio file</button>
+            <button onclick="noneSearch()">Search with only a quote</button>
+        </div>
     </div>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
