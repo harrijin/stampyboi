@@ -15,7 +15,7 @@ h1{
 /* material design input boxes*/
 input[type=text]{
   font-size:18px;
-  padding:10px 10px 10px 5px;
+  padding:10px 10px 10px 10px;
   display:block;
   width:300px;
   border:none;
