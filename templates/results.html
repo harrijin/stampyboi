@@ -38,8 +38,9 @@
                         {% endif %}
 
                         <ul>
+                            {% set outer = loop.index0 %}
                             {% for tuple in doc['list'] %}
-                                <li><a href="/">{{tuple[1]}}</a> {{tuple[0]}}</li>
+                                <li><a href='javascript:directToVideo("{{outer}}", "{{loop.index0}}")'>{{tuple[1]}}</a> {{tuple[0]}}</li>
                             {% endfor %}
                         </ul>
                     </div>
