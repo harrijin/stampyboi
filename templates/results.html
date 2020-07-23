@@ -18,30 +18,34 @@
         <br>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='secret.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='ytinfo.js')}}"></script>
+
     <div>
         <p id="results">
             {% if result is not string %}
                 {% for doc in result %}
-                    <div>
-                        {% set id = doc['id'] %}
+                    {% set id = doc['id'] %}
+                    <div id="{{id}}" class="{{doc['type']}}">
                         {% if doc['type'] == 'yt' %}
-                        <div id="{{id}}" onload="getInfo('{{id}}')">
                             <h2><a class="title" href='javascript:directToVideo("{{loop.index0}}", "0")'>ID: {{id}}</a></h2>
                             <p class="channel"></p>
                             <p class="date"></p>
-                            <a class="thumb" href='javascript:directToVideo("{{loop.index0}}", "0")'></a>
-                        </div>
+                            <a href='javascript:directToVideo("{{loop.index0}}", "0")'><img class="thumbnail" alt="thumbnail"></a>
                         {% else %}
-                        <h2>ID: {{id}}</h2>
+                            <h2>ID: {{id}}</h2>
                         {% endif %}
 
-                        <h2>Type: {{doc['type']}}</h2>
-                        <ol>
+                        <ul>
                             {% for tuple in doc['list'] %}
-                                <li>{{tuple[0]}} {{tuple[1]}}</li>
+                                <li><a href="/">{{tuple[1]}}</a> {{tuple[0]}}</li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </div>
+                    {% if doc['type'] == 'yt' %}
+                        <script>getInfo('{{id}}')</script>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 {{result}}
@@ -49,9 +53,8 @@
         </p>
     </div>
   </body>
+
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="secret.js"></script>
   <script>
     function check_spelling(){
         document.getElementById('spellcheckButton').style='display:none';
@@ -123,32 +126,6 @@
             }
         }
         req.send(form);
-    }
-
-    function getInfo(id) {
-        const ytApiKey = getYtDataAPIKey();
-
-        $.get("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey, function(data) {
-            const parent = document.getElementById(id);
-            const info = data.items[0].snippet;
-
-            parent.getElementsByClassName('title')[0].innerHTML = info.title;
-
-            let channelElement = parent.getElementsByClassName('channel');
-            channelElement.innerHTML = info.channelTitle;
-            
-            let dateElement = parent.getElementsByClassName('date');
-            let date = new Date(info.publishedAt);
-            let options = {month: 'short', day: 'numeric', year: 'numeric'};
-            dateElement.innerHTML = date.toLocaleDateString(date, options);
-
-            let thumbLinkElement = parent.getElementsByClassName('thumb');
-            let thumbElement = document.createElement('img');
-            thumbElement.setAttribute('src', info.thumbnails.default.url);
-            thumbElement.setAttribute('alt', 'thumbnail');
-            thumbLinkElement.appendChild(thumbElement)
-
-        });
     }
 
   </script>
