@@ -8,17 +8,17 @@
 
   <body>
     <img class="center" src="/static/images/logo.png" alt="Stampyboi">
-        <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
+        <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST' autocomplete="off">
             <div class="group" id="searchDiv">
-                <div id="quoteDiv">
+                <div id="quoteDiv" class="ui-widget">
                     <input type="text" id="quote" name="quote" oninput="suggest()" autofocus list="autosuggest" placeholder="Come with me if you want to live">
                     <span class="bar" name="quoteTop"></span>
                     <span class="bar" name="quote"></span>
                     <span class="vertBar" name="left"></span>
                     <span class="vertBar" name="right"></span>
-                </div>
+                </div><!-- quoteDiv -->
                 <button id="searchButton">Search</button>
-            </div><!--optionsDiv-->
+            </div><!--searchDiv-->
           <datalist id="autosuggest"></datalist>
 
           <br>
@@ -59,10 +59,12 @@
             <button type="button" onclick="noneSearch(); this.blur();">Everything</button>
         </div>
     </div> <!--optionsDiv-->
-    <button id="optionsButton" class="textButton" onclick="toggleOptions(); this.blur()">Options</button>
-    <button id="aboutButton" class="textButton" onclick="window.open('https://github.com/harrijin/stampyboi','_blank');">About</button>
+    <button id="optionsButton" class="textButton" onclick="this.blur()">Options</button>
+    <button id="aboutButton" class="textButton" onclick="window.open('https://github.com/harrijin/stampyboi','_blank'); this.blur()">About</button>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script>
 
     var searchSrc="none";
@@ -70,6 +72,7 @@
     //yt = youtube (default)
     //flix = netflix
     //file = file
+
     function toggleFile(state){
         document.getElementById("vid_upload").disabled = !state;
     }
@@ -112,36 +115,37 @@
     function suggest(){
         var userIn=encodeURIComponent(document.getElementById('quote').value);
         var suggestRequest = new XMLHttpRequest();
-        var suggestions;
         suggestRequest.open('POST','/suggest', true);
         suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                suggestions = JSON5.parse(this.responseText);
-                document.getElementById('autosuggest').innerHTML= "";
-                let userOption = document.createElement('option');
-                userOption.value = document.getElementById('quote').value;
-                document.getElementById('autosuggest').appendChild(userOption);
-                suggestions.forEach(addSuggestion);
+                var suggestions = JSON5.parse(this.responseText);
+                $( "#quote" ).autocomplete({
+                    source: suggestions
+                });
             }
 
         };
         suggestRequest.send("q="+userIn);
 
     }
-    function addSuggestion(suggestion){
-        let option = document.createElement('option');
-        option.value = suggestion.toLowerCase();
-        document.getElementById('autosuggest').appendChild(option);
-    }
-    function toggleOptions(){
-        var div = document.getElementById("optionsDiv");
-        if(window.getComputedStyle(div).display === "none"){
-            div.style.display = "block";
-        }else{
-            div.style.display = "none";
-        }
-    }
+    $("#optionsButton").click(function() {
+      $("#optionsDiv").fadeToggle(100);
+      return false;
+    });
+
+    $("body").click(function() {
+      if ($("#optionsDiv").is(":visible")) {
+        $("#optionsDiv").fadeToggle(100);
+      }
+    });
+
+    $("#optionsDiv").click(function(e){
+        e.preventDefault();
+        return false;
+    });
+
+
   </script>
 
 </html>

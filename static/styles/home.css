@@ -9,7 +9,7 @@ Global constants defined in style.css.
 img{
     display: block;
     margin: 0 auto;
-    margin-top: 15vh;
+    margin-top: 10vh;
 }
 .group        {
   position:relative;
@@ -58,6 +58,7 @@ input:focus ~ .vertBar:before, input:focus ~ .vertBar:after {
 #quoteDiv{
     width:85%;
     margin-right:1.5vh;
+    z-index: 1000;
 }
 
 div.searchSources{
@@ -83,7 +84,7 @@ div.searchSources{
     z-index: 9;
     max-width: 300px;
     padding: 10px;
-    background: #151515C0;
+    background: #151515DF;
 }
 
 .textButton{
@@ -92,6 +93,16 @@ div.searchSources{
     background: #00000000;
     color: var(--ACCENT);
     font-size: 20px;
+    border-radius: 4px;
+    padding: 10px 10px;
+}
+
+.textButton::after{
+    all:unset;
+}
+
+.textButton:hover, .textButton:active, .textButton:focus{
+    border: none;
 }
 
 #optionsButton{
@@ -104,6 +115,45 @@ div.searchSources{
     left: 15px;
 }
 
+.ui-menu
+{
+    position: relative;
+    list-style: none;
+    background-color: #FFFFFF10;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index:10;
+    box-shadow: none;
+    width: 214px;
+    line-height: 200%;
+    font-size: 18px;
+    padding: 0px;
+    border: solid 0px var(--ACCENT);
+
+}
+.ui-menu .ui-menu-item
+{
+    padding-left: 0px;
+    left:0;
+}
+
+.ui-menu-item-wrapper{
+    padding-left: 15px;
+}
+
+.ui-menu .ui-menu-item-wrapper:hover, .ui-menu .ui-menu-item-wrapper.ui-state-active
+{
+    background: #FFFFFF20;
+}
+
+.ui-helper-hidden-accessible{
+    display:none !important;
+}
+
+li:last-child div{
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
 
 
 
