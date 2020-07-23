@@ -26,7 +26,10 @@
                         {% set id = doc['id'] %}
                         {% if doc['type'] == 'yt' %}
                         <div id="{{id}}" onload="getInfo('{{id}}')">
-                            <h2><a href='javascript:directToVideo("{{loop.index0}}", "0")'>ID: {{id}}</a></h2>
+                            <h2><a class="title" href='javascript:directToVideo("{{loop.index0}}", "0")'>ID: {{id}}</a></h2>
+                            <p class="channel"></p>
+                            <p class="date"></p>
+                            <a class="thumb" href='javascript:directToVideo("{{loop.index0}}", "0")'></a>
                         </div>
                         {% else %}
                         <h2>ID: {{id}}</h2>
@@ -122,11 +125,28 @@
     }
 
     function getInfo(id) {
-        var ytApiKey = "...";   // TODO fix
+        const ytApiKey = "...";   // TODO fix
 
         $.get("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey, function(data) {
-            let parent = document.getElementById(id)
-            parent.getElementsByTagName('a')[0].innerHTML = data.items[0].snippet.title
+            const parent = document.getElementById(id);
+            const info = data.items[0].snippet;
+
+            parent.getElementsByClassName('title')[0].innerHTML = info.title;
+
+            let channelElement = parent.getElementsByClassName('channel');
+            channelElement.innerHTML = info.channelTitle;
+            
+            let dateElement = parent.getElementsByClassName('date');
+            let date = new Date(info.publishedAt);
+            let options = {month: 'short', day: 'numeric', year: 'numeric'};
+            dateElement.innerHTML = date.toLocaleDateString(date, options);
+
+            let thumbLinkElement = parent.getElementsByClassName('thumb');
+            let thumbElement = document.createElement('img');
+            thumbElement.setAttribute('src', info.thumbnails.default.url);
+            thumbElement.setAttribute('alt', 'thumbnail');
+            thumbLinkElement.appendChild(thumbElement)
+
         });
     }
 
