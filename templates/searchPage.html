@@ -8,7 +8,6 @@
 
   <body>
     <img class="center" src="/static/images/logo.png" alt="Stampyboi">
-    <div>
         <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
             <div class="group" id="searchDiv">
                 <div id="quoteDiv">
@@ -18,12 +17,12 @@
                     <span class="vertBar" name="left"></span>
                     <span class="vertBar" name="right"></span>
                 </div>
-                <input type="submit" value="Search" id="searchButton">
-            </div>
+                <button id="searchButton">Search</button>
+            </div><!--optionsDiv-->
           <datalist id="autosuggest"></datalist>
 
           <br>
-
+          <div id="optionsDiv">
             <div class="group">
               <input type="text" id="yt_source" name="yt_source" disabled placeholder=" ">
               <span class="bar"></span>
@@ -54,24 +53,17 @@
           <input type="file" id="vid_upload" name="vid_upload" disabled required>
         </form>
         <div class="searchSources">
-            <button onclick="ytSearch()">Search YouTube video</button>
-            <button onclick="flixSearch()">Search Netflix show</button>
-            <button onclick="fileSearch()">Search a video/audio file</button>
-            <button onclick="noneSearch()">Search with only a quote</button>
+            <button type="button" onclick="ytSearch(); this.blur();">YouTube</button>
+            <button type="button" onclick="flixSearch(); this.blur();">Netflix</button>
+            <button type="button" onclick="fileSearch(); this.blur();">File</button>
+            <button type="button" onclick="noneSearch(); this.blur();">Everything</button>
         </div>
-    </div>
+    </div> <!--optionsDiv-->
+    <button id="optionsButton" class="textButton" onclick="toggleOptions(); this.blur()">Options</button>
+    <button id="aboutButton" class="textButton" onclick="window.open('https://github.com/harrijin/stampyboi','_blank');">About</button>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script>
-    //for hiding the labels
-    // var labels = document.getElementsByTagName('LABEL');
-    // for (var i = 0; i < labels.length; i++) {
-    //     if (labels[i].htmlFor != '') {
-    //          var elem = document.getElementById(labels[i].htmlFor);
-    //          if (elem)
-    //             elem.label = labels[i];
-    //     }
-    // }
 
     var searchSrc="none";
     document.getElementById('search_src').value=searchSrc;
@@ -141,6 +133,14 @@
         let option = document.createElement('option');
         option.value = suggestion.toLowerCase();
         document.getElementById('autosuggest').appendChild(option);
+    }
+    function toggleOptions(){
+        var div = document.getElementById("optionsDiv");
+        if(window.getComputedStyle(div).display === "none"){
+            div.style.display = "block";
+        }else{
+            div.style.display = "none";
+        }
     }
   </script>
 
