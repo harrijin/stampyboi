@@ -51,6 +51,7 @@
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="secret.js"></script>
   <script>
     function check_spelling(){
         document.getElementById('spellcheckButton').style='display:none';
@@ -125,7 +126,7 @@
     }
 
     function getInfo(id) {
-        const ytApiKey = "...";   // TODO fix
+        const ytApiKey = getYtDataAPIKey();
 
         $.get("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey, function(data) {
             const parent = document.getElementById(id);
