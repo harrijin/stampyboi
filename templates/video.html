@@ -1,6 +1,10 @@
 <html>
     <head>
-        Title Placeholder (TODO)
+        {% if doc is not none %}
+            <h1>{{doc['title']}}</h1>
+            <p>{{doc['channel']}}</p>
+            <p>{{doc['date']}}</p>
+        {% endif %}
     </head>
     <body>
         <div>
@@ -9,20 +13,20 @@
             </form>
         </div>
 
-        {% if stamps is not string %}
-        <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ id ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <br>
+        {% if doc is not none %}
+            {% set start = doc['list'][stamp][1] %}
+            <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <br>
 
-        <p>
-            {% for stamp in stamps %}
-            <div>
-                {% set sec = stamp['sec'] %}
-                <span><a href='javascript:;' onclick="seek('{{sec}}')">{{stamp['time']}}</a> {{stamp['text']}}</span>
-            </div>
-            {% endfor %}
-        </p>
+            <ul>
+                {% for tuple in doc['list'] %}
+                    {% set text = tuple[0] %}
+                    {% set sec = tuple[1] %}
+                    <li><a href='javascript:;' onclick="seek('{{sec}}')">{{time_string(sec)}}</a> {{text}}</li>
+                {% endfor %}
+            </ul>
         {% else %}
-        <p>{{stamps}}</p>
+            <p>ERROR: No video.</p>
         {% endif %}
         
         <script src="http://www.youtube.com/player_api"></script>
