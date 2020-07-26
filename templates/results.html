@@ -23,7 +23,7 @@
             {% if result is not string %}
                 {% for doc in result %}
                     {% set id = doc['id'] %}
-                    {% set info = doc|tojson|safe %}
+                    {% set info = doc|tojson %}
                     <div id="{{id}}" class="{{doc['type']}}">
                         {% if doc['type'] == 'yt' %}
                             <h2><a class="title" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a></h2>
@@ -40,9 +40,6 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    {% if doc['type'] == 'yt' %}
-                        <!-- <script>getInfo('{{id}}')</script> -->
-                    {% endif %}
                 {% endfor %}
             {% else %}
                 {{result}}

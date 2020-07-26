@@ -34,7 +34,6 @@
             var player;
 
             function onYouTubeIframeAPIReady() {
-                console.log("player");
                 player = new YT.Player('player', {
                     events: {
                         'onReady': onPlayerReady
@@ -44,7 +43,6 @@
 
             function onPlayerReady(event) {
                 event.target.playVideo();
-                console.log("ready");
             }
 
             function seek(sec) {

@@ -186,12 +186,10 @@ def check_spelling():
 
 @app.route('/video', methods=['POST'])
 def receive_video():
-    # print(request.form)
-    # print(request.form['doc'])
-    # doc = ast.literal_eval(request.form['doc']) # Convert from string to dict
-    # stamp = int(request.form['stamp'])
-
     doc = request.json
+    for item in doc['list']:
+        text = item[0]
+        item[0] = Markup(text)
     print(doc)
     stamp = int(doc.pop('index'))
 
