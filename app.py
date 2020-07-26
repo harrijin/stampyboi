@@ -190,7 +190,6 @@ def receive_video():
     for item in doc['list']:
         text = item[0]
         item[0] = Markup(text)
-    print(doc)
     stamp = int(doc.pop('index'))
 
     return render_template("video.html", doc=doc, stamp=stamp)
