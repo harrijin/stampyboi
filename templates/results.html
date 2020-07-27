@@ -23,19 +23,27 @@
         <p id="results">
             {% if result is not string %}
                 {% for doc in result %}
-                    <div>
+                    {% set id = doc['id'] %}
+                    {% set info = doc|tojson %}
+                    <div id="{{id}}" class="{{doc['type']}}">
                         {% if doc['type'] == 'yt' %}
-                        <h2><a href='javascript:directToVideo("{{loop.index0}}", "0")'>ID: {{doc['id']}}</a></h2>
+                            <h2><a class="title" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a></h2>
+                            <p class="channel">{{doc['channel']}}</p>
+                            <p class="date">{{doc['date']}}</p>
+                            <a href='javascript:;' onclick='directToVideo({{info}}, "0")'><img class="thumbnail" src="{{doc['thumb']}}" alt="thumbnail"></a>
+                            <ul>
+                                {% for tuple in doc['list'] %}
+                                    <li><a href='javascript:;' onclick='directToVideo({{info}}, "{{loop.index0}}")'>{{time_string(tuple[1])}}</a> {{tuple[0]}}</li>
+                                {% endfor %}
+                            </ul>
                         {% else %}
-                        <h2>ID: {{doc['id']}}</h2>
+                            <h2>ID: {{id}}</h2>
+                            <ul>
+                                {% for tuple in doc['list'] %}
+                                    <li><a href='#'>{{time_string(tuple[1])}}</a> {{tuple[0]}}</li>
+                                {% endfor %}
+                            </ul>
                         {% endif %}
-
-                        <h2>Type: {{doc['type']}}</h2>
-                        <ol>
-                            {% for tuple in doc['list'] %}
-                                <li>{{tuple[0]}} {{tuple[1]}}</li>
-                            {% endfor %}
-                        </ol>
                     </div>
                 {% endfor %}
             {% else %}
@@ -44,81 +52,10 @@
         </p>
     </div>
   </body>
+
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
-  <script>
-    function check_spelling(){
-        document.getElementById('spellcheckButton').style='display:none';
-        var userIn=encodeURIComponent(document.getElementById('inputQuote').value);
-        var suggestRequest = new XMLHttpRequest();
-        var suggestions;
-        suggestRequest.open('POST','/spellcheck', true);
-        suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        suggestRequest.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                suggestions = JSON5.parse(this.responseText);
-                if(suggestions.length > 0){
-                    generateSpellcheck();
-                    suggestions.forEach(addSuggestion);
-                }
-            }
-        };
-        suggestRequest.send("q="+userIn);
-
-    }
-
-    function generateSpellcheck(){
-        let prefix = document.createElement('span');
-        let form = document.createElement('form');
-        let searchSrc = document.createElement('input');
-        let dropdown = document.createElement('select');
-        let submitButton = document.createElement('input');
-        prefix.style = 'color:red';
-        prefix.innerHTML = "Did you mean:";
-        form.action = '/results';
-        form.id = 'searchSuggestion';
-        form.enctype = 'application/x-www-form-urlencoded';
-        form.method = 'POST';
-        form.style = 'display:inline';
-        searchSrc.type = 'text';
-        searchSrc.id='search_src';
-        searchSrc.style='display:none'; // this line BAD (limits searching to only solr search, can't set additional options)
-        searchSrc.value='none';
-        searchSrc.name='search_src';
-        dropdown.id='quote';
-        dropdown.name='quote';
-        submitButton.type='submit';
-        submitButton.value='Search';
-        form.appendChild(searchSrc);
-        form.appendChild(dropdown);
-        form.appendChild(submitButton);
-        document.getElementById('spellchecking').appendChild(prefix);
-        document.getElementById('spellchecking').appendChild(form);
-    }
-
-    function addSuggestion(suggestion){
-        let option = document.createElement('option');
-        suggestion = suggestion.substring('script:'.length);//gets rid of 'script:'' from query
-        option.value=suggestion;
-        option.innerHTML=suggestion;
-        document.getElementById("quote").appendChild(option);
-    }
-
-    function directToVideo(docIndex, stampIndex) {
-        var form = new FormData();
-        form.append('doc', docIndex);
-        form.append('stamp', stampIndex);
-
-        var req = new XMLHttpRequest();
-        req.open('POST','/receive-video');
-        req.onreadystatechange = function() {
-            if(req.readyState == XMLHttpRequest.DONE && req.status == 200) {
-                window.location.href = '/video';
-            }
-        }
-        req.send(form);
-    }
-
-  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='results.js')}}"></script>
 </html>
 
 

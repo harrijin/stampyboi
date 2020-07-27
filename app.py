@@ -1,10 +1,11 @@
-import os, re
+import os, re, ast
 from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup, session
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
 from .transcribers.flix import FlixExtractor
 from .transcribers.file import FileExtractor
+from . import secret
 from urllib.request import urlopen
 import json, datetime, urllib.parse
 from pathlib import Path
@@ -13,7 +14,7 @@ import pysolr
 
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
-ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}
+ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}        
 MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
 MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
@@ -37,7 +38,7 @@ os.chdir(WORKING_DIRECTORY)
 solr = pysolr.Solr('http://'+SOLR_HOST+'/solr/'+SOLR_COLLECTION)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = b'\xee\xe7\x0e\xe8\x1c\x87x%\xc3\x95\xfd\xb1wI\x96\x97' # MUST CHANGE IF APP IS DEPLOYED
+app.secret_key = secret.app_key # MUST CHANGE IF APP IS DEPLOYED
 
 # ===========Index pages===========
 
@@ -47,6 +48,19 @@ def render_index():
 
 @app.route('/results', methods=['POST'])
 def render_results():
+    # ENABLE IF TESTING WITHOUT SEARCH ENGINE *****************************************************************
+    DUMMY = False
+    if DUMMY:
+        results = [
+            {"type": "yt", "id": 'bS5P_LAqiVg', 'list':[('quote one at 125 sec', 125),('quote two at 322', 322)]},
+            {"type": "yt", "id": 'eJ-T3i8Ap3U', 'list':[('quote one at 2 sec', 2),('quote two at 69', 69)]},
+        ]
+        results[0].update(getYouTubeInfo('bS5P_LAqiVg'))
+        results[1].update(getYouTubeInfo('eJ-T3i8Ap3U'))
+
+        return render_template("results.html", result=results, query=request.form['quote'])
+    # END OF DUMMY TEST*****************************************************************************************
+
     quote = request.form['quote']
     # ===============Database Search===============
     if request.form['search_src'] == 'none':
@@ -137,8 +151,6 @@ def render_results():
     else:
         results = "ERROR: Invalid searchsearch_src"
 
-    session['results'] = results
-
     return render_template("results.html", result=results, query=quote)
 
 @app.route('/suggest', methods=['POST'])
@@ -173,39 +185,23 @@ def check_spelling():
     suggestions = response['spellcheck']['collations'][1::2]
     return str(suggestions).replace('"','')
 
-@app.route('/receive-video', methods=['POST'])
+@app.route('/video', methods=['POST'])
 def receive_video():
-    id, start = None, None
-    if 'results' in session and not isinstance(session['results'], str):
-        stamps = []
-        doc = session['results'][int(request.form['doc'])]  # Get the doc result that the user wants to go to
-        id = doc['id']
-        for item in doc['list']:
-            text = item[0]
-            sec = int(item[1])
-            time = str(datetime.timedelta(seconds=sec))
-            stamps.append({'text':text, 'sec':sec, 'time':time})
-        stampIndex = int(request.form['stamp'])
-        start = stamps[stampIndex]['sec']
-    else:
-        stamps = "ERROR: No video loaded."
+    doc = request.json
+    for item in doc['list']:
+        text = item[0]
+        item[0] = Markup(text)
+    stamp = int(doc.pop('index'))
 
-    session['stamps'] = stamps
-    session['start'] = start
-    session['id'] = id
+    return render_template("video.html", doc=doc, stamp=stamp)
 
-    return redirect(url_for('render_video'))
-
-@app.route('/video')
-def render_video():
-    if all(x in session for x in ['stamps', 'start', 'id']):
-        stamps = session['stamps']
-        start = session['start']
-        id = session['id']
-    else:
-        stamps = "ERROR: No video loaded."
-        start, id = None, None
-    return render_template("video.html", stamps=stamps, start=start, id=id)
+@app.context_processor
+def utility():
+    def time_string(sec):
+        delta = datetime.timedelta(seconds=sec)
+        stamp = (datetime.datetime.min + delta).time()
+        return stamp.strftime('%H:%M:%S')
+    return dict(time_string=time_string)
 
 # ==============Helper Methods==============
 
@@ -222,9 +218,9 @@ def extractHighlights(script, times):
                     buildPhrase.append((re.sub('-', ' ', phrase)))
                     if ('</em>' in script_list[i]):
                         break
-                result.append((Markup(' '.join(buildPhrase)), times[index]))
+                result.append((Markup(' '.join(buildPhrase)), int(times[index])))
             else:
-                result.append((Markup(re.sub('-', ' ', phrase)), times[index]))
+                result.append((Markup(re.sub('-', ' ', phrase)), int(times[index])))
     return result
 
 def stringToSuggestions(script):
@@ -299,6 +295,10 @@ def search_solr(quote, source='none', id=''):
         highlightedScript = response['highlighting'][docID]['script'][0]
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
+        if document['type'] == 'yt':
+            ytInfo = getYouTubeInfo(docID)
+            if ytInfo:
+                videoInfo.update(ytInfo)
         results.append(videoInfo)
 
     if not results:
@@ -336,3 +336,16 @@ def findStringInTranscript(transcriptList, targetString):
 def formatTranscriptToDictionary(type, id, tupleList):
     resultDict = {"type": type, "id": id, "list": tupleList}
     return resultDict
+
+def getYouTubeInfo(id):
+    with urlopen('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + id + '&key=' + secret.yt_key) as response:
+        data = json.loads(response.read().decode())
+        info = data['items'][0]['snippet']
+        title = info['title']
+        channel = info['channelTitle']
+        date = info['publishedAt']
+        date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ').strftime('%b %-d, %Y')
+        thumb = info['thumbnails']['default']['url']
+    
+    if title and channel and date and thumb:
+        return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
