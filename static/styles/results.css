@@ -1,0 +1,46 @@
+.result {
+    border-radius: 5px;
+    padding-left: 20px;
+    padding-top: 15px;
+    padding-bottom: 0px;
+    background: #FFFFFF10;
+    overflow: hidden;
+}
+
+.link {
+    color: var(--ACCENT);
+    text-decoration: none;
+}
+
+.link:focus, .link:hover {
+    text-decoration: underline;
+}
+
+.link:active {
+    color: #FFF
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.stamp {
+    font-weight: bold;
+}
+
+.thumbnail {
+    float:left;
+    padding-right: 20px
+}
+
+.info {
+    color: #BBB
+}
+
+.stamp-list {
+    list-style-type: none;
+    padding: 0;
+    height: 150;
+    overflow: auto
+}

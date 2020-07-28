@@ -2,6 +2,7 @@
   <head>
     Results
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/results.css') }}">
   </head>
   <body>
 
@@ -25,17 +26,20 @@
                 {% for doc in result %}
                     {% set id = doc['id'] %}
                     {% set info = doc|tojson %}
-                    <div id="{{id}}" class="{{doc['type']}}">
+                    <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
                         {% if doc['type'] == 'yt' %}
-                            <h2><a class="title" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a></h2>
-                            <p class="channel">{{doc['channel']}}</p>
-                            <p class="date">{{doc['date']}}</p>
-                            <a href='javascript:;' onclick='directToVideo({{info}}, "0")'><img class="thumbnail" src="{{doc['thumb']}}" alt="thumbnail"></a>
-                            <ul>
-                                {% for tuple in doc['list'] %}
-                                    <li><a href='javascript:;' onclick='directToVideo({{info}}, "{{loop.index0}}")'>{{time_string(tuple[1])}}</a> {{tuple[0]}}</li>
-                                {% endfor %}
-                            </ul>
+                            <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
+                            <div>
+                                <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
+                                    <img src="{{doc['thumb']}}" width=320 height=180 alt="thumbnail">
+                                </a>
+                                <p class="info">{{doc['channel']}} • {{doc['date']}}</p>
+                                <ul class="stamp-list">
+                                    {% for tuple in doc['list'] %}
+                                        <li><a class="stamp link" href='javascript:;' onclick='directToVideo({{info}}, "{{loop.index0}}")'>{{time_string(tuple[1])}}</a> {{tuple[0]}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% else %}
                             <h2>ID: {{id}}</h2>
                             <ul>
@@ -45,6 +49,7 @@
                             </ul>
                         {% endif %}
                     </div>
+                    <br>
                 {% endfor %}
             {% else %}
                 {{result}}
