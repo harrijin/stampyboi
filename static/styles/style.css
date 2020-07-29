@@ -9,9 +9,10 @@ html {
     color: var(--TEXT);
     font-family: var(--FONT-FACE);
 }
-h1{
+h1, a{
     color: var(--ACCENT);
 }
+
 /* material design input boxes*/
 input, button{
     color:var(--TEXT);

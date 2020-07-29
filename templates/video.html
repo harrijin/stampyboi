@@ -1,38 +1,56 @@
 <html>
     <head>
-        {% if doc is not none %}
-            <h1>{{doc['title']}}</h1>
-            <p>{{doc['channel']}}</p>
-            <p>{{doc['date']}}</p>
-        {% endif %}
-    </head>
-    <body>
-        <div>
+         <div>
             <form action='/'>
               <input type='submit' value='New search'>
             </form>
         </div>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/video.css') }}">
 
-        {% if doc is not none %}
-            {% set start = doc['list'][stamp][1] %}
-            <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <br>
+    </head>
+    <body>
+        <div class="vertically-center">
+            <div class="clip-container">
 
-            <ul>
-                {% for tuple in doc['list'] %}
-                    {% set text = tuple[0] %}
-                    {% set sec = tuple[1] %}
-                    <li><a href='javascript:;' onclick="seek('{{sec}}')">{{time_string(sec)}}</a> {{text}}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>ERROR: No video.</p>
-        {% endif %}
-        
+
+            {% if doc is not none %}
+                {% set start = doc['list'][stamp][1] %}
+                <iframe id="player" width="100%" height="100%" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?autoplay=1&enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="infobar">
+                    <div class="ytInfo">
+                        <h1>{{doc['title']}}</h1>
+                        <h4>{{doc['channel']}} • {{doc['date']}}</h4>
+                    </div>
+                    <div class="timestamps">
+                    <table id="times" cellspacing="0px" cellpadding="0px">
+                        {% for tuple in doc['list'] %}
+                            {% set text = tuple[0] %}
+                            {% set sec = tuple[1] %}
+
+                            {% if sec == start %}
+                                <tr onclick="setActive(this);seek('{{sec}}');" class="activeStamp">
+                                {% else %}
+                                <tr onclick="setActive(this);seek('{{sec}}');">
+                                {% endif %}
+                                    <td>{{text}}</td>
+                                    <td class="timestamp">{{time_string(sec)}}</td>
+                                </tr>
+
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <p>ERROR: No video.</p>
+                {% endif %}
+                </div>
+                </div>
+            </div>
+            <h2>Share this boi:</h2>
+        </div>
         <script src="http://www.youtube.com/player_api"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
             var player;
-
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
                     events: {
@@ -50,6 +68,14 @@
                     player.seekTo(parseInt(sec), true);
                 }
             }
+
+            function setActive(el) {
+                $('.activeStamp').removeClass('activeStamp');
+                $(el).addClass('activeStamp');
+            }
+
+
+
         </script>
     </body>
 </html>

@@ -14,7 +14,7 @@ import pysolr
 
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
-ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}        
+ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}
 MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
 MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
@@ -209,14 +209,14 @@ def extractHighlights(script, times):
     result = []
     script_list = script.split()
     for index, phrase in enumerate(script_list):
-        begin = phrase.rfind('<em>')
+        begin = phrase.rfind('<b>')
         if begin != -1:
-            end = phrase.rfind('</em>')
+            end = phrase.rfind('</b>')
             if end < begin:
                 buildPhrase = []
                 for i in range(index + 1, len(script_list)):
                     buildPhrase.append((re.sub('-', ' ', phrase)))
-                    if ('</em>' in script_list[i]):
+                    if ('</b>' in script_list[i]):
                         break
                 result.append((Markup(' '.join(buildPhrase)), int(times[index])))
             else:
@@ -253,7 +253,7 @@ def allowed_file(filename):
 
 def search_solr(quote, source='none', id=''):
     quote = '"'+quote.replace(" ", "+")+'"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true'
+    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true&hl.tag.pre=<b>&hl.tag.post=</b>'
     # ===============Database Search===============
     if source == 'yt':
         connectionURL = connectionURL + '&fq=%2Btype:yt'
@@ -346,6 +346,6 @@ def getYouTubeInfo(id):
         date = info['publishedAt']
         date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ').strftime('%b %-d, %Y')
         thumb = info['thumbnails']['default']['url']
-    
+
     if title and channel and date and thumb:
         return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}

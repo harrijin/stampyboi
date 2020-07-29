@@ -1,0 +1,78 @@
+.vertically-center{
+    display: flex;
+    height: 90%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.clip-container{
+    display: flex;
+    margin: auto auto;
+    width: 80%;
+    height: 90%;
+    outline: 5px solid var(--ACCENT);
+
+
+}
+
+.infobar{
+    display: flex;
+    flex-direction: column;
+    border-left: 3px solid var(--ACCENT);
+    background-color: #ffffff10;
+}
+
+.ytInfo{
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 3px solid white;
+    z-index: -1;
+}
+
+.ytInfo h1{
+    margin-block-start: 0.3em;
+    margin-block-end: 0em;
+}
+
+tr{
+    border-bottom: 3px solid #00000000;
+    border-top: 3px solid #00000000;
+    transition: border-top 0.2s, border-bottom 0.2s;
+}
+tr:hover { background: #ffffff20; }
+tr:active { background: #151515; }
+tr.activeStamp{
+    background: var(--BACKGROUND);
+    color: var(--ACCENT);
+    border-bottom: 3px solid var(--ACCENT);
+    border-top: 3px solid var(--ACCENT);
+}
+td {
+    height: 100%;
+    padding: 7px 5px 5px 15px;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #606060;
+}
+
+.timestamp{
+    font-style: italic;
+    vertical-align: middle;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.bar{
+    width: 100%;
+    display: inline-table;
+}
+
+.timestamps{
+    overflow:auto;
+}
+
+table{
+    border-collapse: collapse;
+}
