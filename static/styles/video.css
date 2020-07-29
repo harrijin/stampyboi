@@ -12,8 +12,6 @@
     width: 80%;
     height: 90%;
     outline: 5px solid var(--ACCENT);
-
-
 }
 
 .infobar{
@@ -62,6 +60,7 @@ td {
 
 .timestamps{
     overflow:auto;
+    padding-bottom: 5px;
 }
 
 table{
