@@ -66,9 +66,11 @@ def render_results():
         results = [
             {"type": "yt", "id": 'bS5P_LAqiVg', 'list':longList},
             {"type": "yt", "id": 'eJ-T3i8Ap3U', 'list':[('quote one at 2 sec', 2),('quote two at 69', 69)]},
+            {"type": "yt", "id": 'rtgY1q0J_TQ', 'list':[('quote one at 4 sec', 4),('quote two at 42', 42)]},
         ]
         results[0].update(getYouTubeInfo('bS5P_LAqiVg'))
         results[1].update(getYouTubeInfo('eJ-T3i8Ap3U'))
+        results[2].update(getYouTubeInfo('rtgY1q0J_TQ'))
 
         return render_template("results.html", result=results, query=request.form['quote'])
     # END OF DUMMY TEST*****************************************************************************************

@@ -1,6 +1,5 @@
 <html>
   <head>
-    Results
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/results.css') }}">
   </head>
@@ -14,7 +13,6 @@
 
     <div id='spellchecking'>
         <p id="userQuery">Searched quote: {{query}}</p>
-        <br>
         <input type='text' id="inputQuote" style="display: none;" value="{{query}}">
         <button id = 'spellcheckButton' onclick='check_spelling()'>Check spelling</button>
         <br>
@@ -28,6 +26,7 @@
                     {% set info = doc|tojson %}
                     <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
                         {% if doc['type'] == 'yt' %}
+                            <div class="typetab"></div>
                             <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
                             <div>
                                 <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
