@@ -26,7 +26,7 @@
 .ytInfo{
     padding-left: 15px;
     padding-right: 15px;
-    border-bottom: 3px solid white;
+    border-bottom: 3px solid var(--ACCENT);
     z-index: -1;
 }
 
@@ -36,18 +36,14 @@
 }
 
 tr{
-    border-bottom: 3px solid #00000000;
-    border-top: 3px solid #00000000;
-    transition: border-top 0.2s, border-bottom 0.2s;
+    transition: outline 0.2s;
 }
 tr:hover { background: #ffffff20; }
 tr:active { background: #151515; }
 tr.activeStamp{
     background: var(--BACKGROUND);
     color: var(--ACCENT);
-    border-bottom: 3px solid var(--ACCENT);
-    border-top: 3px solid var(--ACCENT);
-}
+    outline: 3px solid var(--ACCENT);}
 td {
     height: 100%;
     padding: 7px 5px 5px 15px;
@@ -64,15 +60,11 @@ td {
     padding-right: 10px;
 }
 
-.bar{
-    width: 100%;
-    display: inline-table;
-}
-
 .timestamps{
     overflow:auto;
 }
 
 table{
     border-collapse: collapse;
+    cursor:pointer;
 }
