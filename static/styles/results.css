@@ -1,0 +1,77 @@
+:root {
+    --result-height: 245px;
+    --title-pad: 10px;
+}
+
+#userQuery, .title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.result {
+    height: var(--result-height);
+    border-radius: 5px;
+    padding-left: 23px;
+    padding-top: var(--title-pad);
+    background: #FFFFFF10;
+    overflow: hidden;
+}
+
+.link {
+    color: var(--ACCENT);
+    text-decoration: none;
+}
+
+.link:focus, .link:hover {
+    text-decoration: underline;
+}
+
+.link:active {
+    color: #FFF
+}
+
+.stamp {
+    font-weight: bold;
+}
+
+.thumbnail {
+    float:left;
+    padding-right: 20px;
+    padding-top: 5px;
+}
+
+.info {
+    color: #BBB;
+    margin-top: 6px;
+    margin-bottom: 0px;
+}
+
+.stamp-list {
+    list-style-type: none;
+    padding: 0;
+    height: 150px;
+    overflow: auto;
+}
+
+.typetab {
+    float: right;
+    width: 5%;
+    height: calc(var(--result-height) + var(--title-pad));
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-top: calc(0px - var(--title-pad));
+    overflow: hidden;
+    
+}
+
+.yt > .typetab {
+    background-color: red;
+}
+
+.flix > .typetab {
+    background-color: white;
+}
+
+.file > .typetab {
+    background-color: green;
+}

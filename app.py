@@ -51,12 +51,26 @@ def render_results():
     # ENABLE IF TESTING WITHOUT SEARCH ENGINE *****************************************************************
     DUMMY = False
     if DUMMY:
+        longList = [
+            ('quote at 123 sec', 123),
+            ('quote at 234 sec', 234),
+            ('quote at 345 sec', 345),
+            ('quote at 456 sec, this one is really long and might have to go to the next line re9g8gheruhiadfjnhgfnjdfgdsfgdsfg aaaa aaaaaaaa aaaaaaaaaa aaaaaa aaaaa', 456),
+            ('quote at 567 sec', 567),
+            ('quote at 678 sec', 678),
+            ('quote at 789 sec', 789),
+            ('quote at 890 sec', 890),
+            ('quote at 900 sec', 900),
+            ('quote at 1001 sec', 1001),
+        ]
         results = [
-            {"type": "yt", "id": 'bS5P_LAqiVg', 'list':[('quote one at 125 sec', 125),('quote two at 322', 322)]},
+            {"type": "yt", "id": 'bS5P_LAqiVg', 'list':longList},
             {"type": "yt", "id": 'eJ-T3i8Ap3U', 'list':[('quote one at 2 sec', 2),('quote two at 69', 69)]},
+            {"type": "yt", "id": 'rtgY1q0J_TQ', 'list':[('quote one at 4 sec', 4),('quote two at 42', 42)]},
         ]
         results[0].update(getYouTubeInfo('bS5P_LAqiVg'))
         results[1].update(getYouTubeInfo('eJ-T3i8Ap3U'))
+        results[2].update(getYouTubeInfo('rtgY1q0J_TQ'))
 
         return render_template("results.html", result=results, query=request.form['quote'])
     # END OF DUMMY TEST*****************************************************************************************
@@ -345,7 +359,6 @@ def getYouTubeInfo(id):
         channel = info['channelTitle']
         date = info['publishedAt']
         date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ').strftime('%b %-d, %Y')
-        thumb = info['thumbnails']['default']['url']
-
+        thumb = info['thumbnails']['medium']['url']
     if title and channel and date and thumb:
         return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
