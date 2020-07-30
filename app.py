@@ -62,6 +62,13 @@ def render_results():
             ('quote at 890 sec', 890),
             ('quote at 900 sec', 900),
             ('quote at 1001 sec', 1001),
+            ('quote at 1002 sec', 1002),
+            ('quote at 1004 sec', 1004),
+            ('quote at 1005 sec', 1005),
+            ('quote at 1007 sec', 1007),
+            ('quote at 1008 sec', 1008),
+            ('quote at 1020 sec', 1020),
+            ('quote at 1035 sec', 1035),
         ]
         results = [
             {"type": "yt", "id": 'bS5P_LAqiVg', 'list':longList},
