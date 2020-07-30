@@ -18,14 +18,13 @@
     display: flex;
     flex-direction: column;
     border-left: 3px solid var(--ACCENT);
-    background-color: #ffffff10;
+    background-color: #303030;
 }
 
 .ytInfo{
     padding-left: 15px;
     padding-right: 15px;
     border-bottom: 3px solid var(--ACCENT);
-    z-index: -1;
 }
 
 .ytInfo h1{
@@ -68,4 +67,14 @@ table{
     cursor:pointer;
     min-width:100%;
     max-width:100%;
+}
+
+#share {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#share h2{
+    margin-block-end: 0px;
 }

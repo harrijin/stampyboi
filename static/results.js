@@ -64,7 +64,7 @@ function directToVideo(info, stampIndex) {
         data: JSON.stringify(info),
         contentType: 'application/json',
         success: function(response) {
-            document.write(response);
+            $('body').append(response)
         }
     });
 }
