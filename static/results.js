@@ -65,6 +65,7 @@ function directToVideo(info, stampIndex) {
         contentType: 'application/json',
         success: function(response) {
             $('body').append(response)
+            $('body').css('overflow', 'hidden');
         }
     });
 }
