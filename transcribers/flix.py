@@ -24,6 +24,8 @@ TIMESTAMP_LEN = 12
 
 SPACE_REPLACEMENT_CHAR = '-'
 
+NETFLIX_ID_DIRECTORY = r'O:\Git Projects\stampiboi\flixIDConverter\netflixIDDictionary.json'
+
 
 """
 FlixExtractor is the caption extractor for video sources where
@@ -39,39 +41,17 @@ class FlixExtractor(Transcriber):
     episode - integer indicating the episode number
     """
 
-    def __init__(self, title, season, episode):
+    def __init__(self, netflixID):
 
         super().__init__()
-        self.show=title
-        self.szn=season
-        self.epis=episode
-        # Get list of shows and transcripts from 8flix
-        r = requests.get(SHOW_TRANSCRIPTS_URL)
-        soup = BeautifulSoup(r.content)
 
-        # Find show from title
-        shows = soup.select(SHOWS_CSS_SELECTOR)
-        show = self.__find_show(title, shows)
-        show_details = show.parent.find_next_sibling('ul')
-
-        # Find season
-        szns = show_details.select(SEASONS_CSS_SELECTOR)
-        if (season <= 0 or season > len(szns)):
-            raise IndexError('Season out of range')
-        szn = szns[season - 1]
-        episodes = szn.select(EPISODES_CSS_SELECTOR)
-
-        # Find episode
-        if (episode <= 0 or episode > len(episodes)):
-            raise IndexError('Episode out of range')
-        epis = episodes[episode - 1]
-
-        # Get episode link and fetch pdf
-        episode_link = epis['href']
-        e = requests.get(episode_link)
-        pdf_soup = BeautifulSoup(e.content)
-        buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
-        self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
+        with open(NETFLIX_ID_DIRECTORY, "r") as file:
+            dictionary = json.load(file)
+        entry = dictionary[netflixID]
+        self.show = entry[0]
+        self.szn = entry[1]
+        self.epis = entry[2]
+        self.episName = entry[3]
 
 
     def getTranscript(self):
@@ -152,3 +132,39 @@ class FlixExtractor(Transcriber):
                 return show
         # If show not found
         raise ValueError('Show not found')
+
+
+"""
+OLD 8FLIX STUFF
+
+        self.show=title
+        self.szn=season
+        self.epis=episode
+        # Get list of shows and transcripts from 8flix
+        r = requests.get(SHOW_TRANSCRIPTS_URL)
+        soup = BeautifulSoup(r.content)
+
+        # Find show from title
+        shows = soup.select(SHOWS_CSS_SELECTOR)
+        show = self.__find_show(title, shows)
+        show_details = show.parent.find_next_sibling('ul')
+
+        # Find season
+        szns= show_details.select(SEASONS_CSS_SELECTOR)
+        if (season <= 0 or season > len(szns)):
+            raise IndexError('Season out of range')
+        szn = szns[season - 1]
+        episodes = szn.select(EPISODES_CSS_SELECTOR)
+
+        # Find episode
+        if (episode <= 0 or episode > len(episodes)):
+            raise IndexError('Episode out of range')
+        epis = episodes[episode - 1]
+
+        # Get episode link and fetch pdf
+        episode_link = epis['href']
+        e = requests.get(episode_link)
+        pdf_soup = BeautifulSoup(e.content)
+        buttons = pdf_soup.select(BUTTONS_CSS_SELECTOR)
+        self.pdf_url = BASE_URL + buttons[PDF_BUTTON_INDEX]['href']
+"""
