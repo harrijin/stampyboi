@@ -174,5 +174,74 @@ button:disabled::after, input[type=submit]:disabled::after {
     opacity: 0;
 }
 
+.ui-menu
+{
+    position: relative;
+    list-style: none;
+    background-color: #303030;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index:10;
+    box-shadow: none;
+    width: 214px;
+    line-height: 200%;
+    font-size: 18px;
+    padding: 0px;
+    border: solid 0px white;
 
+}
+.ui-menu .ui-menu-item
+{
+    padding-left: 0px;
+    left:0;
+}
 
+.ui-menu-item-wrapper{
+    padding-left: 15px;
+}
+
+.ui-menu .ui-menu-item-wrapper:hover, .ui-menu .ui-menu-item-wrapper.ui-state-active
+{
+    background: #404040;
+}
+
+.ui-helper-hidden-accessible{
+    display:none !important;
+}
+
+li:last-child div{
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.bar[name=quote],.bar[name=quoteTop]  {width:100%; margin: 0 auto;}
+.bar[name=quote] {bottom: -2px;}
+.bar[name=quoteTop] {bottom:100%;}
+
+.vertBar{position:relative; display:block; height:100%;margin:auto 0;bottom: 100%; padding: 0; width: 0px;}
+.vertBar:before, .vertBar:after   {
+  content:'';
+  width:3px;
+  height:0px;
+  left:0px;
+  position:absolute;
+  background:var(--ACCENT);
+  transition:0.2s ease all;
+}
+.vertBar[name=right] {left:calc(100% - 3px); bottom:200%;}
+.vertBar:before {
+  bottom:50%;
+}
+.vertBar:after {
+  top:50%;
+}
+
+/* active state */
+input:focus ~ .vertBar:before, input:focus ~ .vertBar:after {
+  height:50%;
+}
+
+.group        {
+  position:relative;
+  margin-bottom:20px;
+}

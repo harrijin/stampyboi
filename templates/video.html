@@ -6,7 +6,7 @@
             <input type='submit' value='New search'>
         </form>
     </div> -->
-    
+
     <div class="vertically-center">
         <div class="clip-container">
         {% if doc is not none %}
@@ -60,6 +60,10 @@
                 <a href='javascript:;' onclick='shareBoi(4)'>
                     <img src="/static/images/link.png" alt="Get link" />
                 </a>
+                    <!--GIF-->
+                <a href='javascript:;' onclick='shareBoi(5)'>
+                    <img src="/static/images/gifIcon.png" alt="Convert to gif" />
+                </a>
             </div>
         </div>
 
@@ -95,7 +99,7 @@
             // if the target of the click isn't the container nor a descendant of the container
             if (!container.is(e.target) && container.has(e.target).length === 0
                 && !share.is(e.target) && share.has(e.target).length === 0) {
-                
+
                 $('body').css('overflow', 'auto');
                 $('.overlay').remove();
             }
@@ -130,7 +134,7 @@
                 case 3:
                     window.open("https://www.reddit.com/submit?url="+link, "_blank");
                 break;
-                default:
+                case 4:
                     var dummy = document.createElement("textarea");
                     document.body.appendChild(dummy);
                     dummy.textContent = link;
@@ -145,6 +149,21 @@
                         $('#copied').fadeTo(10, 1);
                     }
                     $('#copied').fadeOut(3000);
+                break;
+                default:
+                    var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
+                    if (result){
+                        var dummy = document.createElement("textarea");
+                        document.body.appendChild(dummy);
+                        var minutes = (+a[0]) * 60 + (+a[1]);
+                        var sec_60 = (+a[2]);
+                        dummy.textContent = minutes + ":" + sec_60;
+                        dummy.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(dummy);
+                        window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
+                    }
+
                 break;
             }
         }
