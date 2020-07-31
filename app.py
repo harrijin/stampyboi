@@ -49,7 +49,8 @@ def render_index():
 @app.route('/results', methods=['POST'])
 def render_results():
     # ENABLE IF TESTING WITHOUT SEARCH ENGINE *****************************************************************
-    DUMMY = False
+    print(request.form['search_src'])
+    DUMMY = True
     if DUMMY:
         longList = [
             ('quote at 123 sec', 123),
