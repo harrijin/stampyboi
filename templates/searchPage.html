@@ -18,7 +18,7 @@
                     <span class="vertBar" name="right"></span>
 
                 </div>
-                <button id="searchButton">Search</button>
+                <button type="submit" form="searchForm" id="searchButton">Search</button>
             </div><!-- searchDiv -->
 
             <div id="optionalInputs">
@@ -49,13 +49,13 @@
                   <label for="flix_ep" style="display: none;">Episode # (optional)</label>
                 </div>
                 <div id="fileUploadDiv" style="display: none;">
-                    <input type="file" id="vid_upload" name="vid_upload" required>
+                    <input type="file" id="vid_upload" name="vid_upload" disabled required>
                     <img src="/static/images/uploadIcon.png" alt="Upload Files Here" width="10%">
                     <h3 style="text-align: center;">Choose a file or drag it here</h3>
                 </div>
             </div>
           <br>
-          <div id="optionsDiv">
+      <div id="optionsDiv">
             <h3>Narrow your search to:</h3>
             <label for="searchYt" class="checkboxLabel">YouTube</label>
             <input type="checkbox" name="searchYt" id="searchYt" onclick="toggleYt()"><br>
@@ -63,7 +63,7 @@
             <input type="checkbox" name="searchFlix" id="searchFlix" onclick="toggleFlix()"><br>
             <label for="searchFile" class="checkboxLabel">File</label>
             <input type="checkbox" name="searchFile" id="searchFile" onclick="toggleFile()"><br>
-    </div> <!--optionsDiv-->
+        </div> <!--optionsDiv-->
     </form>
 
     <button id="optionsButton" class="textButton" onclick="this.blur()">Options</button>
@@ -80,8 +80,10 @@
         var check = document.getElementById('searchFile');
         if (check.checked == true){
             $('#fileUploadDiv').fadeIn(100);
+            $('#vid_upload').prop("disabled", false);
         } else {
             $('#fileUploadDiv').fadeOut(100);
+            $('#vid_upload').prop("disabled", true);
         }
     }
     function toggleYt(state){
