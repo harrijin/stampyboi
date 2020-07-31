@@ -13,7 +13,7 @@ img{
 }
 .group        {
   position:relative;
-  margin-bottom:10px;
+  margin-bottom:20px;
 }
 
 input[name=quote] {
@@ -80,11 +80,11 @@ div.searchSources{
     position: fixed;
     bottom: 65px;
     right: 15px;
-    border: 2px solid #f1f1f1;
     z-index: 9;
     max-width: 300px;
     padding: 10px;
-    background: #151515DF;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .textButton{
@@ -119,7 +119,7 @@ div.searchSources{
 {
     position: relative;
     list-style: none;
-    background-color: #FFFFFF10;
+    background-color: #303030;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     z-index:10;
@@ -143,7 +143,7 @@ div.searchSources{
 
 .ui-menu .ui-menu-item-wrapper:hover, .ui-menu .ui-menu-item-wrapper.ui-state-active
 {
-    background: #FFFFFF20;
+    background: #404040;
 }
 
 .ui-helper-hidden-accessible{
@@ -155,5 +155,48 @@ li:last-child div{
     border-bottom-right-radius: 8px;
 }
 
+.checkboxLabel{
+    position: initial;
+    font-size: 20px !important;
+    color: #CCC !important;
+}
 
+#optionalInputs{
+    width:60%;
+    margin: auto;
+    margin-top: 2em;
+}
+
+h3{
+    font-size: 20px;
+    margin: 10px auto;
+}
+
+
+#fileUploadDiv{
+    width:100%;
+    height:25vh;
+    border: 4px dashed var(--ACCENT);
+    background: #ffffff10;
+    text-align: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+input[type="file"]{
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: 60vw;
+    height: 25vh;
+    outline: none;
+    opacity: 0;
+    left: 20vw;
+    cursor: pointer;
+}
+
+#fileUploadDiv img{
+    margin-top: 5%;
+
+}
 

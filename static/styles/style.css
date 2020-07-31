@@ -9,7 +9,7 @@ html {
     color: var(--TEXT);
     font-family: var(--FONT-FACE);
 }
-h1, a{
+h1, h3, a{
     color: var(--ACCENT);
 }
 
@@ -23,7 +23,7 @@ input[type=text]{
   font-size:18px;
   padding:10px 10px;
   display:block;
-  width:300px;
+  width:100%;
   border:none;
   border-bottom:1px solid #999;
 }
@@ -48,7 +48,7 @@ input:focus ~ label, input:not(:placeholder-shown) ~ label{
   color:var(--ACCENT);
 }
 /* BOTTOM BARS ================================= */
-.bar{ position:relative; display:block; width:300px;}
+.bar{ position:relative; display:block; width:100%;}
 .bar:before, .bar:after   {
   content:'';
   height:3px;
@@ -173,4 +173,6 @@ button:disabled::before, input[type=submit]:disabled::before {
 button:disabled::after, input[type=submit]:disabled::after {
     opacity: 0;
 }
+
+
 
