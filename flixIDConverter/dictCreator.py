@@ -98,9 +98,9 @@ def getEpisodeInfoFromEntry(dictionary):
 	episodeNumber = href[episodeNumberIndex:]
 	return [episodeName, episodeNumber]
 
-def generateDictionary():
+def generateDictionary(directory):
 	resultDic = {}
-	for entry in os.scandir(showDirectory):
+	for entry in os.scandir(directory):
 		if entry.is_file():
 			with open(entry) as file:
 				entryList = jsonToDictEntryShow(file)
@@ -114,10 +114,16 @@ def writeDictAsJSON(dictionary, fileAddress):
 	with open(fileAddress, "w") as outfile:
 		json.dump(dictionary, outfile)
 
+def MergeDictionaries(dict1, dict2):
+	res = {**dict1, **dict2}
+	return res
+
 # "Main method" (runs on execution) ===================================================
-dictionary = generateDictionary()
-print(dictionary)
-writeDictAsJSON(dictionary, outputAddress)
+movieDictionary = generateDictionary(movieDirectory)
+showDictionary = generateDictionary(showDirectory)
+mergedDictionary = MergeDictionaries(movieDictionary, showDictionary)
+print(mergedDictionary)
+writeDictAsJSON(mergedDictionary, outputAddress)
 
 
 #with open('O:/Git Projects/stampiboi netflix files/fixedShowFiles/80049714.txt') as f:
