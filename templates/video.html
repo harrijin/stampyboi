@@ -39,7 +39,7 @@
                 </div>
             {% else %}
                 {% set extension, is_video = get_extension(doc['id']) %}
-                <video id="player-vid" src="{{ url_for('download_file', filename=doc['id']) }}#t={{start}}" width="50%" height="100%" style="background-color: black;" controls autoplay></video>
+                <video id="player-vid" src="{{ url_for('download_file', filename=doc['id']) }}#t={{start}}" width="70%" height="100%" style="background-color: black;" controls autoplay></video>
                 <div class="infobar">
                     <div class="ytInfo">
                         <h1>{{doc['id']}}</h1>
@@ -97,4 +97,57 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='video.js')}}"></script>
+    <script>
+        function shareBoi(dest){
+    //dest values
+    //1 - facebook
+    //2 - twitter
+    //3 - reddit
+    var a = $('.activeStamp .timestamp').html().split(':');
+    var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+    var link = "https://youtu.be/{{doc['id']}}?t=" + seconds;
+    if(dest < 3){
+        link = encodeURIComponent(link);
+    } else if(dest == 3){
+        link = encodeURI(link);
+    }
+    console.log(link);
+    switch(dest){
+        case 1:
+            window.open("https://www.facebook.com/sharer.php?u="+link, "_blank");
+        break;
+        case 2:
+            window.open("https://twitter.com/intent/tweet?url="+link, "_blank");
+        break;
+        case 3:
+            window.open("https://www.reddit.com/submit?url="+link, "_blank");
+        break;
+        case 4:
+            var dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.textContent = link;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            window.alert('Timestamped video link copied!');
+        break;
+        default:
+            var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
+            if (result){
+                var dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                var minutes = (+a[0]) * 60 + (+a[1]);
+                var sec_60 = (+a[2]);
+                dummy.textContent = minutes + ":" + sec_60;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+                window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
+            }
+
+        break;
+    }
+}
+
+</script>
 </div>

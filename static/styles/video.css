@@ -21,7 +21,7 @@
     flex-direction: column;
     border-left: 3px solid var(--ACCENT);
     background-color: #303030;
-    width: 50%;
+    width: 30%;
 }
 
 .ytInfo{
