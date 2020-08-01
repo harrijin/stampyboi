@@ -167,7 +167,7 @@ def render_results():
             #     pass
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList, length = transcriber.getTranscript()
-            tupleList = findStringInTranscript(transcriptList, quote)
+            tupleList = findStringInTranscript(transcriptList, quote.lower())
             if not tupleList:
                 file_results = 'No results found.'
             else:
