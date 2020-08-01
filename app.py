@@ -318,7 +318,6 @@ def search_solr(quote, source='none', id=''):
                 connectionURL = connectionURL +'%20%2Btitle:'+title
             #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
     try:
-        print(connectionURL)
         connection = urlopen(connectionURL)
         response = json.load(connection)
     except:
@@ -357,20 +356,20 @@ def findStringInTranscript(transcriptList, targetString):
         if (transcriptList[x])[0] == firstWord:
             y = 1
             equal = True
-            while y < len(targetString.split()) and x + y < len(transcriptList):
+            while y < len(targetStringSplit) and x + y < len(transcriptList):
                 if (transcriptList[x + y])[0] != targetStringSplit[y]:
                     equal = False
                 y += 1
             if equal:
                 z = 1
-                resultString = targetString
+                resultString = "<b>" + targetString + "</b>"
                 while z <= WORDS_OF_CONTEXT:
                     if x - z >= 0:
                         resultString = (transcriptList[x - z])[0] + " "  + resultString
                     if x + len(targetStringSplit) + z - 1 < len(transcriptList):
                         resultString = resultString + " " + (transcriptList[x + len(targetStringSplit) + z - 1])[0]
                     z += 1
-                targetTuples.append((resultString, (transcriptList[x])[1]))
+                targetTuples.append((Markup(resultString), (transcriptList[x])[1]))
         x += 1
     #targetTuples = list(filter(lambda x:firstWord in x, transcriptList))
     return targetTuples
