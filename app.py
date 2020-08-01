@@ -1,5 +1,5 @@
 import os, re, ast
-from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup, session
+from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup, session, send_from_directory
 from werkzeug.utils import secure_filename
 import deepspeech
 from .transcribers.youtube import YouTube
@@ -14,7 +14,8 @@ import pysolr
 
 
 UPLOAD_FOLDER = './transcribers/uploadedFiles'
-ALLOWED_EXTENSIONS = {'wav', 'ogv', 'mp4', 'mpeg', 'avi', 'mov'}
+ALLOWED_AUDIO = ['.wav']
+ALLOWED_VIDEO = ['.ogv', '.mp4', '.mpeg', '.avi', '.mov']
 MODEL = deepspeech.Model('./transcribers/deepspeech-0.7.4-models.pbmm')
 MODEL.enableExternalScorer('./transcribers/deepspeech-0.7.4-models.scorer')
 
@@ -83,6 +84,7 @@ def render_results():
     # END OF DUMMY TEST*****************************************************************************************
     quote = request.form['quote']
     results = []
+    print(request.form)
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
         results = search_solr(quote)
@@ -165,15 +167,14 @@ def render_results():
             # while not os.path.exists(audioPath):
             #     pass
             transcriber = FileExtractor(audioPath, MODEL)
-            transcriptList = transcriber.getTranscript()
+            transcriptList, length = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote)
             if not tupleList:
                 file_results = 'No results found.'
             else:
-                file_results = [formatTranscriptToDictionary("file", filename, tupleList)]
-
-            if os.path.exists(audioPath):
-                os.remove(audioPath)
+                file_results = formatTranscriptToDictionary("file", filename, tupleList)
+                file_results['length'] = int(length)
+                file_results = [file_results]
 
             if not isinstance(file_results, str): # check that the file search didn't result in no results or an error
                 if isinstance(results, str): # check if the youtube or search resulted in no results or an error
@@ -229,13 +230,20 @@ def receive_video():
 
     return render_template("video.html", doc=doc, stamp=stamp)
 
+@app.route('/uploads/<path:filename>')
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
 @app.context_processor
 def utility():
     def time_string(sec):
         delta = datetime.timedelta(seconds=sec)
         stamp = (datetime.datetime.min + delta).time()
         return stamp.strftime('%H:%M:%S')
-    return dict(time_string=time_string)
+    def get_extension(filename):
+        extension = os.path.splitext(filename)[1]
+        return extension[1:], (extension in ALLOWED_VIDEO)
+    return dict(time_string=time_string, get_extension=get_extension)
 
 # ==============Helper Methods==============
 
@@ -283,7 +291,8 @@ def ytVidId(url):
     return False
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    ext = os.path.splitext(filename)[1]
+    return '.' in filename and (ext in ALLOWED_AUDIO or ext in ALLOWED_VIDEO)
 
 def search_solr(quote, source='none', id=''):
     quote = '"'+quote.replace(" ", "+")+'"'
