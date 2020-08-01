@@ -1,6 +1,6 @@
 .vertically-center{
     display: flex;
-    height: 90%;
+    height: 100%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -9,10 +9,11 @@
 .clip-container{
     display: flex;
     margin: auto auto;
-    margin-top: 80px;
-    width: 80%;
+    margin-top: 2%;
+    width: 90%;
     height: 90%;
     outline: 5px solid var(--ACCENT);
+    overflow: hidden;
 }
 
 .infobar{
@@ -20,6 +21,7 @@
     flex-direction: column;
     border-left: 3px solid var(--ACCENT);
     background-color: #303030;
+    width: 50%;
 }
 
 .ytInfo{
@@ -78,6 +80,7 @@ table{
     display:flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 2%;
 }
 
 #share-buttons img {

@@ -51,13 +51,11 @@
                     <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{id}}</a>
                     <p class="info">{{time_string(doc['length'])}} • {{extension.upper()}} File</p>
                     <div id="wrap-timestamps">
+                        {% if is_video %}
                         <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
-                            {% if is_video %}
-                            <video src="{{ url_for('download_file', filename=id) }}" width="320" height="180" alt="thumbnail" style="background-color: black;"></video>
-                            {% else %}
-                            <img src="static/images/audio.png" width=320 height=180 alt="thumbnail">
-                            {% endif %}
+                            <video src="{{ url_for('download_file', filename=id) }}#t=0,0" width="320" height="180" style="background-color: black;"></video>
                         </a>
+                        {% endif %}
                         <div class="result-timestamps">
                         <table id="times" cellspacing="0px" cellpadding="0px">
                             {% for tuple in doc['list'] %}
