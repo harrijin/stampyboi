@@ -12,7 +12,7 @@
         {% if doc is not none %}
             {% set start = doc['list'][stamp][1] %}
             {% if doc['type'] == 'yt' %}
-                <iframe id="player" width="50%" height="100%" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?autoplay=1&enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe id="player" width="70%" height="100%" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?autoplay=1&enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <div class="infobar">
                     <div class="ytInfo">
                         <h1>{{doc['title']}}</h1>
