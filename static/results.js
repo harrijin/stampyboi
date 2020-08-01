@@ -23,7 +23,6 @@ function generateSpellcheck(){
     let form = document.createElement('form');
     let dropdown = document.createElement('select');
     let submitButton = document.createElement('input');
-    let bottomBar = document.createElement('span');
     prefix.style = 'color:red';
     prefix.innerHTML = "Did you mean:";
     form.action = '/results';
