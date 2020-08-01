@@ -30,8 +30,8 @@
             {% set id = doc['id'] %}
             {% set info = doc|tojson %}
             <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
+                <div class="typetab"></div>
                 {% if doc['type'] == 'yt' %}
-                    <div class="typetab"></div>
                     <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
                     <p class="info">{{doc['channel']}} • {{doc['date']}}</p>
                     <div id="wrap-timestamps">
@@ -54,12 +54,30 @@
                         </div>
                     </div>
                 {% else %}
-                    <h2>ID: {{id}}</h2>
-                    <ul>
-                        {% for tuple in doc['list'] %}
-                            <li><a href='#'>{{time_string(tuple[1])}}</a> {{tuple[0]}}</li>
-                        {% endfor %}
-                    </ul>
+                    {% set extension, is_video = get_extension(id) %}
+                    <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{id}}</a>
+                    <p class="info">{{time_string(doc['length'])}} • {{extension.upper()}} File</p>
+                    <div id="wrap-timestamps">
+                        {% if is_video %}
+                        <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
+                            <video src="{{ url_for('download_file', filename=id) }}#t=0,0" width="320" height="180" style="background-color: black;"></video>
+                        </a>
+                        {% endif %}
+                        <div class="result-timestamps">
+                        <table id="times" cellspacing="0px" cellpadding="0px">
+                            {% for tuple in doc['list'] %}
+                                {% set text = tuple[0] %}
+                                {% set sec = tuple[1] %}
+
+                                <tr onclick='directToVideo({{info}}, "{{loop.index0}}")'>
+                                    <td>{{text}}</td>
+                                    <td class="timestamp">{{time_string(sec)}}</td>
+                                </tr>
+
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
         {% endfor %}
