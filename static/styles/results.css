@@ -1,0 +1,193 @@
+:root {
+    --result-height: 260px;
+    --title-pad: 10px;
+    --tab-width: 20px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.result {
+    height: var(--result-height);
+    border-radius: 5px;
+    padding-left: 23px;
+    padding-top: var(--title-pad);
+    background: #FFFFFF10;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.link {
+    color: var(--ACCENT);
+    text-decoration: none;
+}
+
+.link:focus, .link:hover {
+    text-decoration: underline;
+}
+
+.link:active {
+    color: #FFF
+}
+
+.thumbnail {
+    float:left;
+    padding-right: 20px;
+    padding-top: 5px;
+}
+
+.info {
+    color: #BBB;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.typetab {
+    float: right;
+    width: var(--tab-width);
+    height: calc(var(--result-height) + var(--title-pad));
+    margin-top: calc(0px - var(--title-pad));
+    overflow: hidden;
+
+}
+
+.yt > .typetab {
+    background-color: red;
+}
+.yt {
+    border: 1px solid red;
+}
+
+.flix > .typetab {
+    background-color: white;
+}
+.flix {
+    border: 1px solid white;
+}
+
+.file > .typetab {
+    background-color: var(--ACCENT);
+}
+.file {
+    border: 1px solid var(--ACCENT);
+}
+
+
+
+/* Table stuff */
+tr{
+    transition: outline 0.2s;
+}
+tr:hover { background: #ffffff20; }
+tr:active { background: #151515; }
+tr.activeStamp{
+    background: var(--BACKGROUND);
+    color: var(--ACCENT);
+    outline: 3px solid var(--ACCENT);}
+td {
+    height: 100%;
+    padding: 7px 5px 5px 15px;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #606060;
+}
+
+.timestamp{
+    font-style: italic;
+    vertical-align: middle;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.result-timestamps{
+    overflow:auto;
+    padding-bottom: 5px;
+    height: 180px;
+}
+
+#wrap-timestamps {
+    padding-right: calc(var(--tab-width) + 20px);
+}
+
+table{
+    border-collapse: collapse;
+    cursor:pointer;
+    min-width:100%;
+    max-width:100%;
+}
+/* End table stuff */
+
+.overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: block; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 2000; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+#newSearch{
+    display: flex;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index:12;
+}
+
+#newSearch input[type='text']{
+    width: 35vw;
+}
+
+.group{
+    margin-bottom: 0px;
+    margin-right: 10px;
+}
+
+
+/*.wrap {
+  position: absolute;
+  right: 0;
+  top: 40%;
+  width: 350px;
+  left: 0;
+  margin: 0 auto;
+}*/
+
+/* select starting stylings ------------------------------*/
+
+.select-text {
+    position: relative;
+    font-family: inherit;
+    background-color: transparent;
+    padding: 10px 10px 10px 0;
+    font-size: 18px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid white;
+    color: var(--TEXT);
+    margin: auto 10px;
+}
+
+/* Remove focus */
+.select-text:focus {
+    outline: none;
+    border-bottom: 1px solid rgba(0,0,0, 0);
+}
+
+
+
+.select option{
+    color: black;
+}
+
+
+
+
+

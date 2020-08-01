@@ -1,141 +1,164 @@
 <html>
 
   <head>
-    StampyBoi
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/home.css') }}">
+
   </head>
 
   <body>
-    <div>
-        <button onclick="ytSearch()">Search YouTube video</button>
-        <button onclick="flixSearch()">Search Netflix show</button>
-        <button onclick="fileSearch()">Search a video/audio file</button>
-        <button onclick="noneSearch()">Search with only a quote</button>
-    </div>
-    <div>
-        <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST'>
-          <label for="quote">Quote to search for:</label>
-          <input type="text" id="quote" name="quote" oninput="suggest()" autofocus required list="autosuggest">
-          <br>
-          <datalist id="autosuggest"></datalist>
-          <br>
-          <p>in this video/audio file:</p>
-          <br>
+    <img class="center" src="/static/images/logo.png" alt="Stampyboi">
+        <form action="/results" id="searchForm" enctype="multipart/form-data" method='POST' autocomplete="off">
+            <div class="group" id="searchDiv">
+                <div id="quoteDiv" class="ui-widget">
+                    <input type="text" id="quote" name="quote" oninput="suggest()" autofocus list="autosuggest" placeholder="Come with me if you want to live">
+                    <span class="bar" name="quoteTop"></span>
+                    <span class="bar" name="quote"></span>
+                    <span class="vertBar" name="left"></span>
+                    <span class="vertBar" name="right"></span>
 
-          <label for="yt_source">YouTube video to search in:</label>
-          <input type="text" id="yt_source" name="yt_source" disabled=true >
+                </div>
+                <button type="submit" form="searchForm" id="searchButton">Search</button>
+            </div><!-- searchDiv -->
 
+            <div id="optionalInputs">
+                <div class="group">
+                  <input type="text" id="yt_source" name="yt_source" placeholder=" " style="display: none;">
+                  <span class="bar"></span>
+                  <span class="highlight"></span>
+                  <label for="yt_source" style="display: none;">YouTube link (optional)</label>
+                </div>
+                <div class="group">
+                  <input type="text" id="flix_title" name="flix_title" placeholder=" " style="display: none;">
+                  <span class="bar"></span>
+                  <span class="highlight"></span>
+                  <label for="flix_title" style="display: none;">Show title (optional)</label>
 
-          <br>
-          <br>
+                </div>
+                <div class="group">
+                  <input type="text" id="flix_szn" name="flix_szn" pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" " style="display: none;">
+                  <span class="bar"></span>
+                  <span class="highlight"></span>
+                  <label for="flix_szn" style="display: none;">Season # (optional)</label>
 
-          <label for="flix_title">Name of Netflix show:</label>
-          <input type="text" id="flix_title" name="flix_title" disabled=true >
+                </div>
+                <div class="group">
+                  <input type="text" id="flix_ep" name="flix_ep" pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" " style="display: none;">
+                  <span class="bar"></span>
+                  <span class="highlight"></span>
+                  <label for="flix_ep" style="display: none;">Episode # (optional)</label>
+                </div>
+                <div id="fileUploadDiv" style="display: none;">
+                    <input type="file" id="vid_upload" name="vid_upload" disabled required>
+                    <img src="/static/images/uploadIcon.png" alt="Upload Files Here" width="10%">
+                    <h3 style="text-align: center;">Choose a file or drag it here</h3>
+                </div>
+            </div>
+          <br>
+      <div id="optionsDiv">
+            <h3>Narrow your search to:</h3>
+            <label for="searchYt" class="checkboxLabel">YouTube</label>
+            <input type="checkbox" name="searchYt" id="searchYt" onclick="toggleYt()"><br>
+            <label for="searchFlix" class="checkboxLabel">Netflix</label>
+            <input type="checkbox" name="searchFlix" id="searchFlix" onclick="toggleFlix()"><br>
+            <label for="searchFile" class="checkboxLabel">File</label>
+            <input type="checkbox" name="searchFile" id="searchFile" onclick="toggleFile()"><br>
+        </div> <!--optionsDiv-->
+    </form>
 
-          <br>
-          <br>
-
-          <label for="flix_szn">Season #:</label>
-          <input type="text" id="flix_szn" name="flix_szn" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
-          <br>
-          <br>
-
-          <label for="flix_ep">Episode #:</label>
-          <input type="text" id="flix_ep" name="flix_ep" disabled=true pattern="\d{1,2}" title="1-2 digit number" size=2 maxlength=2 >
-
-          <input type="text" id="search_src" name="search_src" style="display: none;" >
-          <br>
-          <br>
-          <input type="file" id="vid_upload" name="vid_upload" disabled=true required>
-          <br>
-          <br>
-          <input type="submit" value="Search">
-
-
-        </form>
-    </div>
+    <button id="optionsButton" class="textButton" onclick="this.blur()">Options</button>
+    <button id="aboutButton" class="textButton" onclick="window.open('https://github.com/harrijin/stampyboi','_blank'); this.blur()">About</button>
   </body>
   <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script>
-    //for hiding the labels
-    // var labels = document.getElementsByTagName('LABEL');
-    // for (var i = 0; i < labels.length; i++) {
-    //     if (labels[i].htmlFor != '') {
-    //          var elem = document.getElementById(labels[i].htmlFor);
-    //          if (elem)
-    //             elem.label = labels[i];
-    //     }
-    // }
 
-    var searchSrc="none";
-    document.getElementById('search_src').value=searchSrc;
-    //yt = youtube (default)
-    //flix = netflix
-    //file = file
-    function toggleFile(state){
-        document.getElementById("vid_upload").disabled = !state;
+
+
+    function toggleFile(){
+        var check = document.getElementById('searchFile');
+        if (check.checked == true){
+            $('#fileUploadDiv').fadeIn(100);
+            $('#vid_upload').prop("disabled", false);
+        } else {
+            $('#fileUploadDiv').fadeOut(100);
+            $('#vid_upload').prop("disabled", true);
+        }
     }
     function toggleYt(state){
-        document.getElementById("yt_source").disabled = !state;
+        var check = document.getElementById('searchYt');
+        var input = document.getElementById("yt_source");
+        if (check.checked == true){
+            $('#yt_source').show(100);
+            $('label[for="yt_source"]').show(100);
+        } else {
+            $('#yt_source').hide(100);
+            $('label[for="yt_source"]').hide(50);
+        }
     }
     function toggleFlix(state){
-        document.getElementById("flix_title").disabled = !state;
-        document.getElementById("flix_szn").disabled = !state;
-        document.getElementById("flix_ep").disabled = !state;
+        var check = document.getElementById('searchFlix');
+        if (check.checked == true){
+            $('#flix_title').show(100);
+            $('#flix_szn').show(100);
+            $('#flix_ep').show(100);
+            $('label[for="flix_title"]').show(100);
+            $('label[for="flix_szn"]').show(100);
+            $('label[for="flix_ep"]').show(100);
+        } else {
+            $('#flix_title').hide(100);
+            $('#flix_szn').hide(100);
+            $('#flix_ep').hide(100);
+            $('label[for="flix_title"]').hide(50);
+            $('label[for="flix_szn"]').hide(50);
+            $('label[for="flix_ep"]').hide(50);
+        }
     }
-    function ytSearch(){
-        searchSrc="yt";
-        document.getElementById('search_src').value=searchSrc;
-        toggleYt(true);
-        toggleFlix(false);
-        toggleFile(false);
-    }
-    function flixSearch(){
-        searchSrc="flix";
-        document.getElementById('search_src').value=searchSrc;
-        toggleYt(false);
-        toggleFlix(true);
-        toggleFile(false);
-    }
-    function fileSearch(){
-        searchSrc="file";
-        document.getElementById('search_src').value=searchSrc;
-        toggleYt(false);
-        toggleFlix(false);
-        toggleFile(true);
-    }
-    function noneSearch(){
-        searchSrc="none";
-        document.getElementById('search_src').value=searchSrc;
-        toggleYt(false);
-        toggleFlix(false);
-        toggleFile(false);
-    }
+
     function suggest(){
         var userIn=encodeURIComponent(document.getElementById('quote').value);
         var suggestRequest = new XMLHttpRequest();
-        var suggestions;
         suggestRequest.open('POST','/suggest', true);
         suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         suggestRequest.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                suggestions = JSON5.parse(this.responseText);
-                document.getElementById('autosuggest').innerHTML= "";
-                let userOption = document.createElement('option');
-                userOption.value = document.getElementById('quote').value;
-                document.getElementById('autosuggest').appendChild(userOption);
-                suggestions.forEach(addSuggestion);
+                var suggestions = JSON5.parse(this.responseText);
+                $( "#quote" ).autocomplete({
+                    source: suggestions
+                });
             }
 
         };
         suggestRequest.send("q="+userIn);
 
     }
-    function addSuggestion(suggestion){
-        let option = document.createElement('option');
-        option.value = suggestion.toLowerCase();
-        document.getElementById('autosuggest').appendChild(option);
-    }
+    $("#optionsButton").click(function() {
+      $("#optionsDiv").animate({
+        width: "toggle"
+      }, 200);
+      return false;
+    });
+
+    // $("body").click(function() {
+    //   if ($("#optionsDiv").is(":visible")) {
+    //     $("#optionsDiv").fadeToggle(100);
+    //   }
+    // });
+
+    // $("#optionsDiv").click(function(){
+    //     $("#optionsDiv").stop(true, true);
+    //     $("#optionsDiv").fadeIn(100);
+    //     return false;
+    // });
+
+    $(document).ready(function(){
+        $('#fileUploadDiv input').change(function () {
+            $('#fileUploadDiv h3').text("Selected file: " + this.value.split('\\').pop());
+            // this.files.length + " file(s) selected"
+        });
+    });
+
   </script>
 
 </html>

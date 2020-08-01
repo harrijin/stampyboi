@@ -1,55 +1,153 @@
-<html>
-    <head>
-        {% if doc is not none %}
-            <h1>{{doc['title']}}</h1>
-            <p>{{doc['channel']}}</p>
-            <p>{{doc['date']}}</p>
-        {% endif %}
-    </head>
-    <body>
-        <div>
-            <form action='/'>
-              <input type='submit' value='New search'>
-            </form>
-        </div>
+<div class="overlay">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/video.css') }}">
+    <!-- <div>
+        <form action='/'>
+            <input type='submit' value='New search'>
+        </form>
+    </div> -->
 
+    <div class="vertically-center">
+        <div class="clip-container">
         {% if doc is not none %}
             {% set start = doc['list'][stamp][1] %}
-            <iframe id="player" width="853" height="480" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <br>
+            {% if doc['type'] == 'yt' %}
+                <iframe id="player" width="70%" height="100%" src="{{'https://www.youtube.com/embed/' ~ doc['id'] ~ '?autoplay=1&enablejsapi=true&start=' ~ start}}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="infobar">
+                    <div class="ytInfo">
+                        <h1>{{doc['title']}}</h1>
+                        <h4>{{doc['channel']}} • {{doc['date']}}</h4>
+                    </div>
+                    <div class="timestamps">
+                    <table id="times" cellspacing="0px" cellpadding="0px">
+                        {% for tuple in doc['list'] %}
+                            {% set text = tuple[0] %}
+                            {% set sec = tuple[1] %}
 
-            <ul>
-                {% for tuple in doc['list'] %}
-                    {% set text = tuple[0] %}
-                    {% set sec = tuple[1] %}
-                    <li><a href='javascript:;' onclick="seek('{{sec}}')">{{time_string(sec)}}</a> {{text}}</li>
-                {% endfor %}
-            </ul>
+                            {% if sec == start %}
+                            <tr onclick="setActive(this);seek('{{sec}}');" class="activeStamp">
+                            {% else %}
+                            <tr onclick="setActive(this);seek('{{sec}}');">
+                            {% endif %}
+                                <td>{{text}}</td>
+                                <td class="timestamp">{{time_string(sec)}}</td>
+                            </tr>
+
+                        {% endfor %}
+                    </table>
+                    </div>
+                </div>
+            {% else %}
+                {% set extension, is_video = get_extension(doc['id']) %}
+                <video id="player-vid" src="{{ url_for('download_file', filename=doc['id']) }}#t={{start}}" width="70%" height="100%" style="background-color: black;" controls autoplay></video>
+                <div class="infobar">
+                    <div class="ytInfo">
+                        <h1>{{doc['id']}}</h1>
+                        <h4>{{time_string(doc['length'])}} • {{extension.upper()}} File</h4>
+                    </div>
+                    <div class="timestamps">
+                    <table id="times" cellspacing="0px" cellpadding="0px">
+                        {% for tuple in doc['list'] %}
+                            {% set text = tuple[0] %}
+                            {% set sec = tuple[1] %}
+
+                            <tr onclick="setActive(this);seekVideo('{{sec}}');" {% if sec == start %} class="activeStamp" {% endif %}>
+                                <td>{{text}}</td>
+                                <td class="timestamp">{{time_string(sec)}}</td>
+                            </tr>
+
+                        {% endfor %}
+                    </table>
+                    </div>
+                </div>
+            {% endif %}
         {% else %}
             <p>ERROR: No video.</p>
         {% endif %}
-        
-        <script src="http://www.youtube.com/player_api"></script>
-        <script>
-            var player;
+        </div>
 
-            function onYouTubeIframeAPIReady() {
-                player = new YT.Player('player', {
-                    events: {
-                        'onReady': onPlayerReady
-                    }
-                });
+        {% if doc['type'] == 'yt' %}
+        <div id="share">
+            <h2>Share this boi:</h2>
+            <div id="share-buttons">
+                    <!-- Facebook -->
+                <a href='javascript:;' onclick='shareBoi(1)'>
+                    <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook"/>
+                </a>
+                    <!-- Twitter -->
+                <a href='javascript:;' onclick='shareBoi(2)'>
+                    <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+                </a>
+                    <!-- Reddit -->
+                <a href='javascript:;' onclick='shareBoi(3)'>
+                    <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+                </a>
+                    <!-- Link (copy) -->
+                <a href='javascript:;' onclick='shareBoi(4)'>
+                    <img src="/static/images/link.png" alt="Get link" />
+                </a>
+                    <!--GIF-->
+                <a href='javascript:;' onclick='shareBoi(5)'>
+                    <img src="/static/images/gifIcon.png" alt="Convert to gif" />
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='video.js')}}"></script>
+    <script>
+        function shareBoi(dest){
+    //dest values
+    //1 - facebook
+    //2 - twitter
+    //3 - reddit
+    var a = $('.activeStamp .timestamp').html().split(':');
+    var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+    var link = "https://youtu.be/{{doc['id']}}?t=" + seconds;
+    if(dest < 3){
+        link = encodeURIComponent(link);
+    } else if(dest == 3){
+        link = encodeURI(link);
+    }
+    console.log(link);
+    switch(dest){
+        case 1:
+            window.open("https://www.facebook.com/sharer.php?u="+link, "_blank");
+        break;
+        case 2:
+            window.open("https://twitter.com/intent/tweet?url="+link, "_blank");
+        break;
+        case 3:
+            window.open("https://www.reddit.com/submit?url="+link, "_blank");
+        break;
+        case 4:
+            var dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.textContent = link;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            window.alert('Timestamped video link copied!');
+        break;
+        default:
+            var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
+            if (result){
+                var dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                var minutes = (+a[0]) * 60 + (+a[1]);
+                var sec_60 = (+a[2]);
+                dummy.textContent = minutes + ":" + sec_60;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+                window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
             }
 
-            function onPlayerReady(event) {
-                event.target.playVideo();
-            }
+        break;
+    }
+}
 
-            function seek(sec) {
-                if (player) {
-                    player.seekTo(parseInt(sec), true);
-                }
-            }
-        </script>
-    </body>
-</html>
+</script>
+</div>
