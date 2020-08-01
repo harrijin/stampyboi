@@ -6,15 +6,22 @@
   <body>
 
     <div>
-    <form action='/'>
-      <button>New Search</button>
+    <form action='/' id="home">
+      <button><img src="/static/images/logo.png" alt="Stampyboi"></button>
     </form>
     </div>
+    <form action='/results' method='POST' autocomplete="off" id="newSearch">
+        <div class="group">
+                <input type="text" id="quote" name="quote" oninput="suggest()" list="autosuggest" value="{{query}}" placeholder="Streets ahead!">
+                <span class="bar" name="quoteTop"></span>
+                <span class="bar" name="quote"></span>
+                <span class="vertBar" name="left"></span>
+                <span class="vertBar" name="right"></span>
+        </div>
+        <input type='submit' value="Search">
+    </form>
+    <div id='spellchecking' class="select">
 
-    <div id='spellchecking'>
-        <p id="userQuery">Searched quote: {{query}}</p>
-        <input type='text' id="inputQuote" style="display: none;" value="{{query}}">
-        <button id = 'spellcheckButton' onclick='check_spelling()'>Check spelling</button>
     </div>
 
     <div>
@@ -36,12 +43,12 @@
                             {% for tuple in doc['list'] %}
                                 {% set text = tuple[0] %}
                                 {% set sec = tuple[1] %}
-    
+
                                 <tr onclick='directToVideo({{info}}, "{{loop.index0}}")'>
                                     <td>{{text}}</td>
                                     <td class="timestamp">{{time_string(sec)}}</td>
                                 </tr>
-    
+
                             {% endfor %}
                         </table>
                         </div>
@@ -90,9 +97,30 @@
     <!-- THIS IS WHERE THE VIDEO OVERLAY WILL GO -->
   </body>
 
-  <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='results.js')}}"></script>
+    <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='results.js')}}"></script>
+    <script>
+        check_spelling();
+        function suggest(){
+            var userIn=encodeURIComponent(document.getElementById('quote').value);
+            var suggestRequest = new XMLHttpRequest();
+            suggestRequest.open('POST','/suggest', true);
+            suggestRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            suggestRequest.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var suggestions = JSON5.parse(this.responseText);
+                    $( "#quote" ).autocomplete({
+                        source: suggestions
+                    });
+                }
+
+            };
+            suggestRequest.send("q="+userIn);
+
+        }
+    </script>
 </html>
 
 

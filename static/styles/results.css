@@ -4,7 +4,7 @@
     --tab-width: 20px;
 }
 
-#userQuery, .title {
+.title {
     font-size: 25px;
     font-weight: bold;
 }
@@ -50,7 +50,7 @@
     height: calc(var(--result-height) + var(--title-pad));
     margin-top: calc(0px - var(--title-pad));
     overflow: hidden;
-    
+
 }
 
 .yt > .typetab {
@@ -130,5 +130,68 @@ table{
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0,0.5); /* Black background with opacity */
-    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    z-index: 2000; /* Specify a stack order in case you're using a different order for other elements */
 }
+
+#newSearch{
+    display: flex;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index:12;
+}
+
+#newSearch input[type='text']{
+    width: 35vw;
+}
+
+.group{
+    margin-bottom: 0px;
+    margin-right: 10px;
+}
+
+.ui-menu{
+    border-width: 1px;
+}
+
+
+/*.wrap {
+  position: absolute;
+  right: 0;
+  top: 40%;
+  width: 350px;
+  left: 0;
+  margin: 0 auto;
+}*/
+
+/* select starting stylings ------------------------------*/
+
+.select-text {
+    position: relative;
+    font-family: inherit;
+    background-color: transparent;
+    padding: 10px 10px 10px 0;
+    font-size: 18px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid white;
+    color: var(--TEXT);
+    margin: auto 10px;
+}
+
+/* Remove focus */
+.select-text:focus {
+    outline: none;
+    border-bottom: 1px solid rgba(0,0,0, 0);
+}
+
+
+
+.select option{
+    color: black;
+}
+
+
+
+
+
