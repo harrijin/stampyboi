@@ -62,7 +62,7 @@ function shareBoi(dest){
         case 3:
             window.open("https://www.reddit.com/submit?url="+link, "_blank");
         break;
-        default:
+        case 4:
             var dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
             dummy.textContent = link;
@@ -77,6 +77,21 @@ function shareBoi(dest){
                 $('#copied').fadeTo(10, 1);
             }
             $('#copied').fadeOut(3000);
+        break;
+        default:
+            var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
+            if (result){
+                var dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                var minutes = (+a[0]) * 60 + (+a[1]);
+                var sec_60 = (+a[2]);
+                dummy.textContent = minutes + ":" + sec_60;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+                window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
+            }
+
         break;
     }
 }
