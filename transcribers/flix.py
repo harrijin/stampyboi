@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 from .utils import get_pdf_text, extract_words
 from .transcriber import Transcriber
+import os
+import subprocess
 import requests
 import re
 import json
@@ -55,41 +57,49 @@ class FlixExtractor(Transcriber):
 
 
     def getTranscript(self):
-        # Extract text from PDF
-        transcript = get_pdf_text(self.pdf_url)
+        query = (self.show + " " + "{0:0=2x}".format(self.szn) + "x" + "{0:0=2x}".format(self.epis)).replace(" ", "-")
+        command = ["addic7ed", "-l", "english", "-bb", query]
+        subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
+        if "Completed" in subDownload.stdout:
+            # Parse SRT file here, it's downloaded to the root directory
+        else:
+            raise ValueError("Show not found")
+        # Old 8flix stuff======================================
+        # # Extract text from PDF
+        # transcript = get_pdf_text(self.pdf_url)
 
-        # Strip stage directions
-        stage_dir_re = re.compile(STAGE_DIRECTIONS_REGEX)
-        transcript = stage_dir_re.sub(' ', transcript)
+        # # Strip stage directions
+        # stage_dir_re = re.compile(STAGE_DIRECTIONS_REGEX)
+        # transcript = stage_dir_re.sub(' ', transcript)
 
-        # Strip end timestamps
-        end_stamp_re = re.compile(END_TIMESTAMP_REGEX)
-        transcript = end_stamp_re.sub('', transcript)
+        # # Strip end timestamps
+        # end_stamp_re = re.compile(END_TIMESTAMP_REGEX)
+        # transcript = end_stamp_re.sub('', transcript)
 
-        transcript_list = re.split(BLOCK_NUMBER_REGEX, transcript)
+        # transcript_list = re.split(BLOCK_NUMBER_REGEX, transcript)
 
-        # Remove intro text from generated timestamp-text pairs
-        transcript_list.pop(0)
+        # # Remove intro text from generated timestamp-text pairs
+        # transcript_list.pop(0)
 
-        transcript = list()
+        # transcript = list()
 
-        for component in transcript_list:
+        # for component in transcript_list:
 
-            timestamp = component[:TIMESTAMP_LEN]
-            time = self.__convert_to_seconds(timestamp)
+        #     timestamp = component[:TIMESTAMP_LEN]
+        #     time = self.__convert_to_seconds(timestamp)
 
-            phrase = component[TIMESTAMP_LEN:]
-            words = extract_words(phrase)
-            if len(words) != 0:
-                transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
+        #     phrase = component[TIMESTAMP_LEN:]
+        #     words = extract_words(phrase)
+        #     if len(words) != 0:
+        #         transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
 
-        return transcript
+        # return transcript
+
 
     def convertToJSON(self, filepath):
         transcript=self.getTranscript()
         text=""
         times=[]
-        #this following line is the only weird one for me. not sure if those variables are local or not
         identification = self.show + "^!" + str(self.szn) + "_"+str(self.epis)
         for timestamp in transcript:
             text+=(timestamp[0]+" ")
