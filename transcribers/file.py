@@ -51,7 +51,7 @@ class FileExtractor(Transcriber):
         # print()
 
         result = metadata_to_list(transcript)
-        return result
+        return result, audio_length
 
     def convertToJSON(self, filepath):
         pass

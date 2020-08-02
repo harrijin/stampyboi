@@ -1,0 +1,247 @@
+:root {
+    --BACKGROUND: #202020;
+    --ACCENT: #00b3ff;
+    --TEXT: #fff;
+    --FONT-FACE: system-ui
+}
+html {
+    background-color: var(--BACKGROUND);
+    color: var(--TEXT);
+    font-family: var(--FONT-FACE);
+}
+h1, h3, a{
+    color: var(--ACCENT);
+}
+
+/* material design input boxes*/
+input, button{
+    color:var(--TEXT);
+    font-family: var(--FONT-FACE);
+}
+input[type=text]{
+    background: #00000000;
+  font-size:18px;
+  padding:10px 10px;
+  display:block;
+  width:100%;
+  border:none;
+  border-bottom:1px solid #999;
+}
+
+input:focus    { outline:none; }
+/* LABEL ======================================= */
+label {
+  color:#999;
+  font-size:18px;
+  font-weight:normal;
+  position:absolute;
+  pointer-events:none;
+  left:5px;
+  top:10px;
+  transition:0.2s ease all;
+}
+
+/* active state */
+input:focus ~ label, input:not(:placeholder-shown) ~ label{
+  top:-10px;
+  font-size:14px;
+  color:var(--ACCENT);
+}
+/* BOTTOM BARS ================================= */
+.bar{ position:relative; display:block; width:100%;}
+.bar:before, .bar:after   {
+  content:'';
+  height:3px;
+  width:0;
+  bottom:0px;
+  position:absolute;
+  background:var(--ACCENT);
+  transition:0.2s ease all;
+}
+.bar:before {
+  left:50%;
+}
+.bar:after {
+  right:50%;
+}
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+  width:50%;
+}
+
+/* material buttons*/
+button, input[type=submit] {
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 4px;
+    min-width: 64px;
+    width:auto;
+    /*height: 36px;*/
+    vertical-align: middle;
+    text-align: center;
+    text-overflow: ellipsis;
+    background:#FFFFFF10;
+    /*color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+    background-color: rgb(var(--pure-material-primary-rgb, 33, 150, 243));*/
+/*    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+*/    font-family: var(--FONT-FACE);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 36px;
+    overflow: hidden;
+    border: 1px solid #ffffff00;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+}
+
+
+/* Overlay */
+button::before, input[type=submit]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #606060;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+/* Ripple */
+button::after, input[type=submit]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    padding: 50%;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255,255,255,0.1);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+    transition: opacity 1s, transform 0.5s;
+}
+
+/* Hover, Focus */
+button:hover, input[type=submit]:hover,
+button:focus, input[type=submit]:focus {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    background:#FFFFFF10;
+    border: 1px solid var(--ACCENT);
+}
+
+button:hover::before, input[type=submit]:hover::before {
+    opacity: 0.08;
+}
+
+button:focus::before, input[type=submit]:focus::before {
+    opacity: 0.24;
+}
+
+button:hover:focus::before, input[type=submit]:hover:focus::before {
+    opacity: 0.3;
+}
+
+/* Active */
+button:active, input[type=submit]:active {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    background:#FFFFFF10;
+    border: 1px solid var(--ACCENT);
+}
+
+button:active::after, input[type=submit]:active::after {
+    opacity: 0.32;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0s;
+}
+
+/* Disabled */
+button:disabled, input[type=submit]:disabled {
+    color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.38);
+    background-color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.12);
+    box-shadow: none;
+    cursor: initial;
+}
+
+button:disabled::before, input[type=submit]:disabled::before {
+    opacity: 0;
+}
+
+button:disabled::after, input[type=submit]:disabled::after {
+    opacity: 0;
+}
+
+.ui-menu
+{
+    position: relative;
+    list-style: none;
+    background-color: #303030;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index:10;
+    box-shadow: none;
+    width: 214px;
+    line-height: 200%;
+    font-size: 18px;
+    padding: 0px;
+    border: solid 1px white;
+
+}
+.ui-menu .ui-menu-item
+{
+    padding-left: 0px;
+    left:0;
+}
+
+.ui-menu-item-wrapper{
+    padding-left: 15px;
+}
+
+.ui-menu .ui-menu-item-wrapper:hover, .ui-menu .ui-menu-item-wrapper.ui-state-active
+{
+    background: #404040;
+}
+
+.ui-helper-hidden-accessible{
+    display:none !important;
+}
+
+li:last-child div{
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.bar[name=quote],.bar[name=quoteTop]  {width:100%; margin: 0 auto;}
+.bar[name=quote] {bottom: -2px;}
+.bar[name=quoteTop] {bottom:100%;}
+
+.vertBar{position:relative; display:block; height:100%;margin:auto 0;bottom: 100%; padding: 0; width: 0px;}
+.vertBar:before, .vertBar:after   {
+  content:'';
+  width:3px;
+  height:0px;
+  left:0px;
+  position:absolute;
+  background:var(--ACCENT);
+  transition:0.2s ease all;
+}
+.vertBar[name=right] {left:calc(100% - 3px); bottom:200%;}
+.vertBar:before {
+  bottom:50%;
+}
+.vertBar:after {
+  top:50%;
+}
+
+/* active state */
+input:focus ~ .vertBar:before, input:focus ~ .vertBar:after {
+  height:50%;
+}
+
+.group        {
+  position:relative;
+  margin-bottom:20px;
+}
