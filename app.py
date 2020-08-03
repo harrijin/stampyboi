@@ -116,28 +116,52 @@ def render_results():
             results = search_solr(quote,'yt')
     # =============Netflix==============
     if "searchFlix" in request.form: #request.form['search_src'] == 'flix':
-        title = request.form['flix_title']
-        szn = request.form['flix_szn']
-        ep = request.form['flix_ep']
-        if len(title) > 0:
-            videoID = title + "^!" + szn + "_"+ep
-            solr_results = search_solr(quote,'flix',videoID)
-            if solr_results == 'No results found.': # Check if solr found the video id in the index
-                if szn != '' and ep != '': # Check if season and episode are provided
+        source = request.form['flix_source']
+        if len(source) > 0: # Check if a netflix link was provided
+            videoID = flixVidId(source)
+            if videoID: # Check if provided link is valid
+                results = search_solr(quote,'flix',videoID)
+                if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
-                    try:
-                        transcriber = FlixExtractor(title, int(szn), int(ep))
-                        # results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
-                        # transcriber.convertToJSON("jsonTranscripts/transcript.json")
-                        transcriptJSON = transcriber.getJSON()
-                        solr.add(transcriptJSON, commit=True)
-                        solr_results = search_solr(quote,'flix',videoID)
-                    except(ValueError):
-                        solr_results = "ERROR: Netflix show " + title + " not found"
-                    except IndexError as e:
-                        solr_results = "ERROR:" + title +" season " + szn + " episode " + ep + " not found. " + str(e)
+                    transcriber = FlixExtractor(videoID)
+                    transcript = transcriber.getTranscript()
+                    if not isinstance(transcript, str): # Check if getTranscript returned an error message
+                        try:
+                            transcriptJSON = transcriber.getJSON()
+                            solr.add(transcriptJSON, commit=True)
+                            results = search_solr(quote,'flix',videoID)
+                        except:
+                            print("solr server is down")
+                            # Add search function used for file uploads here
+
+                    else:
+                        results = transcript
+            else:
+                results = "ERROR: Invalid Netflix link."
         else:
-            solr_results = search_solr(quote,'flix')
+            results = search_solr(quote,'flix')
+        # title = request.form['flix_title']
+        # szn = request.form['flix_szn']
+        # ep = request.form['flix_ep']
+        # if len(title) > 0:
+        #     videoID = title + "^!" + szn + "_"+ep
+        #     solr_results = search_solr(quote,'flix',videoID)
+        #     if solr_results == 'No results found.': # Check if solr found the video id in the index
+        #         if szn != '' and ep != '': # Check if season and episode are provided
+        #             print('video not found. transcribing and indexing')
+        #             try:
+        #                 transcriber = FlixExtractor(title, int(szn), int(ep))
+        #                 # results = "Title: " + title + "<br>Season #: " + szn + "<br>Episode #: " + ep + "<br>Results: <br>" + str(transcriber.getTranscript())
+        #                 # transcriber.convertToJSON("jsonTranscripts/transcript.json")
+        #                 transcriptJSON = transcriber.getJSON()
+        #                 solr.add(transcriptJSON, commit=True)
+        #                 solr_results = search_solr(quote,'flix',videoID)
+        #             except(ValueError):
+        #                 solr_results = "ERROR: Netflix show " + title + " not found"
+        #             except IndexError as e:
+        #                 solr_results = "ERROR:" + title +" season " + szn + " episode " + ep + " not found. " + str(e)
+        # else:
+        #     solr_results = search_solr(quote,'flix')
 
         if not isinstance(solr_results, str): # check that the netflix search didn't result in no results or an error
             if isinstance(results, str): # check if the youtube search resulted in no results or an error
@@ -299,24 +323,23 @@ def search_solr(quote, source='none', id=''):
     # ===============Database Search===============
     if source == 'yt':
         connectionURL = connectionURL + '&fq=%2Btype:yt'
-        if len(id) > 0:
-            connectionURL = connectionURL + '%20%2Bid:' + id
     elif source == 'flix':
         connectionURL = connectionURL + '&fq=%2Btype:flix'
-        if len(id) > 0:
-            all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
-            if all_info.match(id):
-                connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
-            else:
-                no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
-                match = no_episode.match(id)
-                if match:
-                    title = match.group(1)
-                    szn = match.group(2)
-                else:# only info provided is the show name
-                    title = id[:-3]
-                connectionURL = connectionURL +'%20%2Btitle:'+title
-            #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
+            # all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
+            # if all_info.match(id):
+            #     connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
+            # else:
+            #     no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
+            #     match = no_episode.match(id)
+            #     if match:
+            #         title = match.group(1)
+            #         szn = match.group(2)
+            #     else:# only info provided is the show name
+            #         title = id[:-3]
+            #     connectionURL = connectionURL +'%20%2Btitle:'+title
+            # #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
+    if len(id) > 0:
+        connectionURL = connectionURL + '%20%2Bid:' + id
     try:
         connection = urlopen(connectionURL)
         response = json.load(connection)
@@ -324,15 +347,15 @@ def search_solr(quote, source='none', id=''):
         return "Sorry, the search server is currently down."
 
     results = []
-    search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
+    # search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
 
     for document in response['response']['docs']:
         docID = document['id']
-        if search_netflix_season:
-            match = all_info.match(docID)
-            docSzn = match.group(2)
-            if docSzn != szn:
-                continue
+        # if search_netflix_season:
+        #     match = all_info.match(docID)
+        #     docSzn = match.group(2)
+        #     if docSzn != szn:
+        #         continue
         highlightedScript = response['highlighting'][docID]['script'][0]
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
@@ -389,3 +412,6 @@ def getYouTubeInfo(id):
         thumb = info['thumbnails']['medium']['url']
     if title and channel and date and thumb:
         return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
+
+def getNetflixInfo(id):
+    pass

@@ -29,24 +29,10 @@
                   <label for="yt_source" style="display: none;">YouTube link (optional)</label>
                 </div>
                 <div class="group">
-                  <input type="text" id="flix_title" name="flix_title" placeholder=" " style="display: none;">
+                  <input type="text" id="flix_source" name="flix_source" placeholder=" " style="display: none;">
                   <span class="bar"></span>
                   <span class="highlight"></span>
-                  <label for="flix_title" style="display: none;">Show title (optional)</label>
-
-                </div>
-                <div class="group">
-                  <input type="text" id="flix_szn" name="flix_szn" pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" " style="display: none;">
-                  <span class="bar"></span>
-                  <span class="highlight"></span>
-                  <label for="flix_szn" style="display: none;">Season # (optional)</label>
-
-                </div>
-                <div class="group">
-                  <input type="text" id="flix_ep" name="flix_ep" pattern="\d{1,2}" title="1-2 digit number" maxlength=2 placeholder=" " style="display: none;">
-                  <span class="bar"></span>
-                  <span class="highlight"></span>
-                  <label for="flix_ep" style="display: none;">Episode # (optional)</label>
+                  <label for="flix_source" style="display: none;">Netflix link (optional)</label>
                 </div>
                 <div id="fileUploadDiv" style="display: none;">
                     <input type="file" id="vid_upload" name="vid_upload" disabled required>
@@ -55,7 +41,7 @@
                 </div>
             </div>
           <br>
-      <div id="optionsDiv">
+        <div id="optionsDiv">
             <h3>Narrow your search to:</h3>
             <label for="searchYt" class="checkboxLabel">YouTube</label>
             <input type="checkbox" name="searchYt" id="searchYt" onclick="toggleYt()"><br>
@@ -100,19 +86,11 @@
     function toggleFlix(state){
         var check = document.getElementById('searchFlix');
         if (check.checked == true){
-            $('#flix_title').show(100);
-            $('#flix_szn').show(100);
-            $('#flix_ep').show(100);
-            $('label[for="flix_title"]').show(100);
-            $('label[for="flix_szn"]').show(100);
-            $('label[for="flix_ep"]').show(100);
+            $('#flix_source').show(100);
+            $('label[for="flix_source"]').show(100);
         } else {
-            $('#flix_title').hide(100);
-            $('#flix_szn').hide(100);
-            $('#flix_ep').hide(100);
-            $('label[for="flix_title"]').hide(50);
-            $('label[for="flix_szn"]').hide(50);
-            $('label[for="flix_ep"]').hide(50);
+            $('#flix_source').hide(100);
+            $('label[for="flix_source"]').hide(50);
         }
     }
 

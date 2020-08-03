@@ -62,8 +62,9 @@ class FlixExtractor(Transcriber):
         subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
         if "Completed" in subDownload.stdout:
             # Parse SRT file here, it's downloaded to the root directory
+            pass
         else:
-            raise ValueError("Show not found")
+            return "ERROR: Show not found"
         # Old 8flix stuff======================================
         # # Extract text from PDF
         # transcript = get_pdf_text(self.pdf_url)
@@ -109,7 +110,7 @@ class FlixExtractor(Transcriber):
             "type":"flix",
             "script":text,
             "times":times,
-            "title":self.show
+            # "title":self.show
         }
         with open(filepath, "w") as outfile:
             json.dump(jsonObject, outfile)
