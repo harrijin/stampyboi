@@ -389,3 +389,13 @@ def getYouTubeInfo(id):
         thumb = info['thumbnails']['medium']['url']
     if title and channel and date and thumb:
         return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
+
+def flixVidId(url):
+	idIndex = url.find("watch/") + len("watch/")
+	if idIndex <= len("watch/"):
+		return 0
+	showID = url[idIndex:]
+	#8 digits is the length of the netflix ID
+	if len(showID) > 8:
+		showID = showID[:8]
+	return showID
