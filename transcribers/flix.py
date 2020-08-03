@@ -26,7 +26,7 @@ TIMESTAMP_LEN = 12
 
 SPACE_REPLACEMENT_CHAR = '-'
 
-NETFLIX_ID_DIRECTORY = r'O:\Git Projects\stampiboi\flixIDConverter\netflixIDDictionary.json'
+NETFLIX_ID_DIRECTORY = os.path.join(os.getcwd(), '..', 'flixIDConverter', 'netflixIDDictionary.json')
 
 
 """
@@ -46,25 +46,24 @@ class FlixExtractor(Transcriber):
     def __init__(self, netflixID):
 
         super().__init__()
-
-        with open(NETFLIX_ID_DIRECTORY, "r") as file:
-            dictionary = json.load(file)
-        entry = dictionary[netflixID]
-        self.show = entry[0]
-        self.szn = entry[1]
-        self.epis = entry[2]
-        self.episName = entry[3]
+        self.id = netflixID
 
 
     def getTranscript(self):
-        query = (self.show + " " + "{0:0=2x}".format(self.szn) + "x" + "{0:0=2x}".format(self.epis)).replace(" ", "-")
+        with open(NETFLIX_ID_DIRECTORY, "r") as file:
+            dictionary = json.load(file)
+        entry = dictionary[self.id]
+        show = entry[0]
+        szn = entry[1]
+        epis = entry[2]
+        query = (show + " " + "{0:0=2x}".format(szn) + "x" + "{0:0=2x}".format(epis)).replace(" ", "-")
         command = ["addic7ed", "-l", "english", "-bb", query]
         subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
         if "Completed" in subDownload.stdout:
             # Parse SRT file here, it's downloaded to the root directory
             pass
         else:
-            return "ERROR: Show not found"
+            raise ValueError("ERROR: Show not found")
         # Old 8flix stuff======================================
         # # Extract text from PDF
         # transcript = get_pdf_text(self.pdf_url)
@@ -101,12 +100,11 @@ class FlixExtractor(Transcriber):
         transcript=self.getTranscript()
         text=""
         times=[]
-        identification = self.show + "^!" + str(self.szn) + "_"+str(self.epis)
         for timestamp in transcript:
             text+=(timestamp[0]+" ")
             times.append(timestamp[1])
         jsonObject={
-            "id":identification,
+            "id":self.id,
             "type":"flix",
             "script":text,
             "times":times,

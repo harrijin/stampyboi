@@ -41,6 +41,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = secret.app_key # MUST CHANGE IF APP IS DEPLOYED
 
+NETFLIX_ID_DIRECTORY = os.path.join(os.getcwd(), 'flixIDConverter', 'netflixIDDictionary.json')
 # ===========Index pages===========
 
 @app.route('/', methods=['GET'])
@@ -106,7 +107,6 @@ def render_results():
                             results = search_solr(quote,'yt',videoID)
                         except:
                             print("solr server is down")
-                            # Add search function used for file uploads here
 
                     else:
                         results = transcript
@@ -124,15 +124,12 @@ def render_results():
                 if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
                     transcriber = FlixExtractor(videoID)
-                    transcript = transcriber.getTranscript()
-                    if not isinstance(transcript, str): # Check if getTranscript returned an error message
-                        try:
-                            transcriptJSON = transcriber.getJSON()
-                            solr.add(transcriptJSON, commit=True)
-                            results = search_solr(quote,'flix',videoID)
-                        except:
-                            print("solr server is down")
-                            # Add search function used for file uploads here
+                    try:
+                        transcriptJSON = transcriber.getJSON()
+                        solr.add(transcriptJSON, commit=True)
+                        results = search_solr(quote,'flix',videoID)
+                    except:
+                        results = "ERROR: show not found"
 
                     else:
                         results = transcript
@@ -360,9 +357,10 @@ def search_solr(quote, source='none', id=''):
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
         if document['type'] == 'yt':
-            ytInfo = getYouTubeInfo(docID)
-            if ytInfo:
-                videoInfo.update(ytInfo)
+            info = getYouTubeInfo(docID)
+        else:
+            info = getNetflixInfo(docID)
+        videoInfo.update(info)
         results.append(videoInfo)
 
     if not results:
@@ -414,4 +412,17 @@ def getYouTubeInfo(id):
         return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
 
 def getNetflixInfo(id):
-    pass
+    with open(NETFLIX_ID_DIRECTORY, "r") as file:
+        dictionary = json.load(file)
+    entry = dictionary[id]
+    return {'title': entry[0], 'season': entry[1], 'episode': entry[2], 'episodeTitle': entry[3]}
+
+def flixVidId(url):
+    idIndex = url.find("watch/") + len("watch/")
+    if idIndex <= len("watch/"):
+        return False
+    showID = url[idIndex:]
+    #8 digits is the length of the netflix ID
+    if len(showID) > 8:
+        showID = showID[:8]
+    return showID
