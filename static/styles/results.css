@@ -74,7 +74,11 @@
     border: 1px solid var(--ACCENT);
 }
 
-
+#load-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /* Table stuff */
 tr{
