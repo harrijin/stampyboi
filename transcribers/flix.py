@@ -6,6 +6,7 @@ import subprocess
 import requests
 import re
 import json
+import srt
 
 BASE_URL = 'https://8flix.com'
 SHOW_TRANSCRIPTS_URL = 'https://8flix.com/transcripts/shows/'
@@ -61,6 +62,16 @@ class FlixExtractor(Transcriber):
         subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
         if "Completed" in subDownload.stdout:
             # Parse SRT file here, it's downloaded to the root directory
+            tupleList = []
+            srtDirectory = os.path.join(os.getcwd(), query + '.srt')
+            filestr = open(srtDirectory, 'r').read()
+            subtitles = srt.parse(filestr)
+            for subtitle in subtitles:
+                time = self.__convert_to_seconds(subtitle.start)
+                phrase = subtitle.content
+                words = extract_words(phrase)
+                if len(words) != 0:
+                    tupleList.append((SPACE_REPLACEMENT_CHAR.join(words), time))
             pass
         else:
             raise ValueError("ERROR: Show not found")
