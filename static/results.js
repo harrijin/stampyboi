@@ -51,7 +51,7 @@ function addSuggestion(suggestion){
 
 function directToVideo(info, stampIndex) {
     info.index = stampIndex;
-    console.log(info)
+    console.log(info);
     $.ajax({
         url: '/video',
         type: 'POST',
@@ -60,6 +60,24 @@ function directToVideo(info, stampIndex) {
         success: function(response) {
             $('body').append(response)
             $('body').css('overflow', 'hidden');
+        }
+    });
+}
+
+function loadMore(url, count, start) {
+    var info = {url:url, count:count, start:start};
+
+    var loadElement = document.getElementById('load-more');
+    loadElement.children[0].innerHTML = 'Loading...';
+
+    $.ajax({
+        url: '/load',
+        type: 'POST',
+        data: JSON.stringify(info),
+        contentType: 'application/json',
+        success: function(response) {
+            loadElement.remove();
+            $('#results-container').append(response);
         }
     });
 }

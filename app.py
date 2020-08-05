@@ -88,7 +88,7 @@ def render_results():
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
         results, count, connectionURL = search_solr(quote)
-        return render_template("results.html", result=results, query=quote, count=count)
+        return render_template("results.html", result=results, query=quote, count=count, connectionURL=connectionURL)
     # =============YouTube=============
     if "searchYt" in request.form: #request.form['search_src'] == 'yt':
         source = request.form['yt_source']
@@ -248,6 +248,18 @@ def receive_video():
 
     return render_template("video.html", doc=doc, stamp=stamp)
 
+@app.route('/load', methods=['POST'])
+def load_more():
+    info = request.json
+    count = info['count']
+    start = info['start']
+    url = info['url'] + '&start=' + str(start)
+    start += 10
+
+    results = search_solr(url=url)[0]
+
+    return render_template('resultList.html', result=results, count=count, connectionURL=info['url'], start=start)
+
 @app.route('/uploads/<path:filename>')
 def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
@@ -312,34 +324,38 @@ def allowed_file(filename):
     ext = os.path.splitext(filename)[1]
     return '.' in filename and (ext in ALLOWED_AUDIO or ext in ALLOWED_VIDEO)
 
-def search_solr(quote, source='none', id=''):
-    quote = '"'+quote.replace(" ", "+")+'"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true&hl.tag.pre=<b>&hl.tag.post=</b>'
-    # ===============Database Search===============
-    if source == 'yt':
-        connectionURL = connectionURL + '&fq=%2Btype:yt'
-    elif source == 'flix':
-        connectionURL = connectionURL + '&fq=%2Btype:flix'
-            # all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
-            # if all_info.match(id):
-            #     connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
-            # else:
-            #     no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
-            #     match = no_episode.match(id)
-            #     if match:
-            #         title = match.group(1)
-            #         szn = match.group(2)
-            #     else:# only info provided is the show name
-            #         title = id[:-3]
-            #     connectionURL = connectionURL +'%20%2Btitle:'+title
-            # #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
-    if len(id) > 0:
-        connectionURL = connectionURL + '%20%2Bid:' + id
+def search_solr(quote='', source='none', id='', url=None):
+    if not url:
+        quote = '"'+quote.replace(" ", "+")+'"'
+        connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true&hl.tag.pre=<b>&hl.tag.post=</b>'
+        # ===============Database Search===============
+        if source == 'yt':
+            connectionURL = connectionURL + '&fq=%2Btype:yt'
+        elif source == 'flix':
+            connectionURL = connectionURL + '&fq=%2Btype:flix'
+                # all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
+                # if all_info.match(id):
+                #     connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
+                # else:
+                #     no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
+                #     match = no_episode.match(id)
+                #     if match:
+                #         title = match.group(1)
+                #         szn = match.group(2)
+                #     else:# only info provided is the show name
+                #         title = id[:-3]
+                #     connectionURL = connectionURL +'%20%2Btitle:'+title
+                # #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
+        if len(id) > 0:
+            connectionURL = connectionURL + '%20%2Bid:' + id
+    else:
+        connectionURL = url
+
     try:
         connection = urlopen(connectionURL)
         response = json.load(connection)
     except:
-        return "Sorry, the search server is currently down."
+        return "Sorry, the search server is currently down.", None, None
 
     results = []
     # search_netflix_season = 'szn' in locals() # Check if results should be filtered by season

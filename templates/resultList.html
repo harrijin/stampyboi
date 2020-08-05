@@ -54,8 +54,12 @@
     </div>
 {% endfor %}
 
-{% if count > 10 %}
-    <div id="load-more" class="result">
+{% if start is not defined %}
+    {% set start = 10 %}
+{% endif %}
+
+{% if count is defined and count > start %}
+    <div id="load-more" class="result" onclick='loadMore({{connectionURL|tojson}}, {{count}}, {{start}})'>
         <h1>Load More</h1>
     </div>
 {% endif %}
