@@ -65,10 +65,12 @@ function directToVideo(info, stampIndex) {
 }
 
 function loadMore(url, count, start) {
-    var info = {url:url, count:count, start:start};
-
     var loadElement = document.getElementById('load-more');
-    loadElement.children[0].innerHTML = 'Loading...';
+    loadElement.onclick = null;
+    loadElement.disabled = true;
+    loadElement.innerHTML = 'Loading...';
+    
+    var info = {url:url, count:count, start:start};
 
     $.ajax({
         url: '/load',

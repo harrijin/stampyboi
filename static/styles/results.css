@@ -74,12 +74,6 @@
     border: 1px solid var(--ACCENT);
 }
 
-#load-more {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 /* Table stuff */
 tr{
     transition: outline 0.2s;
@@ -191,7 +185,9 @@ table{
     color: black;
 }
 
-
-
-
-
+#load-more {
+    font-size: 25px;
+    width: 100%;
+    height: calc(var(--result-height) / 2);
+}
+#load-more:disabled {color: white}
