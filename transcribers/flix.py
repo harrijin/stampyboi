@@ -7,6 +7,7 @@ import requests
 import re
 import json
 import srt
+import math
 
 BASE_URL = 'https://8flix.com'
 SHOW_TRANSCRIPTS_URL = 'https://8flix.com/transcripts/shows/'
@@ -27,7 +28,7 @@ TIMESTAMP_LEN = 12
 
 SPACE_REPLACEMENT_CHAR = '-'
 
-NETFLIX_ID_DIRECTORY = os.path.join(os.getcwd(), '..', 'flixIDConverter', 'netflixIDDictionary.json')
+NETFLIX_ID_DIRECTORY = os.path.join(os.getcwd(),'flixIDConverter', 'netflixIDDictionary.json')
 
 
 """
@@ -61,18 +62,16 @@ class FlixExtractor(Transcriber):
         command = ["addic7ed", "-l", "english", "-bb", query]
         subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
         if "Completed" in subDownload.stdout:
-            # Parse SRT file here, it's downloaded to the root directory
             tupleList = []
             srtDirectory = os.path.join(os.getcwd(), query + '.srt')
             filestr = open(srtDirectory, 'r').read()
             subtitles = srt.parse(filestr)
             for subtitle in subtitles:
-                time = self.__convert_to_seconds(subtitle.start)
+                time = int(subtitle.start.total_seconds())
                 phrase = subtitle.content
                 words = extract_words(phrase)
                 if len(words) != 0:
                     tupleList.append((SPACE_REPLACEMENT_CHAR.join(words), time))
-            pass
         else:
             raise ValueError("ERROR: Show not found")
         # Old 8flix stuff======================================
@@ -104,10 +103,10 @@ class FlixExtractor(Transcriber):
         #     if len(words) != 0:
         #         transcript.append((SPACE_REPLACEMENT_CHAR.join(words), time))
 
-        # return transcript
+        return tupleList
 
 
-    def convertToJSON(self, filepath):
+    def convertToJSON(self):
         transcript=self.getTranscript()
         text=""
         times=[]
@@ -121,8 +120,7 @@ class FlixExtractor(Transcriber):
             "times":times,
             # "title":self.show
         }
-        with open(filepath, "w") as outfile:
-            json.dump(jsonObject, outfile)
+        return jsonObject
 
     @staticmethod
     def __convert_to_seconds(timestamp):
@@ -130,9 +128,8 @@ class FlixExtractor(Transcriber):
         hour_seconds = int(components[0]) * 60 * 60
         minute_seconds = int(components[1]) * 60
         seconds = int(components[2])
-        ms = int(components[3]) * 0.001
 
-        return hour_seconds + minute_seconds + seconds + ms
+        return hour_seconds + minute_seconds + seconds
 
 
 

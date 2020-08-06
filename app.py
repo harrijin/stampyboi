@@ -101,12 +101,12 @@ def render_results():
                     transcriber = YouTube(videoID)
                     transcript = transcriber.getTranscript()
                     if not isinstance(transcript, str): # Check if getTranscript returned an error message
-                        try:
-                            transcriptJSON = transcriber.getJSON()
-                            solr.add(transcriptJSON, commit=True)
-                            results = search_solr(quote,'yt',videoID)
-                        except:
-                            print("solr server is down")
+                        # try:
+                        transcriptJSON = transcriber.getJSON()
+                        solr.add(transcriptJSON, commit=True)
+                        results = search_solr(quote,'yt',videoID)
+                        # except:
+                        #     print("solr server is down")
 
                     else:
                         results = transcript
@@ -120,23 +120,23 @@ def render_results():
         if len(source) > 0: # Check if a netflix link was provided
             videoID = flixVidId(source)
             if videoID: # Check if provided link is valid
-                results = search_solr(quote,'flix',videoID)
-                if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
+                solr_results = search_solr(quote,'flix',videoID)
+                if solr_results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
                     transcriber = FlixExtractor(videoID)
-                    try:
-                        transcriptJSON = transcriber.getJSON()
-                        solr.add(transcriptJSON, commit=True)
-                        results = search_solr(quote,'flix',videoID)
-                    except:
-                        results = "ERROR: show not found"
+                    # try:
+                    transcriptJSON = transcriber.convertToJSON()
+                    solr.add(transcriptJSON, commit=True)
+                    solr_results = search_solr(quote,'flix',videoID)
+                    # except:
+                    #     solr_results = "ERROR: show not found"
 
-                    else:
-                        results = transcript
+                else:
+                    solr_results = transcript
             else:
-                results = "ERROR: Invalid Netflix link."
+                solr_results = "ERROR: Invalid Netflix link."
         else:
-            results = search_solr(quote,'flix')
+            solr_results = search_solr(quote,'flix')
         # title = request.form['flix_title']
         # szn = request.form['flix_szn']
         # ep = request.form['flix_ep']
