@@ -72,6 +72,7 @@ class FlixExtractor(Transcriber):
                 words = extract_words(phrase)
                 if len(words) != 0:
                     tupleList.append((SPACE_REPLACEMENT_CHAR.join(words), time))
+            subprocess.run(["rm", srtDirectory])
         else:
             raise ValueError("ERROR: Show not found")
         # Old 8flix stuff======================================
