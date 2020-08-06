@@ -120,19 +120,6 @@ def render_results():
         if len(source) > 0: # Check if a netflix link was provided
             videoID = flixVidId(source)
             if videoID: # Check if provided link is valid
-                results, count, connectionURL = search_solr(quote,'flix',videoID)
-                if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
-                    print('video not found. transcribing and indexing')
-                    transcriber = FlixExtractor(videoID)
-                    try:
-                        transcriptJSON = transcriber.getJSON()
-                        solr.add(transcriptJSON, commit=True)
-                        results, count, connectionURL = search_solr(quote,'flix',videoID)
-                    except:
-                        results = "ERROR: show not found"
-
-                    else:
-                        results = transcript
                 solr_results, count, connectionURL = search_solr(quote,'flix',videoID)
                 if solr_results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
