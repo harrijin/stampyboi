@@ -81,21 +81,21 @@ def render_results():
         results[1].update(getYouTubeInfo('eJ-T3i8Ap3U'))
         results[2].update(getYouTubeInfo('rtgY1q0J_TQ'))
 
-        return render_template("results.html", result=results, query=request.form['quote'])
+        return render_template("results.html", result=results, query=request.form['quote'], count=3)
     # END OF DUMMY TEST*****************************************************************************************
     quote = request.form['quote']
     results = []
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
-        results = search_solr(quote)
-        return render_template("results.html", result=results, query=quote)
+        results, count, connectionURL = search_solr(quote)
+        return render_template("results.html", result=results, query=quote, count=count, connectionURL=connectionURL)
     # =============YouTube=============
     if "searchYt" in request.form: #request.form['search_src'] == 'yt':
         source = request.form['yt_source']
         if len(source) > 0: # Check if a youtube link was provided
             videoID = ytVidId(source)
             if videoID: # Check if provided link is valid
-                results = search_solr(quote,'yt',videoID)
+                results, count, connectionURL = search_solr(quote,'yt',videoID)
                 if results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
                     transcriber = YouTube(videoID)
@@ -104,7 +104,7 @@ def render_results():
                         # try:
                         transcriptJSON = transcriber.getJSON()
                         solr.add(transcriptJSON, commit=True)
-                        results = search_solr(quote,'yt',videoID)
+                        results, count, connectionURL = search_solr(quote,'yt',videoID)
                         # except:
                         #     print("solr server is down")
 
@@ -113,21 +113,21 @@ def render_results():
             else:
                 results = "ERROR: Invalid YouTube link"
         else:
-            results = search_solr(quote,'yt')
+            results, count, connectionURL = search_solr(quote,'yt')
     # =============Netflix==============
     if "searchFlix" in request.form: #request.form['search_src'] == 'flix':
         source = request.form['flix_source']
         if len(source) > 0: # Check if a netflix link was provided
             videoID = flixVidId(source)
             if videoID: # Check if provided link is valid
-                solr_results = search_solr(quote,'flix',videoID)
+                solr_results, count, connectionURL = search_solr(quote,'flix',videoID)
                 if solr_results == 'No results found.': # Check if solr found the video id in the index. 8 is the length of [][][][]
                     print('video not found. transcribing and indexing')
                     transcriber = FlixExtractor(videoID)
                     # try:
                     transcriptJSON = transcriber.convertToJSON()
                     solr.add(transcriptJSON, commit=True)
-                    solr_results = search_solr(quote,'flix',videoID)
+                    solr_results, count, connectionURL = search_solr(quote,'flix',videoID)
                     # except:
                     #     solr_results = "ERROR: show not found"
 
@@ -136,7 +136,7 @@ def render_results():
             else:
                 solr_results = "ERROR: Invalid Netflix link."
         else:
-            solr_results = search_solr(quote,'flix')
+            solr_results, count, connectionURL = search_solr(quote,'flix')
         # title = request.form['flix_title']
         # szn = request.form['flix_szn']
         # ep = request.form['flix_ep']
@@ -184,8 +184,6 @@ def render_results():
             filename = secure_filename(file.filename)
             audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(audioPath)
-            # while not os.path.exists(audioPath):
-            #     pass
             transcriber = FileExtractor(audioPath, MODEL)
             transcriptList, length = transcriber.getTranscript()
             tupleList = findStringInTranscript(transcriptList, quote.lower())
@@ -206,7 +204,7 @@ def render_results():
 
     if not results: # Checkif results is still an empty list
         results = "No results found."
-    return render_template("results.html", result=results, query=quote)
+    return render_template("results.html", result=results, query=quote, count=count, connectionURL=connectionURL)
 
 @app.route('/suggest', methods=['POST'])
 def get_suggestions():
@@ -249,6 +247,18 @@ def receive_video():
     stamp = int(doc.pop('index'))
 
     return render_template("video.html", doc=doc, stamp=stamp)
+
+@app.route('/load', methods=['POST'])
+def load_more():
+    info = request.json
+    count = info['count']
+    start = info['start']
+    url = info['url'] + '&start=' + str(start)
+    start += 10
+
+    results = search_solr(url=url)[0]
+
+    return render_template('resultList.html', result=results, count=count, connectionURL=info['url'], start=start)
 
 @app.route('/uploads/<path:filename>')
 def download_file(filename):
@@ -314,34 +324,38 @@ def allowed_file(filename):
     ext = os.path.splitext(filename)[1]
     return '.' in filename and (ext in ALLOWED_AUDIO or ext in ALLOWED_VIDEO)
 
-def search_solr(quote, source='none', id=''):
-    quote = '"'+quote.replace(" ", "+")+'"'
-    connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true&hl.tag.pre=<b>&hl.tag.post=</b>'
-    # ===============Database Search===============
-    if source == 'yt':
-        connectionURL = connectionURL + '&fq=%2Btype:yt'
-    elif source == 'flix':
-        connectionURL = connectionURL + '&fq=%2Btype:flix'
-            # all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
-            # if all_info.match(id):
-            #     connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
-            # else:
-            #     no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
-            #     match = no_episode.match(id)
-            #     if match:
-            #         title = match.group(1)
-            #         szn = match.group(2)
-            #     else:# only info provided is the show name
-            #         title = id[:-3]
-            #     connectionURL = connectionURL +'%20%2Btitle:'+title
-            # #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
-    if len(id) > 0:
-        connectionURL = connectionURL + '%20%2Bid:' + id
+def search_solr(quote='', source='none', id='', url=None):
+    if not url:
+        quote = '"'+quote.replace(" ", "+")+'"'
+        connectionURL = 'http://'+ SOLR_HOST + '/solr/'+SOLR_COLLECTION+'/select?q=script:' + quote + '&hl=on&hl.fl=script&hl.method=unified&omitHeader=true&hl.fragsize=0&hl.usePhraseHighlighter=true&hl.tag.pre=<b>&hl.tag.post=</b>'
+        # ===============Database Search===============
+        if source == 'yt':
+            connectionURL = connectionURL + '&fq=%2Btype:yt'
+        elif source == 'flix':
+            connectionURL = connectionURL + '&fq=%2Btype:flix'
+                # all_info = re.compile('^(.+?)\^!(\d{1,2})_(\d{1,3})$')
+                # if all_info.match(id):
+                #     connectionURL = connectionURL + '%20%2Bid:"' + urllib.parse.quote(id) + '"'
+                # else:
+                #     no_episode = re.compile('^(.+?)\^!(\d{1,2})_$')
+                #     match = no_episode.match(id)
+                #     if match:
+                #         title = match.group(1)
+                #         szn = match.group(2)
+                #     else:# only info provided is the show name
+                #         title = id[:-3]
+                #     connectionURL = connectionURL +'%20%2Btitle:'+title
+                # #connectionURL = connectionURL + '&fq=%2Btitle%3A"' + title.replace(" ", "+") + '"' + '%2Btype%3Aflix'
+        if len(id) > 0:
+            connectionURL = connectionURL + '%20%2Bid:' + id
+    else:
+        connectionURL = url
+
     try:
         connection = urlopen(connectionURL)
         response = json.load(connection)
     except:
-        return "Sorry, the search server is currently down."
+        return "Sorry, the search server is currently down.", None, None
 
     results = []
     # search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
@@ -363,10 +377,11 @@ def search_solr(quote, source='none', id=''):
         videoInfo.update(info)
         results.append(videoInfo)
 
-    if not results:
-        return 'No results found.'
+    count = response['response']['numFound']
+    if count == 0:
+        results = "No results found."
 
-    return results
+    return results, count, connectionURL
 
 def findStringInTranscript(transcriptList, targetString):
     targetStringSplit = targetString.split()
