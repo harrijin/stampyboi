@@ -9,3 +9,4 @@ jsonTranscripts/*.json
 ids.txt
 scrape/scrape/spiders/yt8m/records/*
 secret.py
+*.srt

@@ -25,7 +25,7 @@ class YouTube(Transcriber):
         result = list()
         for dic in self.transcript:
             phrase = dic['text']
-            time = dic['start']
+            time = int(dic['start'])
             words = extract_words(phrase)
             if len(words) != 0:
                 result.append((SPACE_REPLACEMENT_CHAR.join(words), time))

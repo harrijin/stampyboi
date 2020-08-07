@@ -28,6 +28,7 @@
     padding-left: 15px;
     padding-right: 15px;
     border-bottom: 3px solid var(--ACCENT);
+    overflow-wrap: break-word;
 }
 
 .ytInfo h1{
@@ -99,4 +100,19 @@ a{
 
 #copied{
     text-align: center;
+}
+
+.flixdiv{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+    cursor: pointer;
+    flex-direction: column;
+    font-size:larger;
+}
+
+.flixbar{
+    width: 50%;
 }

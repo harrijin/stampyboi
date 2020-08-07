@@ -74,8 +74,6 @@
     border: 1px solid var(--ACCENT);
 }
 
-
-
 /* Table stuff */
 tr{
     transition: outline 0.2s;
@@ -187,7 +185,26 @@ table{
     color: black;
 }
 
+#load-more {
+    font-size: 25px;
+    width: 100%;
+    height: calc(var(--result-height) / 2);
+}
+#load-more:disabled {color: white}
 
+.audio-link{
+    width: 320px;
+    height: 180px;
+    justify-content: center;
+}
 
-
-
+.audio{
+    height: 100%;
+    background-color: var(--ACCENT);
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
