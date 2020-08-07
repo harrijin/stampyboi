@@ -191,3 +191,20 @@ table{
     height: calc(var(--result-height) / 2);
 }
 #load-more:disabled {color: white}
+
+.audio-link{
+    width: 320px;
+    height: 180px;
+    justify-content: center;
+}
+
+.audio{
+    height: 100%;
+    background-color: var(--ACCENT);
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}

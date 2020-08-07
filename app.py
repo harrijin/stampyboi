@@ -168,6 +168,9 @@ def render_results():
 
     # ============File Upload===========
     if "searchFile" in request.form: #request.form['search_src'] == 'file':
+        if 'count' not in locals():
+            count = 1
+            connectionURL = ""
         # check if the post request has the file part
         if 'vid_upload' not in request.files:
             if not results or isinstance(results, str): # Check if results is an empty list or an error message

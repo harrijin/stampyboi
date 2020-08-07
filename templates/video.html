@@ -37,6 +37,34 @@
                     </table>
                     </div>
                 </div>
+            {% elif doc['type'] == 'flix' %}
+            <div class="flixdiv" height="100%" onclick="goToNetflix();">Go to Season {{doc['season']}} Episode {{doc['episode']}} of {{doc['title']}} at <span id="outgoing-time"> {{time_string(start)}}</span>
+                <img src='https://cdn.vox-cdn.com/thumbor/AwKSiDyDnwy_qoVdLPyoRPUPo00=/39x0:3111x2048/1400x1400/filters:focal(39x0:3111x2048):format(png)/cdn.vox-cdn.com/uploads/chorus_image/image/49901753/netflixlogo.0.0.png' height="300" width="300" alt='netflix'></div>
+                <div class="flixbar infobar">
+                    <div class="ytInfo">
+                        <h1>{{doc['title']}}</h1>
+                        <h4>Season {{doc['season']}} Episode {{doc['episode']}} • {{doc['episodeTitle']}}</h4>
+                    </div>
+                    <div class="timestamps">
+                    <table id="times" cellspacing="0px" cellpadding="0px">
+                        {% for tuple in doc['list'] %}
+                            {% set text = tuple[0] %}
+                            {% set sec = tuple[1] %}
+
+                            {% if sec == start %}
+                            <tr onclick="setActive(this); $('#outgoing-time').html(' {{time_string(sec)}}');" class="activeStamp">
+                            {% else %}
+                            <tr onclick="setActive(this); $('#outgoing-time').html(' {{time_string(sec)}}');">
+                            {% endif %}
+                                <td>{{text}}</td>
+                                <td class="timestamp">{{time_string(sec)}}</td>
+                            </tr>
+
+                        {% endfor %}
+                    </table>
+                    </div>
+                </div>
+
             {% else %}
                 {% set extension, is_video = get_extension(doc['id']) %}
                 <video id="player-vid" src="{{ url_for('download_file', filename=doc['id']) }}#t={{start}}" width="70%" height="100%" style="background-color: black;" controls autoplay></video>
@@ -66,7 +94,7 @@
         {% endif %}
         </div>
 
-        {% if doc['type'] == 'yt' %}
+        {% if doc['type'] == 'yt' or doc['type'] == 'flix' %}
         <div id="share">
             <h2>Share this boi:</h2>
             <div id="share-buttons">
@@ -87,9 +115,11 @@
                     <img src="/static/images/link.png" alt="Get link" />
                 </a>
                     <!--GIF-->
+            {% if doc['type'] == 'yt' %}
                 <a href='javascript:;' onclick='shareBoi(5)'>
                     <img src="/static/images/gifIcon.png" alt="Convert to gif" />
                 </a>
+            {% endif %}
             </div>
         </div>
         {% endif %}
@@ -98,56 +128,63 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='video.js')}}"></script>
     <script>
-        function shareBoi(dest){
-    //dest values
-    //1 - facebook
-    //2 - twitter
-    //3 - reddit
-    var a = $('.activeStamp .timestamp').html().split(':');
-    var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
-    var link = "https://youtu.be/{{doc['id']}}?t=" + seconds;
-    if(dest < 3){
-        link = encodeURIComponent(link);
-    } else if(dest == 3){
-        link = encodeURI(link);
-    }
-    console.log(link);
-    switch(dest){
-        case 1:
-            window.open("https://www.facebook.com/sharer.php?u="+link, "_blank");
-        break;
-        case 2:
-            window.open("https://twitter.com/intent/tweet?url="+link, "_blank");
-        break;
-        case 3:
-            window.open("https://www.reddit.com/submit?url="+link, "_blank");
-        break;
-        case 4:
-            var dummy = document.createElement("textarea");
-            document.body.appendChild(dummy);
-            dummy.textContent = link;
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
-            window.alert('Timestamped video link copied!');
-        break;
-        default:
-            var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
-            if (result){
+    function shareBoi(dest){
+        //dest values
+        //1 - facebook
+        //2 - twitter
+        //3 - reddit
+        var a = $('.activeStamp .timestamp').html().split(':');
+        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+        if('{{doc['type']}}' == 'yt')
+            var link = "https://youtu.be/{{doc['id']}}?t=" + seconds;
+        else
+            var link = "https://netflix.com/watch/{{doc['id']}}?t=" + seconds;
+        if(dest < 3){
+            link = encodeURIComponent(link);
+        } else if(dest == 3){
+            link = encodeURI(link);
+        }
+        console.log(link);
+        switch(dest){
+            case 1:
+                window.open("https://www.facebook.com/sharer.php?u="+link, "_blank");
+            break;
+            case 2:
+                window.open("https://twitter.com/intent/tweet?url="+link, "_blank");
+            break;
+            case 3:
+                window.open("https://www.reddit.com/submit?url="+link, "_blank");
+            break;
+            case 4:
                 var dummy = document.createElement("textarea");
                 document.body.appendChild(dummy);
-                var minutes = (+a[0]) * 60 + (+a[1]);
-                var sec_60 = (+a[2]);
-                dummy.textContent = minutes + ":" + sec_60;
+                dummy.textContent = link;
                 dummy.select();
                 document.execCommand("copy");
                 document.body.removeChild(dummy);
-                window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
-            }
+                window.alert('Timestamped video link copied!');
+            break;
+            default:
+                var result = window.confirm('The timestamp you have selected has been copied to your clipboard. Redirecting you to gifs.com');
+                if (result){
+                    var dummy = document.createElement("textarea");
+                    document.body.appendChild(dummy);
+                    var minutes = (+a[0]) * 60 + (+a[1]);
+                    var sec_60 = (+a[2]);
+                    dummy.textContent = minutes + ":" + sec_60;
+                    dummy.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(dummy);
+                    window.open("https://gifs.com/watch?v={{doc['id']}}", "_blank");
+                }
 
-        break;
+            break;
+        }
     }
-}
-
+    function goToNetflix(){
+        var a = $('.activeStamp .timestamp').html().split(':');
+        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+        window.open("https://www.netflix.com/watch/{{doc['id']}}?t="+seconds,"_blank");
+    }
 </script>
 </div>
