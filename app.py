@@ -273,7 +273,12 @@ def utility():
     def get_extension(filename):
         extension = os.path.splitext(filename)[1]
         return extension[1:], (extension in ALLOWED_VIDEO)
-    return dict(time_string=time_string, get_extension=get_extension)
+    def to_type_string(typeCode):
+        map = {'yt' : 'YouTube', 'flix' : 'Netflix', 'file' : 'File Upload'}
+        if typeCode in map:
+            return map[typeCode]
+        return ''
+    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string)
 
 # ==============Helper Methods==============
 
