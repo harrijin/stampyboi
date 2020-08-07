@@ -85,6 +85,7 @@ def render_results():
     # END OF DUMMY TEST*****************************************************************************************
     quote = request.form['quote']
     results = []
+    count, connectionURL = None, None
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
         results, count, connectionURL = search_solr(quote)

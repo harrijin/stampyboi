@@ -1,7 +1,7 @@
 :root {
     --result-height: 260px;
     --title-pad: 10px;
-    --tab-width: 20px;
+    --tab-width: 50px;
 }
 
 .title {
@@ -50,7 +50,14 @@
     height: calc(var(--result-height) + var(--title-pad));
     margin-top: calc(0px - var(--title-pad));
     overflow: hidden;
+    position: relative;
+}
 
+.typetab > img {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
 }
 
 .yt > .typetab {
