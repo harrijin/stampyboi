@@ -2,7 +2,9 @@
     {% set id = doc['id'] %}
     {% set info = doc|tojson %}
     <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
-        <div class="typetab"></div>
+        <div class="typetab" title="{{to_type_string(doc['type'])}}">
+            <img src="/static/images/{{doc['type']}}.png" alt="">
+        </div>
         {% if doc['type'] == 'yt' %}
             <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
             <p class="info">{{doc['channel']}} • {{doc['date']}}</p>
@@ -85,7 +87,7 @@
     {% set start = 10 %}
 {% endif %}
 
-{% if count is defined and count > start %}
+{% if count is defined and count is not none and count > start %}
     <button id="load-more" class="result" onclick='loadMore({{connectionURL|tojson}}, {{count}}, {{start}})'>
         Load More
     </button>

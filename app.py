@@ -85,6 +85,7 @@ def render_results():
     # END OF DUMMY TEST*****************************************************************************************
     quote = request.form['quote']
     results = []
+    count, connectionURL = None, None
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
         results, count, connectionURL = search_solr(quote)
@@ -276,7 +277,12 @@ def utility():
     def get_extension(filename):
         extension = os.path.splitext(filename)[1]
         return extension[1:], (extension in ALLOWED_VIDEO)
-    return dict(time_string=time_string, get_extension=get_extension)
+    def to_type_string(typeCode):
+        map = {'yt' : 'YouTube', 'flix' : 'Netflix', 'file' : 'File Upload'}
+        if typeCode in map:
+            return map[typeCode]
+        return ''
+    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string)
 
 # ==============Helper Methods==============
 
