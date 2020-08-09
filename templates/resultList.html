@@ -3,7 +3,7 @@
     {% set info = doc|tojson %}
     <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
         <div class="typetab" title="{{to_type_string(doc['type'])}}">
-            <img src="/static/images/{{doc['type']}}.png" alt="">
+            <img src="/static/images/{{doc['type']}}.png" alt="" height="50">
         </div>
         {% if doc['type'] == 'yt' %}
             <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
@@ -61,7 +61,7 @@
                 </a>
                 {% else %}
                 <a class="thumbnail audio-link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
-                    <div class="audio"><span>{{ id[:-4] }}</span></div>
+                    <div class="audio"><span>{{ id[:-((extension|length)+1)] }}</span></div>
                 </a>
                 {% endif %}
                 <div class="result-timestamps">

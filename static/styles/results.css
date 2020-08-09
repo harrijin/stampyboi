@@ -215,3 +215,10 @@ table{
     justify-content: center;
     font-size: 40px;
 }
+
+#no-results{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

@@ -7,7 +7,7 @@
 
     <div>
     <form action='/' id="home">
-      <button><img src="/static/images/logo.png" alt="Stampyboi"></button>
+      <button><img src="/static/images/logo.png" alt="Stampyboi" height="50"></button>
     </form>
     </div>
     <form action='/results' method='POST' autocomplete="off" id="newSearch">
@@ -28,7 +28,12 @@
     {% if result is not string %}
         {% include 'resultList.html' %}
     {% else %}
-        {{result}}
+    <div id="no-results">
+        <h1>Sad boi hours</h1>
+        <img src="https://i1.sndcdn.com/artworks-000118276252-3cb2tj-t500x500.jpg" alt="" height="300">
+        <h2>{{result}}</h2>
+        <p> Make sure your quote is correct or try providing a video source for us to search</p>
+    </div>
     {% endif %}
     </div>
     <script src="http://www.youtube.com/player_api"></script>
