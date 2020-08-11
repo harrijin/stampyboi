@@ -30,7 +30,7 @@
                             <tr onclick="setActive(this);seek('{{sec}}');">
                             {% endif %}
                                 <td>{{text}}</td>
-                                <td class="timestamp">{{time_string(sec)}}</td>
+                                <td class="timestamp" data-sec={{sec}}>{{time_string(sec)}}</td>
                             </tr>
 
                         {% endfor %}
@@ -133,12 +133,9 @@
         //1 - facebook
         //2 - twitter
         //3 - reddit
-        var a = $('.activeStamp .timestamp').html().split(':');
-        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
-        if('{{doc['type']}}' == 'yt')
-            var link = "https://youtu.be/{{doc['id']}}?t=" + seconds;
-        else
-            var link = "https://netflix.com/watch/{{doc['id']}}?t=" + seconds;
+        var a = $('.activeStamp .timestamp');
+        var seconds = a.attr('data-sec');
+        var link = "{{get_video_link(doc['type'], doc['id'])}}?t=" + seconds;
         if(dest < 3){
             link = encodeURIComponent(link);
         } else if(dest == 3){

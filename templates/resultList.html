@@ -2,12 +2,15 @@
     {% set id = doc['id'] %}
     {% set info = doc|tojson %}
     <div id="{{id}}" class="{{doc['type'] ~ ' result'}}">
-        <div class="typetab" title="{{to_type_string(doc['type'])}}">
+        <a class="typetab" href="{{get_video_link(doc['type'], id, doc['list'][0][1])}}" title="{{to_type_string(doc['type'])}}" target="_blank">
             <img src="/static/images/{{doc['type']}}.png" alt="" height="50">
-        </div>
+        </a>
         {% if doc['type'] == 'yt' %}
             <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
-            <p class="info">{{doc['channel']}} • {{doc['date']}}</p>
+            <br>
+            <a href="{{'http://www.youtube.com/channel/' ~ doc['channelId']}}">
+                <span class="info">{{doc['length']}} • {{doc['channel']}} • {{doc['date']}} • {{doc['views']}}</span>
+            </a>
             <div id="wrap-timestamps">
                 <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
                     <img src="{{doc['thumb']}}" width=320 height=180 alt="thumbnail">
