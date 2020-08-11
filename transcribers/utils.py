@@ -4,7 +4,7 @@ import PyPDF2
 import re
 
 WORDS_REGEX = r"[\w'`.,:;!?]+"
-EXCLUDE_REGEX = r"[[].*?[]]|[(].*?[)]"
+EXCLUDE_REGEX = r"[[].*?[]]|[(].*?[)]|[<].*?[>]"
 
 
 """
