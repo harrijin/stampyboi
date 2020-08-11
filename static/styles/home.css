@@ -8,8 +8,9 @@ Global constants defined in style.css.
 }*/
 img{
     display: block;
-    margin: 0 auto;
-    margin-top: 10vh;
+    margin: 60 auto;
+    margin-top: 25vh;
+    width: 40vw;
 }
 
 

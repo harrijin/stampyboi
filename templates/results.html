@@ -2,12 +2,13 @@
   <head>
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/results.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico')  }}">
   </head>
   <body>
 
     <div>
     <form action='/' id="home">
-      <button><img src="/static/images/logo.png" alt="Stampyboi" height="50"></button>
+      <button><img src="/static/images/logo.png" alt="Stampyboi" height="40"></button>
     </form>
     </div>
     <form action='/results' method='POST' autocomplete="off" id="newSearch">

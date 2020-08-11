@@ -222,3 +222,7 @@ table{
     justify-content: center;
     align-items: center;
 }
+
+#home button{
+    background: #00000000;
+}
