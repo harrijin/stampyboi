@@ -280,7 +280,14 @@ def utility():
         if typeCode in map:
             return map[typeCode]
         return ''
-    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string)
+    def get_video_link(typeCode, id, sec=None):
+        map = {'yt' : 'https://youtu.be/', 'flix' : 'https://netflix.com/watch/'}
+        if typeCode in map:
+            if sec is not None:
+                return map[typeCode] + id + '?t=' + str(sec)
+            return map[typeCode] + id
+        return ''
+    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string, get_video_link=get_video_link)
 
 # ==============Helper Methods==============
 
