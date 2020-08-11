@@ -58,7 +58,7 @@ class FlixExtractor(Transcriber):
         show = entry[0]
         szn = entry[1]
         epis = entry[2]
-        query = (show + " " + "{0:0=2x}".format(szn) + "x" + "{0:0=2x}".format(epis)).replace(" ", "-")
+        query = (show + " " + "{0:0=2d}".format(szn) + "x" + "{0:0=2d}".format(epis)).replace(" ", "-")
         command = ["addic7ed", "-l", "english", "-bb", query]
         subDownload = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
         if "Completed" in subDownload.stdout:
@@ -74,6 +74,7 @@ class FlixExtractor(Transcriber):
                     tupleList.append((SPACE_REPLACEMENT_CHAR.join(words), time))
             subprocess.run(["rm", srtDirectory])
         else:
+            print(subDownload.stdout)
             raise ValueError("ERROR: Show not found")
         # Old 8flix stuff======================================
         # # Extract text from PDF
