@@ -164,37 +164,31 @@ def render_results():
 
     # ============File Upload===========
     if "searchFile" in request.form: #request.form['search_src'] == 'file':
-        # check if the post request has the file part
-        if 'vid_upload' not in request.files:
-            if not results or isinstance(results, str): # Check if results is an empty list or an error message
-                results = 'ERROR: No file part'
-            return render_template("results.html", result=results, query=quote)
-        file = request.files['vid_upload']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            if not results or isinstance(results, str):
-                results = 'ERROR: No file selected'
-            return render_template("results.html", result=results, query=quote)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(audioPath)
-            transcriber = FileExtractor(audioPath, MODEL)
-            transcriptList, length = transcriber.getTranscript()
-            tupleList = findStringInTranscript(transcriptList, quote.lower())
-            if not tupleList:
-                file_results = 'No results found.'
-            else:
-                file_results = formatTranscriptToDictionary("file", filename, tupleList)
-                file_results['length'] = int(length)
-                file_results = [file_results]
+        files = request.files.getlist('vid_upload[]')
+        for file in files:
+            if file.filename == '':
+                if not results or isinstance(results, str):
+                    results = 'ERROR: No file selected'
+                return render_template("results.html", result=results, query=quote)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                audioPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(audioPath)
+                transcriber = FileExtractor(audioPath, MODEL)
+                transcriptList, length = transcriber.getTranscript()
+                tupleList = findStringInTranscript(transcriptList, quote.lower())
+                if not tupleList:
+                    file_results = 'No results found.'
+                else:
+                    file_results = formatTranscriptToDictionary("file", filename, tupleList)
+                    file_results['length'] = int(length)
+                    file_results = [file_results]
 
-            if not isinstance(file_results, str): # check that the file search didn't result in no results or an error
-                if isinstance(results, str): # check if the youtube or search resulted in no results or an error
-                    results = [] # convert results back into a list if it was an error string
-                for video in file_results:
-                    results.insert(0, video) # Prepend file result to results list
+                if not isinstance(file_results, str): # check that the file search didn't result in no results or an error
+                    if isinstance(results, str): # check if the youtube or search resulted in no results or an error
+                        results = [] # convert results back into a list if it was an error string
+                    for video in file_results:
+                        results.insert(0, video) # Prepend file result to results list
         # else:
         #     results = 'ERROR: incorrect file format'
 

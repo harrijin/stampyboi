@@ -35,7 +35,7 @@
                   <label for="flix_source" style="display: none;">Netflix link (optional)</label>
                 </div>
                 <div id="fileUploadDiv" style="display: none;">
-                    <input type="file" id="vid_upload" name="vid_upload" disabled required>
+                    <input type="file" id="vid_upload" name="vid_upload[]" disabled required multiple>
                     <img src="/static/images/uploadIcon.png" alt="Upload Files Here" width="10%">
                     <h3 style="text-align: center;">Choose a file or drag it here</h3>
                 </div>
@@ -132,8 +132,7 @@
 
     $(document).ready(function(){
         $('#fileUploadDiv input').change(function () {
-            $('#fileUploadDiv h3').text("Selected file: " + this.value.split('\\').pop());
-            // this.files.length + " file(s) selected"
+            $('#fileUploadDiv h3').text(this.files.length + " file(s) selected");
         });
     });
 
