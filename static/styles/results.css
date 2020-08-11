@@ -4,6 +4,10 @@
     --tab-width: 50px;
 }
 
+a {
+    text-decoration: none;
+}
+
 .title {
     font-size: 25px;
     font-weight: bold;
@@ -44,6 +48,10 @@
     margin-bottom: 0px;
 }
 
+.yt > a > .info:hover {
+    color: #FFF;
+}
+
 .typetab {
     float: right;
     width: var(--tab-width);
@@ -63,22 +71,13 @@
 .yt > .typetab {
     background-color: red;
 }
-.yt {
-    border: 1px solid red;
-}
 
 .flix > .typetab {
     background-color: white;
 }
-.flix {
-    border: 1px solid white;
-}
 
 .file > .typetab {
     background-color: var(--ACCENT);
-}
-.file {
-    border: 1px solid var(--ACCENT);
 }
 
 /* Table stuff */

@@ -7,7 +7,10 @@
         </div>
         {% if doc['type'] == 'yt' %}
             <a class="title link" href='javascript:;' onclick='directToVideo({{info}}, "0")'>{{doc['title']}}</a>
-            <p class="info">{{doc['channel']}} • {{doc['date']}}</p>
+            <br>
+            <a href="{{'http://www.youtube.com/channel/' ~ doc['channelId']}}">
+                <span class="info">{{doc['length']}} • {{doc['channel']}} • {{doc['date']}} • {{doc['views']}}</span>
+            </a>
             <div id="wrap-timestamps">
                 <a class="thumbnail" href='javascript:;' onclick='directToVideo({{info}}, "0")'>
                     <img src="{{doc['thumb']}}" width=320 height=180 alt="thumbnail">

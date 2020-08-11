@@ -1,4 +1,4 @@
-import os, re, ast
+import os, re, ast, math
 from flask import Flask, send_file, request, flash, redirect, url_for, render_template, Markup, session, send_from_directory
 from werkzeug.utils import secure_filename
 import deepspeech
@@ -270,7 +270,8 @@ def utility():
     def time_string(sec):
         delta = datetime.timedelta(seconds=sec)
         stamp = (datetime.datetime.min + delta).time()
-        return stamp.strftime('%H:%M:%S')
+        stamp = stamp.strftime('%H:%M:%S') if stamp.hour > 0 else stamp.strftime('%M:%S')
+        return stamp
     def get_extension(filename):
         extension = os.path.splitext(filename)[1]
         return extension[1:], (extension in ALLOWED_VIDEO)
@@ -421,16 +422,49 @@ def formatTranscriptToDictionary(type, id, tupleList):
     return resultDict
 
 def getYouTubeInfo(id):
-    with urlopen('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + id + '&key=' + secret.yt_key) as response:
-        data = json.loads(response.read().decode())
-        info = data['items'][0]['snippet']
-        title = info['title']
-        channel = info['channelTitle']
-        date = info['publishedAt']
-        date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ').strftime('%b %-d, %Y')
-        thumb = info['thumbnails']['medium']['url']
-    if title and channel and date and thumb:
-        return {'title': title, 'channel': channel, 'date': date, 'thumb': thumb}
+    info = {}
+
+    apiUrl = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails'
+    fields = 'items(snippet(title,channelTitle,channelId,publishedAt,thumbnails/medium/url),statistics(viewCount),contentDetails(duration))'
+    with urlopen(f'{apiUrl}&id={id}&key={secret.yt_key}&fields={fields}') as response:
+        data = json.loads(response.read().decode())['items'][0]
+        snippet = data['snippet']
+        contentDetails = data['contentDetails']
+        statistics = data['statistics']
+
+        info['title'] = snippet['title']
+        info['channel'] = snippet['channelTitle']
+        info['channelId'] = snippet['channelId']
+        date = snippet['publishedAt']
+        date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ')
+        info['date'] = date.strftime('%b %-d, %Y')
+        info['thumb'] = snippet['thumbnails']['medium']['url']
+        length = contentDetails['duration']
+        length = [f'{int(chunk):02d}' for chunk in re.findall(r'\d+', length)]
+        info['length'] = ':'.join(length) # Format to H:M:S
+
+        views = int(statistics['viewCount'])
+        if views >= 1000:
+            power = int(math.log10(views))
+            unit = power - power % 3
+            views /= 10 ** unit
+
+            if power == unit:
+                significand = f'{views:.1f}'
+            else:
+                significand = f'{round(views):d}'
+
+            unitName = ''
+            unitNames = {3:'K', 6:'M', 9:'B', 12:'T'}
+            if unit in unitNames:
+                unitName = unitNames[unit]
+            
+            viewsString = f'{significand}{unitName} views'
+        else:
+            viewsString = f'{views} views'
+
+        info['views'] = viewsString
+    return info
 
 def getNetflixInfo(id):
     with open(NETFLIX_ID_DIRECTORY, "r") as file:
