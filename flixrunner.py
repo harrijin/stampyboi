@@ -1,5 +1,4 @@
 from transcribers.flix import FlixExtractor
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import os, pysolr
 
@@ -20,12 +19,8 @@ def extract(videoID):
     print(f'EXTRACT {videoID}')
     solr.add(transcriptJSON, commit=True)
     print(f'DONE    {videoID}')
-    
-executor = ThreadPoolExecutor()
 
 with open('flix.txt') as f:
     for line in f:
         id = line.rstrip()
-        executor.submit(extract, id)
-
-executor.shutdown()
+        extract(id)
