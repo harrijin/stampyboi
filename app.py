@@ -371,6 +371,9 @@ def search_solr(quote='', source='none', id='', url=None):
         #     docSzn = match.group(2)
         #     if docSzn != szn:
         #         continue
+        if not response['highlighting'][docID]['script']:   # Unindexed video
+            continue
+        print(response)
         highlightedScript = response['highlighting'][docID]['script'][0]
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
@@ -382,7 +385,7 @@ def search_solr(quote='', source='none', id='', url=None):
         results.append(videoInfo)
 
     count = response['response']['numFound']
-    if count == 0:
+    if len(results) == 0:
         results = "No results found."
 
     return results, count, connectionURL
@@ -438,6 +441,8 @@ def getYouTubeInfo(id):
         info['thumb'] = snippet['thumbnails']['medium']['url']
         length = contentDetails['duration']
         length = [f'{int(chunk):02d}' for chunk in re.findall(r'\d+', length)]
+        if len(length) == 1:    # Prevents single number if video is under 1 min
+            length.insert(0, '00')
         info['length'] = ':'.join(length) # Format to H:M:S
 
         views = int(statistics['viewCount'])
