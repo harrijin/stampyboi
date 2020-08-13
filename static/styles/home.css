@@ -8,11 +8,13 @@ Global constants defined in style.css.
 }*/
 img{
     display: block;
+}
+
+#logo{
     margin: 60 auto;
     margin-top: 25vh;
     width: 40vw;
 }
-
 
 input[name=quote] {
     width: 100%;
@@ -129,8 +131,8 @@ input[type="file"]{
 }
 
 #fileUploadDiv img{
-    margin-top: 5%;
-
+    margin: 0 auto;
+    margin-top: 4%;
 }
 
 input[type="checkbox"]{
