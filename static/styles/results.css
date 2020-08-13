@@ -13,6 +13,12 @@ a {
     font-weight: bold;
 }
 
+#counter {
+    font-size: 20px;
+    color: #BBB;
+    margin-left: 1%;
+}
+
 .result {
     height: var(--result-height);
     border-radius: 5px;

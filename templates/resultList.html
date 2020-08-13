@@ -1,3 +1,4 @@
+{% if result is not string %}
 {% for doc in result %}
     {% set id = doc['id'] %}
     {% set info = doc|tojson %}
@@ -86,12 +87,14 @@
     </div>
 {% endfor %}
 
-{% if start is not defined %}
-    {% set start = 10 %}
+{% if next_start is not defined %}
+    {% set next_start = 10 %}
 {% endif %}
 
-{% if count is defined and count is not none and count > start %}
-    <button id="load-more" class="result" onclick='loadMore({{connectionURL|tojson}}, {{count}}, {{start}})'>
+{% if is_load_more(results_info, next_start) %}
+    <button id="load-more" class="result" onclick='loadMore({{results_info|tojson}}, {{next_start}})'>
         Load More
     </button>
+{% endif %}
+
 {% endif %}

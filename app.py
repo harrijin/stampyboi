@@ -50,46 +50,13 @@ def render_index():
 
 @app.route('/results', methods=['POST'])
 def render_results():
-    # ENABLE IF TESTING WITHOUT SEARCH ENGINE *****************************************************************
-    DUMMY = False
-    if DUMMY:
-        longList = [
-            ('quote at 123 sec', 123),
-            ('quote at 234 sec', 234),
-            ('quote at 345 sec', 345),
-            ('quote at 456 sec, this one is really long and might have to go to the next line re9g8gheruhiadfjnhgfnjdfgdsfgdsfg aaaa aaaaaaaa aaaaaaaaaa aaaaaa aaaaa', 456),
-            ('quote at 567 sec', 567),
-            ('quote at 678 sec', 678),
-            ('quote at 789 sec', 789),
-            ('quote at 890 sec', 890),
-            ('quote at 900 sec', 900),
-            ('quote at 1001 sec', 1001),
-            ('quote at 1002 sec', 1002),
-            ('quote at 1004 sec', 1004),
-            ('quote at 1005 sec', 1005),
-            ('quote at 1007 sec', 1007),
-            ('quote at 1008 sec', 1008),
-            ('quote at 1020 sec', 1020),
-            ('quote at 1035 sec', 1035),
-        ]
-        results = [
-            {"type": "yt", "id": 'bS5P_LAqiVg', 'list':longList},
-            {"type": "yt", "id": 'eJ-T3i8Ap3U', 'list':[('quote one at 2 sec', 2),('quote two at 69', 69)]},
-            {"type": "yt", "id": 'rtgY1q0J_TQ', 'list':[('quote one at 4 sec', 4),('quote two at 42', 42)]},
-        ]
-        results[0].update(getYouTubeInfo('bS5P_LAqiVg'))
-        results[1].update(getYouTubeInfo('eJ-T3i8Ap3U'))
-        results[2].update(getYouTubeInfo('rtgY1q0J_TQ'))
-
-        return render_template("results.html", result=results, query=request.form['quote'], count=3)
-    # END OF DUMMY TEST*****************************************************************************************
     quote = request.form['quote']
     results = []
-    count, connectionURL = None, None
+    results_info = [] # Tuples (count, connectionURL)
     # ===============Database Search===============
     if ("searchYt" not in request.form and "searchFlix" not in request.form and "searchFile" not in request.form): #request.form['search_src'] == 'none':
         results, count, connectionURL = search_solr(quote)
-        return render_template("results.html", result=results, query=quote, count=count, connectionURL=connectionURL)
+        return render_template("results.html", result=results, query=quote, results_info=[(count, connectionURL)])
     # =============YouTube=============
     if "searchYt" in request.form: #request.form['search_src'] == 'yt':
         source = request.form['yt_source']
@@ -115,6 +82,10 @@ def render_results():
                 results = "ERROR: Invalid YouTube link"
         else:
             results, count, connectionURL = search_solr(quote,'yt')
+        
+        if not isinstance(results, str):
+            results_info.append((count, connectionURL))
+
     # =============Netflix==============
     if "searchFlix" in request.form: #request.form['search_src'] == 'flix':
         source = request.form['flix_source']
@@ -157,6 +128,7 @@ def render_results():
         #     solr_results = search_solr(quote,'flix')
 
         if not isinstance(solr_results, str): # check that the netflix search didn't result in no results or an error
+            results_info.append((count, connectionURL))
             if isinstance(results, str): # check if the youtube search resulted in no results or an error
                 results = [] # convert results back into a list if it was an error string
             for video in solr_results:
@@ -165,6 +137,7 @@ def render_results():
     # ============File Upload===========
     if "searchFile" in request.form: #request.form['search_src'] == 'file':
         files = request.files.getlist('vid_upload[]')
+        file_results = []
         for file in files:
             if file.filename == '':
                 if not results or isinstance(results, str):
@@ -177,24 +150,19 @@ def render_results():
                 transcriber = FileExtractor(audioPath, MODEL)
                 transcriptList, length = transcriber.getTranscript()
                 tupleList = findStringInTranscript(transcriptList, quote.lower())
-                if not tupleList:
-                    file_results = 'No results found.'
-                else:
-                    file_results = formatTranscriptToDictionary("file", filename, tupleList)
-                    file_results['length'] = int(length)
-                    file_results = [file_results]
+                if tupleList:
+                    file_result = formatTranscriptToDictionary("file", filename, tupleList)
+                    file_result['length'] = int(length)
+                    file_results.append(file_result)
 
-                if not isinstance(file_results, str): # check that the file search didn't result in no results or an error
-                    if isinstance(results, str): # check if the youtube or search resulted in no results or an error
-                        results = [] # convert results back into a list if it was an error string
-                    for video in file_results:
-                        results.insert(0, video) # Prepend file result to results list
-        # else:
-        #     results = 'ERROR: incorrect file format'
+        if isinstance(results, str): # check if the youtube or search resulted in no results or an error
+            results = [] # convert results back into a list if it was an error string
+        results[0:0] = file_results
+        results_info.append((len(file_results), None))
 
     if not results: # Checkif results is still an empty list
         results = "No results found."
-    return render_template("results.html", result=results, query=quote, count=count, connectionURL=connectionURL)
+    return render_template("results.html", result=results, query=quote, results_info=results_info)
 
 @app.route('/suggest', methods=['POST'])
 def get_suggestions():
@@ -241,14 +209,16 @@ def receive_video():
 @app.route('/load', methods=['POST'])
 def load_more():
     info = request.json
-    count = info['count']
+    results_info = info['results_info']
     start = info['start']
-    url = info['url'] + '&start=' + str(start)
-    start += 10
+    results = []
 
-    results = search_solr(url=url)[0]
+    for entry in results_info:
+        if entry[0] > start and entry[1] is not None:
+            url = f'{entry[1]}&start={str(start)}'
+            results.extend(search_solr(url=url)[0])
 
-    return render_template('resultList.html', result=results, count=count, connectionURL=info['url'], start=start)
+    return render_template('resultList.html', result=results, results_info=results_info, next_start=start+10)
 
 @app.route('/uploads/<path:filename>')
 def download_file(filename):
@@ -276,7 +246,18 @@ def utility():
                 return map[typeCode] + id + '?t=' + str(sec)
             return map[typeCode] + id
         return ''
-    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string, get_video_link=get_video_link)
+    def total_count(results_info):
+        count = 0
+        for entry in results_info:
+            count += entry[0]
+        return count
+    def is_load_more(results_info, start):
+        for entry in results_info:
+            if entry[0] > start and entry[1] is not None:
+                return True
+        return False
+    return dict(time_string=time_string, get_extension=get_extension, to_type_string=to_type_string, \
+    get_video_link=get_video_link, is_load_more=is_load_more, total_count=total_count)
 
 # ==============Helper Methods==============
 
@@ -362,6 +343,7 @@ def search_solr(quote='', source='none', id='', url=None):
         return "Sorry, the search server is currently down.", None, None
 
     results = []
+    count = response['response']['numFound']
     # search_netflix_season = 'szn' in locals() # Check if results should be filtered by season
 
     for document in response['response']['docs']:
@@ -372,8 +354,8 @@ def search_solr(quote='', source='none', id='', url=None):
         #     if docSzn != szn:
         #         continue
         if not response['highlighting'][docID]['script']:   # Unindexed video
+            count -= 1
             continue
-        print(response)
         highlightedScript = response['highlighting'][docID]['script'][0]
         highlights = extractHighlights(highlightedScript, document['times'])
         videoInfo = formatTranscriptToDictionary(document['type'], docID, highlights)
@@ -384,7 +366,6 @@ def search_solr(quote='', source='none', id='', url=None):
         videoInfo.update(info)
         results.append(videoInfo)
 
-    count = response['response']['numFound']
     if len(results) == 0:
         results = "No results found."
 

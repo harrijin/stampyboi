@@ -22,9 +22,17 @@
         </div>
         <input type='submit' value="Search">
     </form>
-    <div id='spellchecking' class="select">
 
-    </div>
+    {% if result is not string %}
+        {% set count = total_count(results_info) %}
+        {% if count == 1 %}
+            <div id='counter'><b>1 result found</b></div>
+        {% else %}
+            <div id='counter'><b>{{count}} results found</b></div>
+        {% endif %}
+    {% endif %}
+
+    <div id='spellchecking' class="select"></div>
 
     <div id='results-container'>
     {% if result is not string %}
