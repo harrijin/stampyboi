@@ -30,7 +30,7 @@
                             <tr onclick="setActive(this);seek('{{sec}}');">
                             {% endif %}
                                 <td>{{text}}</td>
-                                <td class="timestamp" data-sec={{sec}}>{{time_string(sec)}}</td>
+                                <td class="timestamp" data-sec='{{sec}}''>{{time_string(sec)}}</td>
                             </tr>
 
                         {% endfor %}
@@ -166,8 +166,8 @@
                 if (result){
                     var dummy = document.createElement("textarea");
                     document.body.appendChild(dummy);
-                    var minutes = (+a[0]) * 60 + (+a[1]);
-                    var sec_60 = (+a[2]);
+                    var minutes = Math.floor(seconds / 60);
+                    var sec_60 = seconds % 60;
                     dummy.textContent = minutes + ":" + sec_60;
                     dummy.select();
                     document.execCommand("copy");
@@ -179,8 +179,8 @@
         }
     }
     function goToNetflix(){
-        var a = $('.activeStamp .timestamp').html().split(':');
-        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+        var a = $('.activeStamp .timestamp');
+        var seconds = a.attr('data-sec');
         window.open("https://www.netflix.com/watch/{{doc['id']}}?t="+seconds,"_blank");
     }
 </script>
