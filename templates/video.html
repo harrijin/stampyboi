@@ -30,7 +30,7 @@
                             <tr onclick="setActive(this);seek('{{sec}}');">
                             {% endif %}
                                 <td>{{text}}</td>
-                                <td class="timestamp" data-sec='{{sec}}''>{{time_string(sec)}}</td>
+                                <td class="timestamp" data-sec='{{sec}}'>{{time_string(sec)}}</td>
                             </tr>
 
                         {% endfor %}
@@ -57,7 +57,7 @@
                             <tr onclick="setActive(this); $('#outgoing-time').html(' {{time_string(sec)}}');">
                             {% endif %}
                                 <td>{{text}}</td>
-                                <td class="timestamp">{{time_string(sec)}}</td>
+                                <td class="timestamp" data-sec='{{sec}}'>{{time_string(sec)}}</td>
                             </tr>
 
                         {% endfor %}
