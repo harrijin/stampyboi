@@ -3,6 +3,7 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/results.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico')  }}">
+    <script type="text/javascript" src="{{url_for('static', filename='results.js')}}"></script>
   </head>
   <body>
 
@@ -35,6 +36,9 @@
         <h2>{{result}}</h2>
         <p> Make sure your quote is correct or try providing a video source for us to search</p>
     </div>
+    <script>
+        check_spelling();
+    </script>
     {% endif %}
     </div>
     <script src="http://www.youtube.com/player_api"></script>
@@ -52,9 +56,7 @@
     <script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='results.js')}}"></script>
     <script>
-        check_spelling();
         function suggest(){
             var userIn=encodeURIComponent(document.getElementById('quote').value);
             var suggestRequest = new XMLHttpRequest();
