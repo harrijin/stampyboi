@@ -64,13 +64,13 @@ function directToVideo(info, stampIndex) {
     });
 }
 
-function loadMore(url, count, start) {
+function loadMore(resultsInfo, start) {
     var loadElement = document.getElementById('load-more');
     loadElement.onclick = null;
     loadElement.disabled = true;
     loadElement.innerHTML = 'Loading...';
     
-    var info = {url:url, count:count, start:start};
+    var info = {results_info:resultsInfo, start:start};
 
     $.ajax({
         url: '/load',
