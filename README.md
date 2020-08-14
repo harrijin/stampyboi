@@ -60,3 +60,8 @@ Simply type a quote from a YouTube video or Netflix show you're looking for and 
 - [YouTube Transcript API](https://github.com/jdepoix/youtube-transcript-api)
 - [DeepSpeech](https://deepspeech.readthedocs.io/en/v0.7.3/?badge=latest)
 - [MoviePy](https://zulko.github.io/moviepy/ref/ref.html)
+
+# Data Sources
+
+- [YouTube8M](https://research.google.com/youtube8m/)
+- [Netflix ID Dataset](https://healdb.tech/blog/netflix.html)
