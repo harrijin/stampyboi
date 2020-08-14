@@ -60,6 +60,9 @@ Simply type a quote from a YouTube video or Netflix show you're looking for and 
 
 # Demo Video
 
+[![Demo video](https://img.youtube.com/vi/xx477XOz5H4/0.jpg)](http://www.youtube.com/watch?v=xx477XOz5H4)
+
+
 # How Stampyboi works
 
 Stampyboi indexes videos by extracting and storing their timestamped transcripts. When a query is submitted to Stampyboi, it searches its expansive index of over 330,000 videos to find transcripts containing the queried phrase. When a video link is specified, Stampyboi first checks to see if that video is stored in its index. If the video is found, Stampyboi will filter the results to only show that specific video. If not, the video is transcribed, indexed, then searched for the queried phrase (user-uploaded video/audio files are searched and then immediately deleted from the server). That video will now show up in the results when future users make general queries. 
