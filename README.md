@@ -12,12 +12,14 @@ Stampyboi is a tool to help you quickly and easily find the timestamped video cl
 
 # Features
 
-- Autosuggester, generated from the Stampyboi's database so that suggestions are guaranteed to return results. 
-- Spellcheck
-- Word stemmer
-- Stop word filter
-- Phonetic matching filter
 - Easy file uploads
+- Easy conversion to .gif format
+- Easy sharing to Facebook, Twitter, Reddit, and other social media
+- Autosuggester: generated from the Stampyboi's index so that suggestions are guaranteed to return results
+- Spellcheck: also generated from Stampyboi's index
+- Word stemmer: [Porter Stemming Algorithm](https://tartarus.org/martin/PorterStemmer/def.txt)
+- Stop word filter: [List of stampyboi stopwords](https://github.com/harrijin/stampyboi/solrConfig/stopwords.txt)
+- Phonetic matching filter: [Double metaphone algorithm](https://en.wikipedia.org/wiki/Metaphone#Double_Metaphone)
 
 # Usage
 
@@ -45,7 +47,6 @@ SCREENSHOT OF RESULTS
 - Stampyboi logo: Returns user to search page.
 - Quote search bar (top right): Allows user to submit a new general query.
 - Video result: Shows thumbnail, title, and list of timestamps that match the query. The user can jump to a specific part of the video by selecting the desired timestamp. Selecting the right-hand tab will link directly to the source video.
-- "Load more" button: Allows user to load more results for the current query.
 
 SCREENSHOT OF VIDEO
 
