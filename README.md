@@ -6,9 +6,14 @@ Stampyboi is a tool to help you quickly and easily find the timestamped video cl
 
 # Table of Contents
 
-
-
-# Demo Video
+- [Features](#features)
+- [Usage](#usage)
+  * [Quick Start](#quick-start)
+  * [Details](#details)
+- [Demo Video](#demo-video)
+- [How Stampyboi works](#how-stampyboi-works)
+  * [Core Technologies](#core-technologies)
+  * [Data Sources](#data-sources)
 
 # Features
 
@@ -52,6 +57,8 @@ Simply type a quote from a YouTube video or Netflix show you're looking for and 
 
 - List of timestamps: Selecting the desired timestamp allows the user to seek to a specific part of the video.
 - Share this boi (Netflix or YouTube videos only): Allows user to copy the currently selected timestamped link or share the currently selected timestamped link to Facebook, Twitter, or Reddit. YouTube videos also have the option of being converted into gifs.
+
+# Demo Video
 
 # How Stampyboi works
 
